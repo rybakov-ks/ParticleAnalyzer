@@ -24,8 +24,18 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 - Eccentricity (unitless)
 - Intensity values (grayscale units)
 
-*Note: Micrometer values are calculated using the SEM image's scale bar or known pixel-to-µm ratio*
-
 ### Size Distribution Visualization
 ![Distribution Plots](Images/3.png)
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
+
+## Scale Calibration
+Micrometer values are calculated by:
+1. Identifying the SEM image's scale bar using two marker points
+2. Manually specifying the known real-world distance between markers
+3. Automatically computing the pixel-to-µm conversion ratio
+
+*Note: For accurate µm measurements, please ensure:*
+- The scale bar is clearly visible in your image
+- You input the correct reference distance when prompted
+- The scale bar was created at the same magnification as your particles
+
