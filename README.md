@@ -11,6 +11,8 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 - Interactive visualization of size distributions
 - Web-based interface for easy accessibility
 - **Dual-unit display**: toggle between pixels and micrometers (µm)
+- **Multiple AI models** supported (YOLOv8, YOLOv9, Detectron2)
+- **Advanced settings** for precision tuning
 - **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
 ## Analysis Outputs
@@ -28,6 +30,20 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 ![Distribution Plots](Images/3.png)\
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
 
+### Advanced Settings Panel
+![Settings Menu](Images/4.png)\
+*Configuration options include:*
+- **Model Selection**: YOLOv11, YOLOv12, Detectron2
+- **SAHI Mode**: Enable/disable sliced inference for large images
+- **Detection Threshold**: Confidence level (0-1)
+- **IOU Threshold**: Overlap threshold for NMS (0-1)
+- **Max Detections**: Maximum number of particles to detect
+- **Scaling Mode**: Pixel/µm unit selection
+- **Image Resolution**: Output resolution control
+- **Result Rounding**: Decimal places for metrics
+- **Single Particle Mode**: Detailed individual analysis
+- **Histogram Bins**: Number of intervals for distribution plots
+
 ## Scale Calibration
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
@@ -38,4 +54,3 @@ Micrometer values are calculated by:
 - The scale bar is clearly visible in your image
 - You input the correct reference distance when prompted
 - The scale bar was created at the same magnification as your particles
-
