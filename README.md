@@ -1,6 +1,6 @@
 # ParticleAnalyzer
 
-A Computer Vision-based tool for automatic segmentation and size analysis of particles in SEM (Scanning Electron Microscope) images.
+A Computer Vision-based tool for automatic segmentation and size analysis of particles in Scanning Electron Microscope (SEM) images.
 
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 ![Demo](Images/1.png)
