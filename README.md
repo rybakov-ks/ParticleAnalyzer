@@ -45,6 +45,7 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 - **Histogram Bins**: Number of intervals for distribution plots
 
 ## Scale Calibration
+![Scale Calibration](Images/5.png)\
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
 2. Manually specifying the known real-world distance between markers
