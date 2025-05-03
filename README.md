@@ -11,7 +11,7 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 - Interactive visualization of size distributions
 - Web-based interface for easy accessibility
 - **Dual-unit display**: toggle between pixels and micrometers (µm)
-- **Multiple AI models** supported (YOLOv8, YOLOv9, Detectron2)
+- **Multiple AI models** supported (YOLOv11, YOLOv12, Detectron2)
 - **Advanced settings** for precision tuning
 - **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
