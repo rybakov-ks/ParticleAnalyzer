@@ -16,7 +16,7 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 ## Analysis Outputs
 
 ### Statistical Data Table
-![Statistics Table](Images/2.png)
+![Statistics Table](Images/2.png)\
 *Comprehensive metrics including mean, median, min/max, standard deviation values for:*
 - Area (px² or µm²)
 - Perimeter (px or µm)
@@ -25,7 +25,7 @@ A Computer Vision-based tool for automatic segmentation and size analysis of par
 - Intensity values (grayscale units)
 
 ### Size Distribution Visualization
-![Distribution Plots](Images/3.png)
+![Distribution Plots](Images/3.png)\
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
 
 ## Scale Calibration
