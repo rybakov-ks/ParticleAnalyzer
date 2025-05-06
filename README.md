@@ -51,7 +51,7 @@ Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
 2. Manually specifying the known real-world distance between markers
 3. Automatically computing the pixel-to-µm conversion ratio
-![Real Scale](Images/7.png)
+![Real Scale](Images/7.png)\
 *Note: For accurate µm measurements, please ensure:*
 - The scale bar is clearly visible in your image
 - You input the correct reference distance when prompted
