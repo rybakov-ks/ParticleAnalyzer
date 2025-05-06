@@ -35,6 +35,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 *Configuration options include:*
 - **Model Selection**: YOLOv11, YOLOv12, Detectron2
 - **SAHI Mode**: Enable/disable sliced inference for large images
+![SAHI Mode](Images/6.gif)
 - **Detection Threshold**: Confidence level (0-1)
 - **IOU Threshold**: Overlap threshold for NMS (0-1)
 - **Max Detections**: Maximum number of particles to detect
