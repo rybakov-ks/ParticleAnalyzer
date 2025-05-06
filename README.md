@@ -30,7 +30,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 ![Distribution Plots](Images/3.png)\
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
 
-### Advanced Settings Panel
+## Advanced Settings Panel
 ![Settings Menu](Images/4.png)\
 *Configuration options include:*
 - **Model Selection**: YOLOv11, YOLOv12, Detectron2
