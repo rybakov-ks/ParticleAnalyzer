@@ -1,0 +1,14 @@
+detectron2==0.6
+gradio==5.32.0
+matplotlib==3.10.3
+numpy==2.2.6
+opencv_python==4.10.0.84
+opencv_python_headless==4.11.0.86
+pandas==2.2.3
+Pillow==11.2.1
+plotly==6.0.0
+sahi==0.11.23
+scipy==1.15.3
+torch==2.6.0+cu118
+tqdm==4.67.1
+ultralytics==8.3.142
