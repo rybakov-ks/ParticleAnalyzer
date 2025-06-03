@@ -1,15 +1,16 @@
-## 📖 Table of Contents
-- [ParticleAnalyzer](#-particle-analyzer)
-- [Installation Guide](#-installation-guide)
-  - [Prerequisites](#prerequisites)
-  - [Step-by-Step Setup](#step-by-step-setup)
-- [Launching the Application](#-launching-the-application)
-- [Key Features](#-key-features)
-- [Analysis Outputs](#-analysis-outputs)
-  - [Statistical Data Table](#statistical-data-table)
-  - [Size Distribution Visualization](#size-distribution-visualization)
-- [Advanced Settings](#-advanced-settings-panel)
-- [Scale Calibration](#-scale-calibration)
+## 📑 Table of Contents
+
+1. 🔎 [ParticleAnalyzer](#-particle-analyzer)
+2. 📥 [Installation Guide](#-installation-guide)
+   - [Prerequisites](#prerequisites)
+   - [Step-by-Step Setup](#step-by-step-setup)
+3. 🚀 [Launching the Application](#-launching-the-application)
+4. ✨ [Key Features](#-key-features)
+5. 📊 [Analysis Outputs](#-analysis-outputs)
+   - [Statistical Data Table](#statistical-data-table)
+   - [Size Distribution Visualization](#size-distribution-visualization)
+6. ⚙️ [Advanced Settings](#-advanced-settings)
+7. 📏 [Scale Calibration](#-scale-calibration)
 
 # ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
