@@ -41,7 +41,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
    **There may be problems with the installation of Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
 3. **Download AI models (3.4GB)**:
-   - Download model weights from our [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing).
+   - Download model weights from [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing).
    - Place files in model/ directory:
    ```bash
       model/
