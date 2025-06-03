@@ -1,6 +1,6 @@
 ## 📑 Table of Contents
 
-1. 🔎 [ParticleAnalyzer](#-particleanalyzer)
+1. 🔎 [ParticleAnalyzer](#particleanalyzer)
 2. 📥 [Installation Guide](#-installation-guide)
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
