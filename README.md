@@ -16,7 +16,9 @@
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 
 A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images
-![Demo](Images/1.png)
+<p align="center">
+  <img src="Images/1.png" alt="Demo">
+</p>
 
 ## 🛠 Installation Guide
 
@@ -65,7 +67,10 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
 2. Access the interface:
    - Open in browser: http://127.0.0.1:8000
-![Launching the Application](Images/example.gif)   
+<p align="center">
+  <img src="Images/example.gif" alt="Launching the Application">
+</p>
+ 
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
 - Comprehensive statistical analysis of particle characteristics
@@ -79,7 +84,10 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 ## 📊 Analysis Outputs
 
 ### Statistical Data Table
-![Statistics Table](Images/2.png)\
+<div align="center">
+  <img src="Images/2.png" alt="Statistics Table">
+</div>
+
 *Comprehensive metrics including mean, median, min/max, standard deviation values for:*
 - Area (px² or µm²)
 - Perimeter (px or µm)
@@ -88,15 +96,24 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - Intensity values (grayscale units)
 
 ### Size Distribution Visualization
-![Distribution Plots](Images/3.png)\
+<div align="center">
+  <img src="Images/3.png" alt="Distribution Plots">
+</div>
+
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
 
 ## Advanced Settings Panel
-![Settings Menu](Images/4.png)\
+<div align="center">
+  <img src="Images/4.png" alt="Settings Menu">
+</div>
+
 *Configuration options include:*
 - **Model Selection**: YOLOv11, YOLOv12, Detectron2
 - **SAHI Mode**: Enable/disable sliced inference for large images
-![SAHI Mode](Images/6.gif)
+<div align="center">
+  <img src="Images/6.gif" alt="SAHI Mode">
+</div>
+
 - **Detection Threshold**: Confidence level (0-1)
 - **IOU Threshold**: Overlap threshold for NMS (0-1)
 - **Max Detections**: Maximum number of particles to detect
@@ -107,12 +124,18 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - **Histogram Bins**: Number of intervals for distribution plots
 
 ## 📐 Scale Calibration
-![Scale Calibration](Images/5.png)\
+<div align="center">
+  <img src="Images/5.png" alt="Scale Calibration">
+</div>
+
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
 2. Manually specifying the known real-world distance between markers
 3. Automatically computing the pixel-to-µm conversion ratio
-![Real Scale](Images/7.png)\
+<div align="center">
+  <img src="Images/7.png" alt="Real Scale">
+</div>
+
 *Note: For accurate µm measurements, please ensure:*
 - The scale bar is clearly visible in your image
 - You input the correct reference distance when prompted
