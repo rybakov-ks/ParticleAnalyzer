@@ -5,7 +5,69 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 ![Demo](Images/1.png)
 
-## Key Features
+## 📖 Table of Contents
+- [Installation Guide](#-installation-guide)
+  - [Prerequisites](#prerequisites)
+  - [Step-by-Step Setup](#step-by-step-setup)
+- [Launching the Application](#-launching-the-application)
+- [Key Features](#-key-features)
+- [Analysis Outputs](#-analysis-outputs)
+  - [Statistical Data Table](#statistical-data-table)
+  - [Size Distribution Visualization](#size-distribution-visualization)
+- [Advanced Settings](#-advanced-settings-panel)
+- [Scale Calibration](#-scale-calibration)
+
+---
+
+## 🛠 Installation Guide
+
+### Prerequisites
+- Python 3.10 or higher
+- NVIDIA GPU with CUDA support (recommended)
+- 16GB+ RAM for optimal performance
+- **10GB+** free disk space for models
+
+### Step-by-Step Setup
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/your-username/ParticleAnalyzer.git
+   ```
+   ```bash
+   cd ParticleAnalyzer
+   ```
+2. **Install dependencies**:
+   ```python
+   pip install -r requirements.txt
+   ```
+   **There may be problems with the installation of Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
+3. **Download AI models (3.4GB)**:
+   - Download model weights from our [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing).
+   - Place files in model/ directory:
+   ```bash
+      model/
+      ├── Yolo11_d1.pt
+      ├── Yolo11_d2.pt
+      ├── Yolo12_d1.pt
+      ├── Yolo12_d2.pt
+      ├── faster_rcnn_R_101_FPN_3x.pth
+      ├── faster_rcnn_X_101_32x8d_FPN_3x.pth
+      ├── cascade_mask_rcnn_R_50_FPN_3x.pth
+      ├── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.pth
+      ├── faster_rcnn_R_101_FPN_3x.yaml
+      ├── faster_rcnn_X_101_32x8d_FPN_3x.yaml
+      ├── cascade_mask_rcnn_R_50_FPN_3x.yaml
+      └── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml
+   ```
+## 🚀 Launching the Application
+1. Run the server:
+   ```python
+   python app.py
+   ```
+2. Access the interface:
+   - Open in browser: http://127.0.0.1:8000
+![Launching the Application](Images/example.gif)   
+## ✨ Key Features
 - Automated particle segmentation in SEM images
 - Comprehensive statistical analysis of particle characteristics
 - Interactive visualization of size distributions
@@ -15,7 +77,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - **Advanced settings** for precision tuning
 - **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
-## Analysis Outputs
+## 📊 Analysis Outputs
 
 ### Statistical Data Table
 ![Statistics Table](Images/2.png)\
@@ -45,7 +107,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - **Single Particle Mode**: Detailed individual analysis
 - **Histogram Bins**: Number of intervals for distribution plots
 
-## Scale Calibration
+## 📐 Scale Calibration
 ![Scale Calibration](Images/5.png)\
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
