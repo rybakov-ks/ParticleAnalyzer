@@ -1,11 +1,5 @@
-# ParticleAnalyzer
-
-A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images
-
-[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
-![Demo](Images/1.png)
-
 ## 📖 Table of Contents
+- [ParticleAnalyzer](#-particle-analyzer)
 - [Installation Guide](#-installation-guide)
   - [Prerequisites](#prerequisites)
   - [Step-by-Step Setup](#step-by-step-setup)
@@ -17,7 +11,11 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - [Advanced Settings](#-advanced-settings-panel)
 - [Scale Calibration](#-scale-calibration)
 
----
+# ParticleAnalyzer
+[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
+
+A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images
+![Demo](Images/1.png)
 
 ## 🛠 Installation Guide
 
