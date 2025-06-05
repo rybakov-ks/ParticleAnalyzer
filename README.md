@@ -17,7 +17,7 @@
 
 A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images
 <p align="center">
-  <img src="Images/1.png" alt="Demo">
+  <img src="Images/example.gif" alt="Launching the Application">
 </p>
 
 ## 🛠 Installation Guide
@@ -67,9 +67,6 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
 2. Access the interface:
    - Open in browser: http://127.0.0.1:8000
-<p align="center">
-  <img src="Images/example.gif" alt="Launching the Application">
-</p>
  
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
