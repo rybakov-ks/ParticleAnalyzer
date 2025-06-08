@@ -1,4 +1,5 @@
 from core.ui import create_interface
+from core.languages import i18n
 
 def main():
     demo = create_interface()
@@ -10,6 +11,7 @@ def main():
         server_port=8000,
         pwa=True,
         favicon_path="assets/icon/search-solid.png",
+        i18n=i18n
     )
 
 if __name__ == "__main__":

@@ -19,15 +19,20 @@ from core.ModelManager import ModelManager
 from core.CustomDetectron2Model import CustomDetectron2Model
 from core.ImagePreprocessor import ImagePreprocessor
 from core.StatisticsBuilder import StatisticsBuilder
+from core.languages import translations
+from core.language_context import LanguageContext
 
+lang = 'ru'
 
 class ParticleAnalyzer:
-    def __init__(self):
+    def __init__(self, default_lang='ru'):
         """Инициализация анализатора частиц с настройкой окружения"""
         self._setup_environment()
         self.model_manager = ModelManager()
         self.preprocessor = ImagePreprocessor()
         self.error_return = self._create_error_return()
+        self.default_lang = default_lang
+        LanguageContext.set_language(default_lang)  # Устанавливаем язык в контекст
 
     def _setup_environment(self):
         """Настройка параметров окружения и CUDA"""
@@ -35,6 +40,28 @@ class ParticleAnalyzer:
         torch.set_default_device("cuda")
         torch.backends.cudnn.enabled = True
         torch.backends.cudnn.benchmark = True
+
+    def _get_translation(self, text):
+        """Получение перевода текста на текущий язык"""
+        return translations.get(self.lang, translations[self.default_lang]).get(text, text)
+
+    def _determine_language(self, accept_language: str):
+        """Определение языка на основе заголовка Accept-Language"""
+        if not accept_language:
+            return self.default_lang
+            
+        lang_code = accept_language.split(",")[0].lower()
+        
+        language_mapping = {
+            'en-us': 'en',
+            'ru': 'ru',
+            'zh-cn': 'zh-cn',
+            'zh-tw': 'zh-tw'
+        }
+        
+        # Проверяем полное совпадение, затем только язык (например 'en' из 'en-us')
+        return language_mapping.get(lang_code, 
+               language_mapping.get(lang_code.split('-')[0], self.default_lang))
 
     def _create_error_return(self) -> Tuple:
         """Создает кортеж для возврата в случае ошибки"""
@@ -57,24 +84,29 @@ class ParticleAnalyzer:
         """
         Основной метод для анализа изображения.
         """
+        lang = self._determine_language(request.headers.get("Accept-Language", ""))
+        LanguageContext.set_language(lang) 
+        self.lang = lang  # Для обратной совместимости
+        
         try:
-            pbar = tqdm(total=5, desc="Подготовка...", 
+            pbar = tqdm(total=5, desc=self._get_translation("Подготовка..."), 
                        bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]')
             
-            image, orig_image, gray_image, scale = self.preprocessor.preprocess_image(
+            image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
                 image=image,
                 image2=image2,
                 scale_selector=scale_selector,
                 solution=solution,
                 request=request,
                 pbar=pbar,
-                sahi_mode=sahi_mode
+                sahi_mode=sahi_mode,
+                lang=self.lang
             )
 
             if image is None or (isinstance(image, np.ndarray) and image.size == 0):
-                gr.Warning("Ошибка: изображение отсутствует...")
+                gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
                 return self._create_error_return() 
-            if not scale and scale_selector == 'Шкала прибора в мкм':
+            if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
                 return self._create_error_return()
                 
             # Выбор стратегии обработки
@@ -85,17 +117,17 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio, 
-                    pbar, orig_image, gray_image, scale)
+                    pbar, orig_image, gray_image, scale, scale_factor_glob)
 
             output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
             df = pd.DataFrame(particle_data)
 
-            pbar.set_description("Построение таблицы...")
-            builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins)
+            pbar.set_description(self._get_translation("Построение таблицы..."))
+            builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins, lang=self.lang)
             stats_df = builder.build_stats_table()
             pbar.update(1)
 
-            pbar.set_description("Построение графиков...")
+            pbar.set_description(self._get_translation("Построение графиков..."))
             fig = builder.build_distribution_fig()
             pbar.update(1)
             
@@ -130,10 +162,10 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio, 
-                    pbar, orig_image, gray_image, scale):
+                    pbar, orig_image, gray_image, scale, scale_factor_glob):
         """Обработка с использованием YOLO"""
         model = self.model_manager.get_model(model_change)
-        pbar.set_description("YOLO обрабатывает изображение...")
+        pbar.set_description(self._get_translation("YOLO обрабатывает изображение..."))
         
         try:
             with torch.no_grad():
@@ -154,13 +186,13 @@ class ParticleAnalyzer:
             torch.cuda.synchronize()
 
         if len(results[0].boxes) == 0:
-            gr.Info("Объекты не обнаружены.")
+            gr.Info(self._get_translation("Объекты не обнаружены."))
             return Error
         elif len(results[0].boxes) == number_detections:
-           gr.Info("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках.")
+           gr.Info(self._get_translation("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."))
         pbar.update(1)
         
-        pbar.set_description("Обработка частиц...")
+        pbar.set_description(self._get_translation("Обработка частиц..."))
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(output_image.shape[1], output_image.shape[0])
         particle_counter, particle_data, annotations = 1, [], []
@@ -179,7 +211,8 @@ class ParticleAnalyzer:
                         thickness=thickness,
                         particle_data=particle_data,
                         annotations=annotations,
-                        raw_mask=mask2
+                        raw_mask=mask2,
+                        scale_factor_glob=scale_factor_glob
                     )
         pbar.update(1)  
         return output_image, particle_data, annotations
@@ -190,14 +223,14 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio,
-                    pbar, orig_image, gray_image, scale) -> Dict:
+                    pbar, orig_image, gray_image, scale, scale_factor_glob):
         """Обработка с использованием Detectron2"""
         cfg = self.model_manager.get_model(model_change)
         cfg.TEST.DETECTIONS_PER_IMAGE = number_detections
         cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence_threshold
         cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = confidence_iou
 
-        pbar.set_description("Detectron2 обрабатывает изображение...")
+        pbar.set_description(self._get_translation("Detectron2 обрабатывает изображение..."))
         try:
             predictor = DefaultPredictor(cfg)
             results = predictor(image)
@@ -206,13 +239,13 @@ class ParticleAnalyzer:
             self._handle_error(e)
             return self._create_error_return()
         if len(masks) == 0:
-            gr.Info("Объекты не обнаружены.")
+            gr.Info(self._get_translation("Объекты не обнаружены."))
             return self._create_error_return()
         elif len(masks) == number_detections:
-            gr.Info("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках.")
+            gr.Info(self._get_translation("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."))
         pbar.update(1)
         
-        pbar.set_description("Обработка частиц...")
+        pbar.set_description(self._get_translation("Обработка частиц..."))
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(output_image.shape[1], output_image.shape[0])
         particle_counter, particle_data, annotations = 1, [], []
@@ -234,7 +267,8 @@ class ParticleAnalyzer:
                 thickness=thickness,
                 particle_data=particle_data,
                 annotations=annotations,
-                raw_mask=mask
+                raw_mask=mask,
+                scale_factor_glob=scale_factor_glob
             )
         pbar.update(1)    
         return output_image, particle_data, annotations 
@@ -245,7 +279,7 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio,
-                    pbar, orig_image, gray_image, scale) -> Dict:
+                    pbar, orig_image, gray_image, scale, scale_factor_glob):
         """Обработка с использованием SAHI"""
         model_type = self.model_manager.model_types[model_change]
        
@@ -264,7 +298,7 @@ class ParticleAnalyzer:
                 device="cuda",
             )
 
-        pbar.set_description("SAHI обрабатывает изображение...")
+        pbar.set_description(self._get_translation("SAHI обрабатывает изображение..."))
         try:
             results = get_sliced_prediction(
                 image,
@@ -280,11 +314,11 @@ class ParticleAnalyzer:
             self._handle_gpu_error(e)
             return self._create_error_return()        
         if len(results.object_prediction_list) == 0:
-            gr.Info("Объекты не обнаружены.")
+            gr.Info(self._get_translation("Объекты не обнаружены."))
             return self._create_error_return()
         pbar.update(1) 
         
-        pbar.set_description("Обработка частиц...")  
+        pbar.set_description(self._get_translation("Обработка частиц..."))  
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(output_image.shape[1], output_image.shape[0])
         particle_counter, particle_data, annotations = 1, [], []        
@@ -307,7 +341,8 @@ class ParticleAnalyzer:
                     thickness=thickness,
                     particle_data=particle_data,
                     annotations=None,
-                    raw_mask=None
+                    raw_mask=None,
+                    scale_factor_glob=scale_factor_glob
                 )
         pbar.update(1)
         return output_image, particle_data, annotations 
@@ -316,7 +351,7 @@ class ParticleAnalyzer:
                          output_image, scale_selector,
                          scale_input, scale, particle_counter,
                          round_value, thickness, particle_data,
-                         annotations, raw_mask) -> int:
+                         annotations, raw_mask, scale_factor_glob) -> int:
         """Анализ отдельной частицы"""
         if len(points) < 3:
             return particle_counter
@@ -350,17 +385,17 @@ class ParticleAnalyzer:
             annotations.append((raw_mask, f"Particle {particle_counter}"))
 
         # Масштабирование
-        scale_factor = float(scale_input) / float(scale) if scale_selector == 'Шкала прибора в мкм' else 1
+        scale_factor = float(scale_input) / float(scale) * scale_factor_glob if scale_selector == 'Instrument scale in µm' else 1 * scale_factor_glob
         scale_area = scale_factor ** 2
 
         # Добавление данных частицы
         particle_data.append({
             "№": round(particle_counter, round_value),
-            "S [мкм²]" if scale_selector == 'Шкала прибора в мкм' else "S [пикс²]": round(area * scale_area, round_value),
-            "P [мкм]" if scale_selector == 'Шкала прибора в мкм' else "P [пикс]": round(perimeter * scale_factor, round_value),
-            "D [мкм]" if scale_selector == 'Шкала прибора в мкм' else "D [пикс]": round(diameter * scale_factor, round_value),
+            self._get_translation("S [мкм²]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("S [пикс²]"): round(area * scale_area, round_value),
+            self._get_translation("P [мкм]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("P [пикс]"): round(perimeter * scale_factor, round_value),
+            self._get_translation("D [мкм]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("D [пикс]"): round(diameter * scale_factor, round_value),
             "e": round(eccentricity, round_value),
-            "I [ед.]": round(mean_intensity, round_value)
+            self._get_translation("I [ед.]"): round(mean_intensity, round_value)
         })
 
         return particle_counter + 1
@@ -374,13 +409,13 @@ class ParticleAnalyzer:
    
     def _handle_error(self, error: Exception):
         """Обработка ошибок"""
-        gr.Warning(f"Критическая ошибка: {error}")
-        print(f"Критическая ошибка: {error}")
+        gr.Warning(f"{self._get_translation('Критическая ошибка')}: {error}")
+        print(f"{self._get_translation('Критическая ошибка')}: {error}")
 
     def _handle_gpu_error(self, error: Exception):
         """Обработка ошибок GPU"""
-        gr.Warning("Ошибка: недостаточно памяти CUDA. Освобождаем память...")
-        print("Ошибка: недостаточно памяти CUDA. Освобождаем память...")
+        gr.Warning(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память..."))
+        print(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память..."))
 
     def _cleanup(self, pbar: Optional[tqdm] = None):
         """Очистка ресурсов"""

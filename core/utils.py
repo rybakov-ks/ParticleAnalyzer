@@ -4,50 +4,57 @@ import pandas as pd
 import csv
 import os
 from datetime import datetime
+from core.languages import translations
+from core.language_context import LanguageContext
+from core.languages import i18n
+
+def get_translation(text):
+    lang = LanguageContext.get_language()
+    return translations.get(lang, {}).get(text, text)
 
 # Создаем пустые DataFrame с нужными заголовками
 empty_df1 = pd.DataFrame(columns=[
     "№", 
-    "S [мкм²]",  # Площадь в квадратных микрометрах
-    "P [мкм]",   # Периметр в микрометрах
-    "D [мкм]",   # Диаметр в микрометрах
+    get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
+    get_translation("P [мкм]"),   # Периметр в микрометрах
+    get_translation("D [мкм]"),   # Диаметр в микрометрах
     "e",         # Эксцентриситет (безразмерная величина)
-    "I [ед.]"    # Интенсивность в условных единицах
+    get_translation("I [ед.]")    # Интенсивность в условных единицах
 ])
 empty_df2 = pd.DataFrame(columns=[
     "№", 
-    "S [пикс²]", # Площадь в квадратных пикселях 
-    "P [пикс]",  # Периметр в пикселях
-    "D [пикс]",  # Диаметр в пикселях
+    get_translation("S [пикс²]"), # Площадь в квадратных пикселях 
+    get_translation("P [пикс]"),  # Периметр в пикселях
+    get_translation("D [пикс]"),  # Диаметр в пикселях
     "e",         # Эксцентриситет (безразмерная величина)
-    "I [ед.]"    # Интенсивность в условных единицах
+    get_translation("I [ед.]")    # Интенсивность в условных единицах
 ]).fillna("")
 empty_df2_2 = pd.DataFrame(columns=[
     "№", 
-    "S [мкм²]",  # Площадь в квадратных микрометрах
-    "P [мкм]",   # Периметр в микрометрах
-    "D [мкм]",   # Диаметр в микрометрах
+    get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
+    get_translation("P [мкм]"),   # Периметр в микрометрах
+    get_translation("D [мкм]"),   # Диаметр в микрометрах
     "e",         # Эксцентриситет (безразмерная величина)
-    "I [ед.]"    # Интенсивность в условных единицах
+    get_translation("I [ед.]")    # Интенсивность в условных единицах
 ]).fillna("")
 empty_df3 = pd.DataFrame(columns=[
-    "Параметр",  # Параметр
-    "Среднее",   # Среднее
-    "Медиана",    # Медиана
-    "Максимум",   # Максимум
-    "Минимум",    # Минимум
-    "СО"      # Стандартное отклонение
+    get_translation("Параметр"),  # Параметр
+    get_translation("Среднее"),   # Среднее
+    get_translation("Медиана"),    # Медиана
+    get_translation("Максимум"),   # Максимум
+    get_translation("Минимум"),    # Минимум
+    get_translation("СО")     # Стандартное отклонение
 ])
 
 def scale_input_visibility(scale_value):
     """Показываем масштабную шкалу"""
     return (
-            gr.update(visible=(scale_value == "Шкала прибора в мкм")), 
-            gr.update(visible=(scale_value == "Шкала прибора в мкм")), 
-            gr.update(visible=(scale_value == "Пиксели")), 
-            gr.update(value=(empty_df2 if scale_value == "Пиксели" else empty_df1)), 
-            gr.update(visible=(scale_value == "Пиксели")),
-            gr.update(value=(empty_df2 if scale_value == "Пиксели" else empty_df2_2))
+            gr.update(visible=(scale_value == get_translation("Instrument scale in µm"))), 
+            gr.update(visible=(scale_value == get_translation("Instrument scale in µm"))), 
+            gr.update(visible=(scale_value == get_translation("Pixels"))), 
+            gr.update(value=(empty_df2 if scale_value == get_translation("Pixels") else empty_df1)), 
+            gr.update(visible=(scale_value == get_translation("Pixels"))),
+            gr.update(value=(empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2))
            )
 
 def segment_mode_visibility(segment_mode):
@@ -79,19 +86,19 @@ def reset_interface(scale_value):
         None,  # Очищаем output_image
         pd.DataFrame(columns=[
             "№", 
-            "S [мкм²]",  # Площадь в квадратных микрометрах
-            "P [мкм]",   # Периметр в микрометрах
-            "D [мкм]",   # Диаметр в микрометрах
+            get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
+            get_translation("P [мкм]"),   # Периметр в микрометрах
+            get_translation("D [мкм]"),   # Диаметр в микрометрах
             "e",         # Эксцентриситет (безразмерная величина)
-            "I [ед.]"    # Интенсивность в условных единицах
+            get_translation("I [ед.]")    # Интенсивность в условных единицах
         ]),
         pd.DataFrame(columns=[
-            "Параметр",  # Параметр
-            "Среднее",   # Среднее
-            "Медиана",    # Медиана
-            "Максимум",   # Максимум
-            "Минимум",    # Минимум
-            "СО"      # Стандартное отклонение
+            get_translation("Параметр"),  # Параметр
+            get_translation("Среднее"),   # Среднее
+            get_translation("Медиана"),    # Медиана
+            get_translation("Максимум"),   # Максимум
+            get_translation("Минимум"),    # Минимум
+            get_translation("СО")      # Стандартное отклонение
         ]),
         None,  # Очищаем графики
         gr.update(visible=False),  # Скрываем таблицу
@@ -101,7 +108,7 @@ def reset_interface(scale_value):
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем label
         None,  # Очищаем output_image2
-        empty_df2 if scale_value == "Пиксели" else empty_df2_2, # Очищаем output_table_image2
+        empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2, # Очищаем output_table_image2
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем label
     )
@@ -120,9 +127,9 @@ def save_data_to_csv(data_table: pd.DataFrame, data_table2: pd.DataFrame, output
 
 def toggle_theme(current_mode: str):
     """Переключает между темной и светлой темой"""
-    if current_mode == "Тёмный режим":
-        return 'Светлый режим', gr.Button(value='Светлый режим', icon='assets/icon/icons8-солнце-50.png')
-    return 'Тёмный режим', gr.Button(value='Тёмный режим', icon='assets/icon/icons8-темный-режим-50.png')
+    if current_mode == get_translation("Тёмный режим"):
+        return get_translation('Светлый режим'), gr.Button(value=i18n('Светлый режим'), icon='assets/icon/icons8-солнце-50.png')
+    return get_translation('Тёмный режим'), gr.Button(value=i18n('Тёмный режим'), icon='assets/icon/icons8-темный-режим-50.png')
 
 def log_analytics(
     confidence_threshold: float,
