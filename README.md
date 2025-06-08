@@ -5,7 +5,7 @@
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
 3. 🚀 [Launching the Application](#-launching-the-application)
-4. ✨ [Segmentation Optimization Guide](#-segmentation-optimization-guide)
+4. 🧩 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
 5. ✨ [Key Features](#-key-features)
 6. 📊 [Analysis Outputs](#-analysis-outputs)
    - [Statistical Data Table](#statistical-data-table)
@@ -69,7 +69,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
 2. Access the interface:
    - Open in browser: http://127.0.0.1:8000
-## ✨ Segmentation Optimization Guide
+## 🧩 Segmentation Optimization Guide
 🔧 Core Parameters:
    - Model Selection
    - Detection Confidence Threshold (0-1)
