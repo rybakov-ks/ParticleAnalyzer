@@ -72,6 +72,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 
 ## 🎛️ Segmentation Optimization Guide
 🔧 Core Parameters:
+   - Model Selection
    - Detection Confidence Threshold (0-1)
      - Increase (e.g., 0.7→0.85) to reduce false positives
      - Decrease (e.g., 0.5→0.3) to detect faint particles
@@ -79,11 +80,12 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
      - Increase (e.g., 0.5→0.7) to eliminate duplicate detections
      - Decrease for dense particle fields
    - Enable SAHI Processing (split-analyze-merge)
+
 🧩 SAHI Configuration (for large images):
    - Slice Size: Start with 400×400
    - Overlap Ratio: 0.2-0.3 (prevents edge artifacts)
    - Batch Size: Adjust based on GPU memory
-   -   
+
 🔄 Model Selection:
 | Model       | Best For                   | Speed     | Recommended Use Case               |
 |-------------|----------------------------|-----------|------------------------------------|
