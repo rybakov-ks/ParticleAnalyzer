@@ -21,6 +21,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 <p align="center">
   <img src="Images/example.gif" alt="Launching the Application">
 </p>
+
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
 - Comprehensive statistical analysis of particle characteristics
