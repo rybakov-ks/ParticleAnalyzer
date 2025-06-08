@@ -96,11 +96,16 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    - Batch Size: Adjust based on GPU memory
 
 🔄 Model Selection:
+<div align="center">
+   
 | Model       | Best For                   | Speed     | Recommended Use Case               |
 |-------------|----------------------------|-----------|------------------------------------|
 | **YOLOv11** | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
 | **YOLOv12** | High precision detection    | ⚡⚡ Medium | Critical measurements              |
 | From **Detectron2** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
+
+</div>
+
 ## 📊 Analysis Outputs
 
 ### Statistical Data Table
