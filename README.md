@@ -11,7 +11,7 @@
    - [Size Distribution Visualization](#size-distribution-visualization)
 6. ⚙️ [Advanced Settings](#-advanced-settings)
 7. 📏 [Scale Calibration](#-scale-calibration)
-8. 📧 [Contributors](#contributors)
+8. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
@@ -140,5 +140,5 @@ Micrometer values are calculated by:
 - You input the correct reference distance when prompted
 - The scale bar was created at the same magnification as your particles
 
-## 📧 Contributors {#contributors}
+## 📧 Contributors
 Rybakov Kirill (Saratov State University): rybakov-ks@ya.ru
