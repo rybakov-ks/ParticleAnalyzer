@@ -27,6 +27,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
+- SAHI mode helps detect small objects in high-resolution images by using a sliding window approach
 - Comprehensive statistical analysis of particle characteristics
 - Interactive visualization of size distributions
 - Web-based interface for easy accessibility
@@ -95,8 +96,8 @@ If the model fails to segment your images correctly, please send them to rybakov
 
 🧩 SAHI Configuration (for large images):
    - Slice Size: Start with 400×400
-   - Overlap Ratio: 0.2-0.3 (prevents edge artifacts)
-   - Batch Size: Adjust based on GPU memory
+   - Overlap Ratio: 0.2-0.3 (prevents edge artifacts)\
+*SAHI mode helps detect small objects in high-resolution images by using a sliding window approach/*
 
 🔄 Model Selection:
 <div align="center">
