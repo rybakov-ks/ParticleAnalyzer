@@ -5,7 +5,7 @@
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
 3. 🚀 [Launching the Application](#-launching-the-application)
-4. 🎛️ [Segmentation Optimization Guide](#segmentation-optimization-guide)
+4. 🎛️ [Segmentation Optimization Guide](#-segmentation-optimization-guide)
 5. ✨ [Key Features](#-key-features)
 6. 📊 [Analysis Outputs](#-analysis-outputs)
    - [Statistical Data Table](#statistical-data-table)
