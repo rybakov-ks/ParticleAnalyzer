@@ -5,13 +5,14 @@
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
 3. 🚀 [Launching the Application](#-launching-the-application)
-4. ✨ [Key Features](#-key-features)
-5. 📊 [Analysis Outputs](#-analysis-outputs)
+4. 🎛️ [Segmentation Optimization Guide](#-segmentation-optimization-guide)
+5. ✨ [Key Features](#-key-features)
+6. 📊 [Analysis Outputs](#-analysis-outputs)
    - [Statistical Data Table](#statistical-data-table)
    - [Size Distribution Visualization](#size-distribution-visualization)
-6. ⚙️ [Advanced Settings](#-advanced-settings)
-7. 📏 [Scale Calibration](#-scale-calibration)
-8. 📧 [Contributors](#-contributors)
+7. ⚙️ [Advanced Settings](#-advanced-settings)
+8. 📏 [Scale Calibration](#-scale-calibration)
+9. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
@@ -68,7 +69,27 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
 2. Access the interface:
    - Open in browser: http://127.0.0.1:8000
- 
+
+## 🎛️ Segmentation Optimization Guide
+🔧 Core Parameters:
+   - Detection Confidence Threshold (0-1)
+     - Increase (e.g., 0.7→0.85) to reduce false positives
+     - Decrease (e.g., 0.5→0.3) to detect faint particles
+   - IoU Threshold (0-1)
+     - Increase (e.g., 0.5→0.7) to eliminate duplicate detections
+     - Decrease for dense particle fields
+   - Enable SAHI Processing (split-analyze-merge)
+🧩 SAHI Configuration (for large images):
+   - Slice Size: Start with 400×400
+   - Overlap Ratio: 0.2-0.3 (prevents edge artifacts)
+   - Batch Size: Adjust based on GPU memory
+   -   
+🔄 Model Selection:
+| Model       | Best For                   | Speed     | Recommended Use Case               |
+|-------------|----------------------------|-----------|------------------------------------|
+| **YOLOv11** | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
+| **YOLOv12** | High precision detection    | ⚡⚡ Medium | Critical measurements              |
+| From **Detectron2** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
 - Comprehensive statistical analysis of particle characteristics
