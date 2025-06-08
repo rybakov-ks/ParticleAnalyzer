@@ -76,6 +76,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 - **Dual-unit display**: toggle between pixels and micrometers (µm)
 - **Multiple AI models** supported (YOLOv11, YOLOv12, Detectron2)
 - **Advanced settings** for precision tuning
+- **Multi-language support**: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en-us)
 - **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
 ## 📊 Analysis Outputs
