@@ -69,7 +69,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
    ```
 2. Access the interface:
    - Open in browser: http://127.0.0.1:8000
-## 🎛️ Segmentation Optimization Guide
+## 🎛️ Segmentation Optimization Guide {#segmentation-optimization-guide}
 🔧 Core Parameters:
    - Model Selection
    - Detection Confidence Threshold (0-1)
