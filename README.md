@@ -17,13 +17,14 @@
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 
-A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.\
-*If you encounter any errors while using ParticleAnalyzer, please open an issue in our GitHub repository or contact us directly at rybakov-ks@ya.ru for support.
-If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
+A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.
+
 <p align="center">
   <img src="Images/example.gif" alt="Launching the Application">
 </p>
 
+*If you encounter any errors while using ParticleAnalyzer, please open an issue in our GitHub repository or contact us directly at rybakov-ks@ya.ru for support.
+If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
 - Comprehensive statistical analysis of particle characteristics
