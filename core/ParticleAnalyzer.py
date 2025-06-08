@@ -54,12 +54,12 @@ class ParticleAnalyzer:
         
         language_mapping = {
             'en-us': 'en',
+            'en': 'en',
             'ru': 'ru',
             'zh-cn': 'zh-cn',
             'zh-tw': 'zh-tw'
         }
         
-        # Проверяем полное совпадение, затем только язык (например 'en' из 'en-us')
         return language_mapping.get(lang_code, 
                language_mapping.get(lang_code.split('-')[0], self.default_lang))
 
