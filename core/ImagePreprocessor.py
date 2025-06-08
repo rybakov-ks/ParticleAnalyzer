@@ -7,10 +7,11 @@ from tqdm import tqdm
 import gradio as gr
 from typing import Optional, Tuple, Dict, Any
 from datetime import datetime
+from core.languages import translations
 
 """Подготовка изображения перед анализом"""
 class ImagePreprocessor:
-    def __init__(self, output_dir: str = "output"):
+    def __init__(self, output_dir: str = "output", lang='ru'):
         self._processing_profiles = {
             '640x640': (640, 640),
             '1024x1024': (1024, 1024),
@@ -20,8 +21,12 @@ class ImagePreprocessor:
             'Оригинал': None
         }
         self.output_dir = output_dir
+        self.lang = lang
         os.makedirs(self.output_dir, exist_ok=True)
-
+        
+    def _get_translation(self, text):
+        return translations.get(self.lang, {}).get(text, text)
+        
     def preprocess_image(
         self,
         image: np.ndarray,
@@ -30,14 +35,16 @@ class ImagePreprocessor:
         solution: str,
         request: gr.Request,
         pbar: tqdm,
-        sahi_mode: bool
+        sahi_mode: bool,
+        lang: str
     ):
         """Основной метод предварительной обработки изображения."""
-        pbar.set_description("Загрузка изображения...")
+        self.lang = lang
+        pbar.set_description(self._get_translation("Загрузка изображения..."))
         try:
             # Обработка шкалы прибора
             scale = None
-            if scale_selector == 'Шкала прибора в мкм':
+            if scale_selector == self._get_translation('Instrument scale in µm'):
                 scale = self._determine_pixel_scale(image)
                 if scale is None:
                     return None, None, None, None
@@ -50,17 +57,17 @@ class ImagePreprocessor:
             self._save_image_metadata(image, request)
             
             # Изменение размера
-            image = self._resize_image(image, solution, sahi_mode)
+            image, scale_factor_glob = self._resize_image(image, solution, sahi_mode)
             
             # Конвертация цветовых пространств
             orig_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             gray_image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2GRAY)
             pbar.update(1)
-            return image, orig_image, gray_image, scale
+            return image, orig_image, gray_image, scale, scale_factor_glob
             
         except Exception as e:
             #print(f"Ошибка при обработке изображения: {e}")
-            return None, None, None, None
+            return None, None, None, None, None
 
     def _convert_image_channels(self, image: np.ndarray) -> np.ndarray:
         """Конвертирует изображение в RGB при необходимости."""
@@ -73,7 +80,7 @@ class ImagePreprocessor:
     def _resize_image(self, image: np.ndarray, solution: str, sahi_mode: bool) -> np.ndarray:
         """Изменяет размер изображения согласно выбранному профилю."""
         if solution == 'Оригинал' or sahi_mode:
-            return image
+            return image, 1
             
         if solution in self._processing_profiles:
             max_w, max_h = self._processing_profiles[solution]
@@ -82,10 +89,17 @@ class ImagePreprocessor:
             if h > max_h or w > max_w:
                 scale = min(max_h / h, max_w / w)
                 new_size = (int(w * scale), int(h * scale))
+                
+                # Вычисляем коэффициенты масштабирования для обеих осей
+                scale_x = w / new_size[0]
+                scale_y = h / new_size[1]
+                assert abs(scale_x - scale_y) < 0.01, "Изображение масштабировалось с изменением пропорций"
+                scale_factor_glob = (scale_x + scale_y) / 2
+                
                 #print(f"Изменение размера: {w}x{h} → {new_size[0]}x{new_size[1]}")
-                return cv2.resize(image, new_size, interpolation=cv2.INTER_AREA)
+                return cv2.resize(image, new_size, interpolation=cv2.INTER_AREA), scale_factor_glob
         
-        return image
+        return image, 1
 
     def _save_image_metadata(self, image: np.ndarray, request: gr.Request) -> None:
         """Сохраняет изображение и записывает данные в CSV-файл."""
