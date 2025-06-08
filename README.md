@@ -11,7 +11,7 @@
    - [Size Distribution Visualization](#size-distribution-visualization)
 6. ⚙️ [Advanced Settings](#-advanced-settings)
 7. 📏 [Scale Calibration](#-scale-calibration)
-8.  📧 [Contributors](#contributors)
+8. 📧 [Contributors](#contributors)
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
