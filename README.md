@@ -97,7 +97,7 @@ If the model fails to segment your images correctly, please send them to rybakov
 🧩 SAHI Configuration (for large images):
    - Slice Size: Start with 400×400
    - Overlap Ratio: 0.2-0.3 (prevents edge artifacts)\
-*SAHI mode helps detect small objects in high-resolution images by using a sliding window approach/*
+*SAHI mode helps detect small objects in high-resolution images by using a sliding window approach*
 
 🔄 Model Selection:
 <div align="center">
