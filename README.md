@@ -1,12 +1,12 @@
 ## 📑 Table of Contents
 
 1. 🔎 [ParticleAnalyzer](#particleanalyzer)
-2. 📥 [Installation Guide](#-installation-guide)
+2. ✨ [Key Features](#-key-features)
+3. 📥 [Installation Guide](#-installation-guide)
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
-3. 🚀 [Launching the Application](#-launching-the-application)
-4. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
-5. ✨ [Key Features](#-key-features)
+4. 🚀 [Launching the Application](#-launching-the-application)
+5. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
 6. 📊 [Analysis Outputs](#-analysis-outputs)
    - [Statistical Data Table](#statistical-data-table)
    - [Size Distribution Visualization](#size-distribution-visualization)
@@ -21,7 +21,16 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 <p align="center">
   <img src="Images/example.gif" alt="Launching the Application">
 </p>
-
+## ✨ Key Features
+- Automated particle segmentation in SEM images
+- Comprehensive statistical analysis of particle characteristics
+- Interactive visualization of size distributions
+- Web-based interface for easy accessibility
+- **Dual-unit display**: toggle between pixels and micrometers (µm)
+- **Multiple AI models** supported (YOLOv11, YOLOv12, Detectron2)
+- **Advanced settings** for precision tuning
+- **Multi-language support**: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en-us)
+- **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 ## 🛠 Installation Guide
 
 ### Prerequisites
@@ -91,17 +100,6 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 | **YOLOv11** | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
 | **YOLOv12** | High precision detection    | ⚡⚡ Medium | Critical measurements              |
 | From **Detectron2** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
-## ✨ Key Features
-- Automated particle segmentation in SEM images
-- Comprehensive statistical analysis of particle characteristics
-- Interactive visualization of size distributions
-- Web-based interface for easy accessibility
-- **Dual-unit display**: toggle between pixels and micrometers (µm)
-- **Multiple AI models** supported (YOLOv11, YOLOv12, Detectron2)
-- **Advanced settings** for precision tuning
-- **Multi-language support**: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en-us)
-- **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
-
 ## 📊 Analysis Outputs
 
 ### Statistical Data Table
