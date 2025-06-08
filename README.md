@@ -140,5 +140,5 @@ Micrometer values are calculated by:
 - You input the correct reference distance when prompted
 - The scale bar was created at the same magnification as your particles
 
-## 📧 Contributors
+## 📧 Contributors {#contributors}
 Rybakov Kirill (Saratov State University): rybakov-ks@ya.ru
