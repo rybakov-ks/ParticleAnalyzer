@@ -106,7 +106,7 @@ If the model fails to segment your images correctly, please send them to rybakov
 |-------------|----------------------------|-----------|------------------------------------|
 | **YOLOv11** | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
 | **YOLOv12** | High precision detection    | ⚡⚡ Medium | Critical measurements              |
-| From **Detectron2** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
+| **Cascade_X152** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
 
 </div>
 
