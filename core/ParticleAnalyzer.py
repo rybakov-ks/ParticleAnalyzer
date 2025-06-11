@@ -103,17 +103,17 @@ class ParticleAnalyzer:
         ):
             gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
             return self._create_error_return()
-        else:
-            image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
-                image=image,
-                image2=image2,
-                scale_selector=scale_selector,
-                solution=solution,
-                request=request,
-                pbar=pbar,
-                sahi_mode=sahi_mode,
-                lang=self.lang
-            )
+
+        image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
+            image=image,
+            image2=image2,
+            scale_selector=scale_selector,
+            solution=solution,
+            request=request,
+            pbar=pbar,
+            sahi_mode=sahi_mode,
+            lang=self.lang
+        )
             
         if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
             return self._create_error_return()
