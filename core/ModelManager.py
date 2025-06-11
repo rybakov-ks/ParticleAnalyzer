@@ -1,11 +1,21 @@
 from .YOLOLoader import YOLOLoader
-from .Detectron2Loader import Detectron2Loader
-from detectron2.engine import DefaultPredictor
+try:
+    from detectron2.engine import DefaultPredictor
+    from .Detectron2Loader import Detectron2Loader
+    DETECTRON2_AVAILABLE = True
+except ImportError:
+    DETECTRON2_AVAILABLE = False
 
 class ModelManager:
     def __init__(self):
         self.yolo_loader = YOLOLoader()
-        self.detectron_loader = Detectron2Loader()
+        
+        # Инициализируем detectron_loader только если detectron2 доступен
+        if DETECTRON2_AVAILABLE:
+            self.detectron_loader = Detectron2Loader()
+        else:
+            self.detectron_loader = None
+        
         self.model_types = {
             "Yolo11 (dataset 1)": "yolo",
             "Yolo12 (dataset 1)": "yolo",
