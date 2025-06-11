@@ -20,8 +20,12 @@
 A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.
 
 <p align="center">
-  <img src="Images/example.gif" alt="Launching the Application">
+  <a href="https://youtu.be/xX3GJu-ea9E">
+    <img src="Images/1.png" alt="Video">
+  </a>
 </p>
+
+[Video details](Images/ParticleAnalyzer.mp4)
 
 *If you encounter any errors while using ParticleAnalyzer, please open an issue in our GitHub repository or contact us directly at rybakov-ks@ya.ru for support.
 If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
