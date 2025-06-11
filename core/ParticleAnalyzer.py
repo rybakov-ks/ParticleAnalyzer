@@ -9,9 +9,11 @@ from tqdm import tqdm
 from typing import Optional, Tuple, List, Dict, Any, Union
 from scipy.spatial.distance import pdist
 
-from detectron2.config import get_cfg
-from detectron2.engine import DefaultPredictor
-from ultralytics import YOLO
+try:
+    from detectron2.engine import DefaultPredictor
+    DETECTRON2_AVAILABLE = True
+except ImportError:
+    DETECTRON2_AVAILABLE = False
 from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 

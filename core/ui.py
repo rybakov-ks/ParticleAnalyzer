@@ -8,6 +8,13 @@ from core.utils import (
 from core.ui_styles import css, custom_head
 from core.languages import i18n
 
+try:
+    import detectron2
+    model_list = ["Yolo11 (dataset 1)", "Yolo12 (dataset 1)", "Yolo11 (dataset 2)", "Yolo12 (dataset 2)", "R101",
+                        "X101", "Cascade_R50", "Cascade_X152"]
+except ImportError:
+    model_list = ["Yolo11 (dataset 1)", "Yolo12 (dataset 1)", "Yolo11 (dataset 2)", "Yolo12 (dataset 2)"]
+
 analyzer = ParticleAnalyzer()
 
 def create_interface():
@@ -124,8 +131,7 @@ def create_interface():
                         # Селектор для масштаба
                         scale_selector = gr.Radio(("Pixels", "Instrument scale in µm"), value="Pixels", label=i18n("Режим масштабирования"))
                     with gr.Row():
-                        model_change = gr.Dropdown(["Yolo11 (dataset 1)", "Yolo12 (dataset 1)", "Yolo11 (dataset 2)", "Yolo12 (dataset 2)", "R101",
-                        "X101", "Cascade_R50", "Cascade_X152"], value="Yolo11 (dataset 2)", label=i18n("Модель обнаружения"))
+                        model_change = gr.Dropdown(model_list, value="Yolo11 (dataset 2)", label=i18n("Модель обнаружения"))
                     with gr.Row():
                         # Слайдер для точности обнаружения
                         confidence_threshold = gr.Slider(
