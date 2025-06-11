@@ -59,14 +59,14 @@ def scale_input_visibility(scale_value):
 
 def segment_mode_visibility(segment_mode):
     """Режим анализа отдельных частиц"""
-    return gr.update(visible=segment_mode), gr.update(visible=segment_mode)
+    return gr.update(visible=None if segment_mode else False), gr.update(visible=None if segment_mode else False)
 
 def select_section(evt: gr.SelectData, output_table):
     """Режим анализа отдельных частиц. Возвращаем параметры частицы"""
     if 0 <= evt.index < len(output_table):
-        return output_table.iloc[[evt.index]]
+        return output_table.iloc[[evt.index]], gr.update(visible=True)
     else:
-        return empty_df2  
+        return empty_df2, gr.update(visible=False)
         
 def sahi_mode_visibility(sahi_mode):
     """Режим SAHI"""
@@ -82,7 +82,7 @@ def sahi_mode_visibility(sahi_mode):
 def reset_interface(scale_value):
     """Функция для сброса интерфейса"""
     return (
-        None,  # Очищаем im
+        {"background": None, "layers": [], "composite": None},  # Очищаем im
         None,  # Очищаем output_image
         pd.DataFrame(columns=[
             "№", 
@@ -111,6 +111,8 @@ def reset_interface(scale_value):
         empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2, # Очищаем output_table_image2
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем label
+        gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
+        gr.update(visible=False),  # Скрываем строку output_table_image2_row
     )
     
 def save_data_to_csv(data_table: pd.DataFrame, data_table2: pd.DataFrame, output_dir: str = "output"):

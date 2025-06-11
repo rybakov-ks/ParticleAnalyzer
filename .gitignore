@@ -1,0 +1,6 @@
+# Игнорировать все .pt и .pth файлы в model/
+model/*.pt
+model/*.pth
+
+# Игнорировать все .yaml файлы в model/
+model/*.yaml

@@ -70,7 +70,7 @@ class ParticleAnalyzer:
             gr.update(visible=False), None,
             gr.update(visible=False), gr.update(visible=False),
             gr.update(visible=False), gr.update(visible=False),
-            None, gr.update(visible=False), gr.update(visible=False)
+            None, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False)
         )
 
     def analyze_image(self, image: np.ndarray, image2: Optional[np.ndarray], 
@@ -79,7 +79,7 @@ class ParticleAnalyzer:
                     number_detections: int, solution: str, model_change: str,
                     round_value: int, slice_height: int, slice_width: int, 
                     overlap_height_ratio: float, overlap_width_ratio: float, 
-                    sahi_mode: bool, number_of_bins: int,
+                    sahi_mode: bool, number_of_bins: int, segment_mode: bool,
                     request: gr.Request) -> Tuple:
         """
         Основной метод для анализа изображения.
@@ -88,10 +88,22 @@ class ParticleAnalyzer:
         LanguageContext.set_language(lang) 
         self.lang = lang  # Для обратной совместимости
         
-        try:
-            pbar = tqdm(total=5, desc=self._get_translation("Подготовка..."), 
-                       bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]')
-            
+
+        pbar = tqdm(total=5, desc=self._get_translation("Подготовка..."), 
+                   bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]')
+        
+        if (
+            (
+                image["background"] is None
+                and image["composite"] is None
+                and not image["layers"]
+            )
+            and
+            (image2 is None)
+        ):
+            gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
+            return self._create_error_return()
+        else:
             image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
                 image=image,
                 image2=image2,
@@ -102,47 +114,42 @@ class ParticleAnalyzer:
                 sahi_mode=sahi_mode,
                 lang=self.lang
             )
-
-            if image is None or (isinstance(image, np.ndarray) and image.size == 0):
-                gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
-                return self._create_error_return() 
-            if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
-                return self._create_error_return()
-                
-            # Выбор стратегии обработки
-            processor = self._select_processor(model_change, sahi_mode)
-            output_image, particle_data, annotations = processor(image, 
-                    scale_input, confidence_threshold,
-                    scale_selector, confidence_iou, 
-                    number_detections, model_change,
-                    round_value, slice_height, slice_width, 
-                    overlap_height_ratio, overlap_width_ratio, 
-                    pbar, orig_image, gray_image, scale, scale_factor_glob)
-
-            output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
-            df = pd.DataFrame(particle_data)
-
-            pbar.set_description(self._get_translation("Построение таблицы..."))
-            builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins, lang=self.lang)
-            stats_df = builder.build_stats_table()
-            pbar.update(1)
-
-            pbar.set_description(self._get_translation("Построение графиков..."))
-            fig = builder.build_distribution_fig()
-            pbar.update(1)
             
-            return (
-                    output_image, df, fig, stats_df, gr.update(visible=True), len(df), 
-                    gr.update(visible=True), gr.update(visible=True),  gr.update(visible=True), gr.update(visible=True), 
-                    (orig_image, annotations), gr.update(visible=True),  gr.update(visible=True)
-                    )
-                    
-        except Exception as e:
-            self._handle_error(e)
-            self._cleanup(pbar)
+        if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
             return self._create_error_return()
-        finally:
-            self._cleanup(pbar)
+            
+        # Выбор стратегии обработки
+        processor = self._select_processor(model_change, sahi_mode)
+
+        output_image, particle_data, annotations = processor(image, 
+                scale_input, confidence_threshold,
+                scale_selector, confidence_iou, 
+                number_detections, model_change,
+                round_value, slice_height, slice_width, 
+                overlap_height_ratio, overlap_width_ratio, 
+                pbar, orig_image, gray_image, scale, scale_factor_glob)
+        if output_image is None:
+            return self._create_error_return()
+            
+        output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+        df = pd.DataFrame(particle_data)
+
+        pbar.set_description(self._get_translation("Построение таблицы..."))
+        builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins, lang=self.lang)
+        stats_df = builder.build_stats_table()
+        pbar.update(1)
+
+        pbar.set_description(self._get_translation("Построение графиков..."))
+        fig = builder.build_distribution_fig()
+        pbar.update(1)
+        
+        return (
+                output_image, df, fig, stats_df, gr.update(visible=True), len(df), 
+                gr.update(visible=True), gr.update(visible=True),  gr.update(visible=True), gr.update(visible=True), 
+                (orig_image, annotations) if segment_mode else None, gr.update(visible=True),  gr.update(visible=True),
+                gr.update(visible=segment_mode)
+                )
+
 
     def _select_processor(self, model_change: str, sahi_mode: bool):
         """Выбор стратегии обработки в зависимости от модели и режима"""
@@ -177,17 +184,17 @@ class ParticleAnalyzer:
                 )
         except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
             self._handle_gpu_error(e)
-            return self._create_error_return()
+            return None, None, None
         except Exception as e:
             self._handle_error(e)
-            return self._create_error_return()
+            return None, None, None
             
         if torch.cuda.is_available():
             torch.cuda.synchronize()
 
         if len(results[0].boxes) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
-            return Error
+            return None, None, None
         elif len(results[0].boxes) == number_detections:
            gr.Info(self._get_translation("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."))
         pbar.update(1)
@@ -237,10 +244,10 @@ class ParticleAnalyzer:
             masks = results['instances'].pred_masks.to("cpu").numpy()
         except Exception as e:
             self._handle_error(e)
-            return self._create_error_return()
+            return None, None, None
         if len(masks) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
-            return self._create_error_return()
+            return None, None, None
         elif len(masks) == number_detections:
             gr.Info(self._get_translation("Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."))
         pbar.update(1)
@@ -312,10 +319,10 @@ class ParticleAnalyzer:
             )
         except torch.cuda.OutOfMemoryError as e:
             self._handle_gpu_error(e)
-            return self._create_error_return()        
+            return None, None, None      
         if len(results.object_prediction_list) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
-            return self._create_error_return()
+            return None, None, None
         pbar.update(1) 
         
         pbar.set_description(self._get_translation("Обработка частиц..."))  
@@ -414,8 +421,8 @@ class ParticleAnalyzer:
 
     def _handle_gpu_error(self, error: Exception):
         """Обработка ошибок GPU"""
-        gr.Warning(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память..."))
-        print(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память..."))
+        gr.Warning(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память. Попробуйте уменьшить разрешение изображения или включите режим SAHI..."))
+        print(self._get_translation("Ошибка: недостаточно памяти CUDA. Освобождаем память. Попробуйте уменьшить разрешение изображения или включите режим SAHI..."))
 
     def _cleanup(self, pbar: Optional[tqdm] = None):
         """Очистка ресурсов"""
