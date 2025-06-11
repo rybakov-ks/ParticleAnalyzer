@@ -121,27 +121,11 @@ def create_interface():
                     with gr.Row():    
                         toggle_dark = gr.Button(value=i18n("Тёмный режим"), size="sm", icon='assets/icon/icons8-темный-режим-50.png')
                     with gr.Row():
+                        # Селектор для масштаба
+                        scale_selector = gr.Radio(("Pixels", "Instrument scale in µm"), value="Pixels", label=i18n("Режим масштабирования"))
+                    with gr.Row():
                         model_change = gr.Dropdown(["Yolo11 (dataset 1)", "Yolo12 (dataset 1)", "Yolo11 (dataset 2)", "Yolo12 (dataset 2)", "R101",
                         "X101", "Cascade_R50", "Cascade_X152"], value="Yolo11 (dataset 2)", label=i18n("Модель обнаружения"))
-                    with gr.Row():
-                        sahi_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить обработку с разбиением на фрагменты?"))       
-                    with gr.Row(visible=False) as slice_row:
-                        slice_height = gr.Number(value=640, label=i18n("Высота слайса"))
-                        slice_width = gr.Number(value=640, label=i18n("Ширина слайса"))
-                    with gr.Row(visible=False) as slice_row2:
-                        overlap_height_ratio = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.1,
-                            step=0.01,
-                            label=i18n("Перекрытие по высоте"))
-                        overlap_width_ratio = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.1,
-                            step=0.01, 
-                            label=i18n("Перекрытие по ширине"))
-                        
                     with gr.Row():
                         # Слайдер для точности обнаружения
                         confidence_threshold = gr.Slider(
@@ -160,26 +144,41 @@ def create_interface():
                             step=0.01,
                             label=i18n("Порог перекрытия (IoU)")
                         )
+                    with gr.Row() as solution_row:
+                        # Переключатель разрешения
+                        solution = gr.Radio(("Original", "640x640", "1024x1024"), value="1024x1024", label=i18n("Разрешение изображения"))
+                    with gr.Row():
+                        sahi_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить обработку с разбиением на фрагменты (SAHI)?"))       
+                    with gr.Row(visible=False) as slice_row:
+                        slice_height = gr.Number(value=640, label=i18n("Высота слайса"))
+                        slice_width = gr.Number(value=640, label=i18n("Ширина слайса"))
+                    with gr.Row(visible=False) as slice_row2:
+                        overlap_height_ratio = gr.Slider(
+                            minimum=0.0,
+                            maximum=1.0,
+                            value=0.1,
+                            step=0.01,
+                            label=i18n("Перекрытие по высоте"))
+                        overlap_width_ratio = gr.Slider(
+                            minimum=0.0,
+                            maximum=1.0,
+                            value=0.1,
+                            step=0.01, 
+                            label=i18n("Перекрытие по ширине"))
+                    with gr.Row() as segment_mode_row:
+                        segment_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить режим анализа отдельных частиц?")) 
                     with gr.Row() as number_detections_row:
                         # Слайдер для number_detections 
                         number_detections = gr.Slider(
                             minimum=1,
                             maximum=10000,
-                            value=300,
+                            value=1000,
                             step=100,
                             label=i18n("Максимальное количество обнаружений")
                         )
                     with gr.Row():
-                        # Селектор для масштаба
-                        scale_selector = gr.Radio(("Pixels", "Instrument scale in µm"), value="Pixels", label=i18n("Режим масштабирования"))
-                    with gr.Row() as solution_row:
-                        # Переключатель разрешения
-                        solution = gr.Radio(("Original", "640x640", "1024x1024"), value="1024x1024", label=i18n("Разрешение изображения"))
-                    with gr.Row():
                         # Выпадающий список для округления
-                        round_value = gr.Dropdown([0, 1, 2, 3, 4, 5, 6], value=2, label=i18n("Округлять результаты до"))
-                    with gr.Row() as segment_mode_row:
-                        segment_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить режим анализа отдельных частиц?"))    
+                        round_value = gr.Dropdown([0, 1, 2, 3, 4, 5, 6], value=2, label=i18n("Округлять результаты до"))   
                     with gr.Row():
                         # Слайдер для number_of_bins 
                         number_of_bins = gr.Slider(
@@ -196,31 +195,33 @@ def create_interface():
                 inputs=[im, in_image, scale_input, confidence_threshold, scale_selector, 
                         confidence_iou, number_detections, solution, model_change, round_value, 
                         slice_height, slice_width, overlap_height_ratio, overlap_width_ratio, sahi_mode,
-                        number_of_bins],
+                        number_of_bins, segment_mode],
                 outputs=[output_image, output_table, output_plot, output_table2, download_output, label, label,
-                        output_table, output_plot, output_table2, output_image2, question_row, buttons_row]
+                        output_table, output_plot, output_table2, output_image2, question_row, buttons_row,
+                        AnnotatedImage_row]
             )
 
-            scale_selector.change(scale_input_visibility, inputs=scale_selector, outputs=[scale_input_row, Paint_row, Image_row, output_table, in_image_example_row, output_table_image2])
+            scale_selector.change(scale_input_visibility, inputs=scale_selector, outputs=[scale_input_row, Paint_row, Image_row, output_table, 
+                                in_image_example_row, output_table_image2])
 
             segment_mode.change(segment_mode_visibility, inputs=segment_mode, outputs=[AnnotatedImage_row, output_table_image2_row])
                 
             sahi_mode.change(sahi_mode_visibility, inputs=sahi_mode, outputs=[slice_row, slice_row2, number_detections_row, segment_mode_row, segment_mode, solution_row])
 
-            output_image2.select(select_section, output_table, output_table_image2)
+            output_image2.select(select_section, inputs=output_table, outputs=[output_table_image2, output_table_image2_row])
 
             clear_button.click(
                 fn=reset_interface,
                 inputs=[scale_selector],
                 outputs=[im, output_image, output_table, output_table2, output_plot, output_table, output_table2, output_plot, in_image, download_output,
-                label, output_image2, output_table_image2, question_row, buttons_row]
+                label, output_image2, output_table_image2, question_row, buttons_row, AnnotatedImage_row, output_table_image2_row]
             )
             
             scale_selector.change(
                 fn=reset_interface,
                 inputs=[scale_selector],
                 outputs=[im, output_image, output_table, output_table2, output_plot, output_table, output_table2, output_plot, in_image, download_output,
-                label, output_image2, output_table_image2, question_row, buttons_row]
+                label, output_image2, output_table_image2, question_row, buttons_row, AnnotatedImage_row, output_table_image2_row]
             )
             
             yes_button.click(

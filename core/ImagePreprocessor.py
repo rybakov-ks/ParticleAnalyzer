@@ -41,7 +41,7 @@ class ImagePreprocessor:
         """Основной метод предварительной обработки изображения."""
         self.lang = lang
         pbar.set_description(self._get_translation("Загрузка изображения..."))
-        try:
+        try:   
             # Обработка шкалы прибора
             scale = None
             if scale_selector == self._get_translation('Instrument scale in µm'):
@@ -98,7 +98,8 @@ class ImagePreprocessor:
                 
                 #print(f"Изменение размера: {w}x{h} → {new_size[0]}x{new_size[1]}")
                 return cv2.resize(image, new_size, interpolation=cv2.INTER_AREA), scale_factor_glob
-        
+        if image is None or (isinstance(image, np.ndarray) and image.size == 0):
+            gr.Info(self._get_translation("Ошибка: изображение отсутствует..."))
         return image, 1
 
     def _save_image_metadata(self, image: np.ndarray, request: gr.Request) -> None:
@@ -187,16 +188,16 @@ class ImagePreprocessor:
                     # Рассчитываем расстояние между центрами масс двух контуров
                     distance = math.sqrt((cx2 - cx1) ** 2 + (cy2 - cy1) ** 2)
                 else:
-                    gr.Info("Ошибка в вычислении центроида.")
+                    gr.Info(self._get_translation("Ошибка в вычислении центроида."))
             elif len(contours) > 2:
                 distance = False
-                gr.Info("Найдено больше двух точек.")
+                gr.Info(self._get_translation("Найдено больше двух точек."))
             else:
                 distance = False
-                gr.Info("Обозначьте на изображении масштабную шкалу при помощи двух точек.")
+                gr.Info(self._get_translation("Обозначьте на изображении масштабную шкалу при помощи двух точек."))
              # Возвращаем расстояние   
             return distance
         else:
             # Если слоев нет, возвращаем False
-            gr.Info("Обозначьте на изображении масштабную шкалу при помощи двух точек.")
+            gr.Info(self._get_translation("Обозначьте на изображении масштабную шкалу при помощи двух точек."))
             return False
