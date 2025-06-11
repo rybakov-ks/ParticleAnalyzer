@@ -4,3 +4,8 @@ model/*.pth
 
 # Игнорировать все .yaml файлы в model/
 model/*.yaml
+
+# Игнорировать файлы в output/
+output/*.png
+output/*.jpg
+output/*.csv
