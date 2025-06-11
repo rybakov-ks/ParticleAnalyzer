@@ -45,7 +45,7 @@ If the model fails to segment your images correctly, please send them to rybakov
 
 ### Prerequisites
 - Python 3.10 or higher
-- NVIDIA GPU with CUDA support (recommended)
+- NVIDIA GPU with CUDA 11.8 support (recommended)
 - 16GB+ RAM for optimal performance
 - **10GB+** free disk space for models
 
