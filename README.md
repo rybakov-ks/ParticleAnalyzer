@@ -110,11 +110,10 @@ Open in browser: http://127.0.0.1:8000
       └── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml
    ```
 3. 🚀 Launching the Application
-   - Run the server:
       ```python
       python app.py
       ```
-   - Open in browser: http://127.0.0.1:8000
+   Open in browser: http://127.0.0.1:8000
 ## 🛠 Segmentation Optimization Guide
 🔧 Core Parameters:
    - Model Selection
