@@ -1,16 +1,11 @@
-gradio==5.32.0
-matplotlib==3.10.3
-numpy==2.2.6
-opencv_python==4.10.0.84
-opencv_python_headless==4.11.0.86
-pandas==2.2.3
-Pillow==11.2.1
-plotly==6.0.0
-sahi==0.11.23
-scipy==1.15.3
-tqdm==4.67.1
-ultralytics==8.3.142
-torch==2.6.0+cu118 --index-url https://download.pytorch.org/whl/cu118
-torchvision==0.16.0+cu118
-torchaudio==2.2.0+cu118
-git+https://github.com/facebookresearch/detectron2.git@v0.6
+gradio
+matplotlib
+numpy
+opencv_python
+opencv_python_headless
+Pillow
+plotly
+sahi
+scipy
+tqdm
+ultralytics
