@@ -21,7 +21,7 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 <p align="center">
   <strong>Video demonstrations:</strong><br>
   <a href="Images/ParticleAnalyzer.mp4">Local video (MP4)</a> | 
-  <a href="https://youtu.be/xX3GJu-ea9E">YouTube demonstration</a>
+  <a href="https://youtu.be/qlCuZDjDyqk">YouTube demonstration</a>
 </p>
 
 <div align="center">
