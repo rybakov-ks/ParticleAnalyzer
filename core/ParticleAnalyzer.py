@@ -3,6 +3,7 @@ import numpy as np
 import gradio as gr
 import pandas as pd
 import torch
+from torch import device as torch_device
 import os
 import gc
 from tqdm import tqdm
@@ -11,6 +12,7 @@ from scipy.spatial.distance import pdist
 
 try:
     from detectron2.engine import DefaultPredictor
+    from core.CustomDetectron2Model import CustomDetectron2Model
     DETECTRON2_AVAILABLE = True
 except ImportError:
     DETECTRON2_AVAILABLE = False
@@ -18,7 +20,6 @@ from sahi import AutoDetectionModel
 from sahi.predict import get_sliced_prediction
 
 from core.ModelManager import ModelManager
-from core.CustomDetectron2Model import CustomDetectron2Model
 from core.ImagePreprocessor import ImagePreprocessor
 from core.StatisticsBuilder import StatisticsBuilder
 from core.languages import translations
@@ -27,21 +28,33 @@ from core.language_context import LanguageContext
 lang = 'ru'
 
 class ParticleAnalyzer:
-    def __init__(self, default_lang='ru'):
+    def __init__(self, default_lang='ru', device=None):
         """Инициализация анализатора частиц с настройкой окружения"""
-        self._setup_environment()
-        self.model_manager = ModelManager()
+        self._setup_environment(device)
+        self.model_manager = ModelManager(device=self.device)
         self.preprocessor = ImagePreprocessor()
         self.error_return = self._create_error_return()
         self.default_lang = default_lang
         LanguageContext.set_language(default_lang)  # Устанавливаем язык в контекст
 
-    def _setup_environment(self):
+    def _setup_environment(self, device=None):
         """Настройка параметров окружения и CUDA"""
         os.environ['GRADIO_TEMP_DIR'] = os.path.expanduser('~/.gradio_temp')
-        torch.set_default_device("cuda")
-        torch.backends.cudnn.enabled = True
-        torch.backends.cudnn.benchmark = True
+        if device is None:
+            self.device = torch_device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = torch_device(device)
+        if self.device.type == 'cuda':
+            torch.set_default_device("cuda")
+            torch.backends.cudnn.enabled = True
+            torch.backends.cudnn.benchmark = True
+            # Дополнительные настройки для лучшей производительности
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+            print(f"CUDA device in use: {torch.cuda.get_device_name(0)}")
+        else:
+            print("CUDA not available, using CPU")
+            torch.set_default_device("cpu")
 
     def _get_translation(self, text):
         """Получение перевода текста на текущий язык"""
@@ -90,68 +103,73 @@ class ParticleAnalyzer:
         LanguageContext.set_language(lang) 
         self.lang = lang  # Для обратной совместимости
         
-
-        pbar = tqdm(total=5, desc=self._get_translation("Подготовка..."), 
-                   bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]')
-        
-        if (
-            (
-                image["background"] is None
-                and image["composite"] is None
-                and not image["layers"]
-            )
-            and
-            (image2 is None)
-        ):
-            gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
-            return self._create_error_return()
-
-        image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
-            image=image,
-            image2=image2,
-            scale_selector=scale_selector,
-            solution=solution,
-            request=request,
-            pbar=pbar,
-            sahi_mode=sahi_mode,
-            lang=self.lang
-        )
+        try:
+            pbar = tqdm(total=5, desc=self._get_translation("Подготовка..."), 
+                       bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]')
             
-        if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
-            return self._create_error_return()
-            
-        # Выбор стратегии обработки
-        processor = self._select_processor(model_change, sahi_mode)
-
-        output_image, particle_data, annotations = processor(image, 
-                scale_input, confidence_threshold,
-                scale_selector, confidence_iou, 
-                number_detections, model_change,
-                round_value, slice_height, slice_width, 
-                overlap_height_ratio, overlap_width_ratio, 
-                pbar, orig_image, gray_image, scale, scale_factor_glob)
-        if output_image is None:
-            return self._create_error_return()
-            
-        output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
-        df = pd.DataFrame(particle_data)
-
-        pbar.set_description(self._get_translation("Построение таблицы..."))
-        builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins, lang=self.lang)
-        stats_df = builder.build_stats_table()
-        pbar.update(1)
-
-        pbar.set_description(self._get_translation("Построение графиков..."))
-        fig = builder.build_distribution_fig()
-        pbar.update(1)
-        
-        return (
-                output_image, df, fig, stats_df, gr.update(visible=True), len(df), 
-                gr.update(visible=True), gr.update(visible=True),  gr.update(visible=True), gr.update(visible=True), 
-                (orig_image, annotations) if segment_mode else None, gr.update(visible=True),  gr.update(visible=True),
-                gr.update(visible=segment_mode)
+            if (
+                (
+                    image["background"] is None
+                    and image["composite"] is None
+                    and not image["layers"]
                 )
+                and
+                (image2 is None)
+            ):
+                gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
+                return self._create_error_return()
 
+            image, orig_image, gray_image, scale, scale_factor_glob = self.preprocessor.preprocess_image(
+                image=image,
+                image2=image2,
+                scale_selector=scale_selector,
+                solution=solution,
+                request=request,
+                pbar=pbar,
+                sahi_mode=sahi_mode,
+                lang=self.lang
+            )
+                
+            if not scale and scale_selector == self._get_translation('Instrument scale in µm'):
+                return self._create_error_return()
+                
+            # Выбор стратегии обработки
+            processor = self._select_processor(model_change, sahi_mode)
+
+            output_image, particle_data, annotations = processor(image, 
+                    scale_input, confidence_threshold,
+                    scale_selector, confidence_iou, 
+                    number_detections, model_change,
+                    round_value, slice_height, slice_width, 
+                    overlap_height_ratio, overlap_width_ratio, 
+                    pbar, orig_image, gray_image, scale, scale_factor_glob)
+            if output_image is None:
+                return self._create_error_return()
+                
+            output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+            df = pd.DataFrame(particle_data)
+
+            pbar.set_description(self._get_translation("Построение таблицы..."))
+            builder = StatisticsBuilder(df, scale_selector, round_value=round_value, number_of_bins=number_of_bins, lang=self.lang)
+            stats_df = builder.build_stats_table()
+            pbar.update(1)
+
+            pbar.set_description(self._get_translation("Построение графиков..."))
+            fig = builder.build_distribution_fig()
+            pbar.update(1)
+            
+            return (
+                    output_image, df, fig, stats_df, gr.update(visible=True), len(df), 
+                    gr.update(visible=True), gr.update(visible=True),  gr.update(visible=True), gr.update(visible=True), 
+                    (orig_image, annotations) if segment_mode else None, gr.update(visible=True),  gr.update(visible=True),
+                    gr.update(visible=segment_mode)
+                    )
+        except Exception as e:
+            self._handle_error(e)
+            self._cleanup(pbar)
+            return self._create_error_return()
+        finally:
+            self._cleanup(pbar)
 
     def _select_processor(self, model_change: str, sahi_mode: bool):
         """Выбор стратегии обработки в зависимости от модели и режима"""
@@ -182,7 +200,7 @@ class ParticleAnalyzer:
                     image, verbose=False, 
                     conf=confidence_threshold,
                     retina_masks=True, iou=confidence_iou,
-                    max_det=number_detections, device="cuda:0"
+                    max_det=number_detections, device=self.device
                 )
         except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
             self._handle_gpu_error(e)
