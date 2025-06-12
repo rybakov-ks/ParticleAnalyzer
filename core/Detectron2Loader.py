@@ -1,4 +1,5 @@
 import os
+import torch
 from detectron2.config import get_cfg
 from detectron2.model_zoo import model_zoo
 from detectron2.utils.logger import setup_logger
@@ -13,7 +14,13 @@ logging.disable(logging.CRITICAL)
 warnings.filterwarnings("ignore", category=UserWarning)
 """Работаем с моделями Detectron2"""
 class Detectron2Loader:
-    def __init__(self):
+    def __init__(self, device=None):
+        if device is None:
+            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        elif isinstance(device, torch.device):
+            self.device = device.type  # Преобразуем torch.device в строку
+        else:
+            self.device = str(device)
         # Инициализация конфигураций
         self.configs = {
             "R101": self._init_r101_config(),
@@ -45,7 +52,7 @@ class Detectron2Loader:
         cfg.OUTPUT_DIR = 'model'
         cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "faster_rcnn_R_101_FPN_3x.pth")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-        cfg.MODEL.DEVICE = "cuda"
+        cfg.MODEL.DEVICE = self.device
         return cfg
 
     def _init_x101_config(self):
@@ -54,7 +61,7 @@ class Detectron2Loader:
         cfg.OUTPUT_DIR = 'model'
         cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "faster_rcnn_X_101_32x8d_FPN_3x.pth")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-        cfg.MODEL.DEVICE = "cuda"
+        cfg.MODEL.DEVICE = self.device
         return cfg
 
     def _init_cascade_r50_config(self):
@@ -63,7 +70,7 @@ class Detectron2Loader:
         cfg.OUTPUT_DIR = 'model'
         cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "cascade_mask_rcnn_R_50_FPN_3x.pth")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-        cfg.MODEL.DEVICE = "cuda"
+        cfg.MODEL.DEVICE = self.device
         return cfg
 
     def _init_cascade_x152_config(self):
@@ -72,7 +79,7 @@ class Detectron2Loader:
         cfg.OUTPUT_DIR = 'model'
         cfg.MODEL.WEIGHTS = os.path.join(cfg.OUTPUT_DIR, "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.pth")
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
-        cfg.MODEL.DEVICE = "cuda"
+        cfg.MODEL.DEVICE = self.device
         return cfg
 
     def _save_configs(self):

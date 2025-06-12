@@ -1,3 +1,6 @@
+import os
+import requests
+from tqdm import tqdm
 from .YOLOLoader import YOLOLoader
 try:
     from detectron2.engine import DefaultPredictor
@@ -7,12 +10,25 @@ except ImportError:
     DETECTRON2_AVAILABLE = False
 
 class ModelManager:
-    def __init__(self):
+    def __init__(self, device=None):
+        self.device = device 
+        # URL сервера
+        self.SERVER_URL = "https://rybakov-k.ru/model/"  
+        
+        #Путь к моделям
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.MODELS_DIR = os.path.join(base_path, "model")
+        os.makedirs(self.MODELS_DIR, exist_ok=True)
+        
+        # Проверяем и загружаем модели
+        self._ensure_models_available()
+        
+        # Инициализируем YOLO
         self.yolo_loader = YOLOLoader()
         
         # Инициализируем detectron_loader только если detectron2 доступен
         if DETECTRON2_AVAILABLE:
-            self.detectron_loader = Detectron2Loader()
+            self.detectron_loader = Detectron2Loader(device=self.device)
         else:
             self.detectron_loader = None
         
@@ -59,3 +75,59 @@ class ModelManager:
         if model_name in self.detectron_loader.configs:
             return self.detectron_loader.get_config_path(model_name)
         raise ValueError(f"Config for {model_name} not available (YOLO models don't use config files)")
+            
+    def _ensure_models_available(self):
+        """Проверяет и загружает только необходимые модели"""
+        # Базовые файлы для YOLO (всегда нужны)
+        required_files = [
+            "Yolo11_d1.pt",
+            "Yolo11_d2.pt",
+            "Yolo12_d1.pt",
+            "Yolo12_d2.pt"
+        ]
+        
+        # Добавляем модели Detectron2 только если доступен
+        if DETECTRON2_AVAILABLE:
+            required_files.extend([
+                "faster_rcnn_R_101_FPN_3x.pth",
+                "faster_rcnn_X_101_32x8d_FPN_3x.pth",
+                "cascade_mask_rcnn_R_50_FPN_3x.pth",
+                "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.pth"
+            ])
+        
+        for filename in required_files:
+            file_path = os.path.join(self.MODELS_DIR, filename)
+            if not os.path.exists(file_path):
+                self._download_file(filename)
+
+    def _download_file(self, filename):
+        """Скачивает файл с сервера"""
+        # Если это модель Detectron2 и библиотека недоступна - пропускаем
+        if filename.endswith(('.pth', '.yaml')) and not DETECTRON2_AVAILABLE:
+            print(f"Skipping {filename} (Detectron2 not available)")
+            return False
+            
+        url = f"{self.SERVER_URL}{filename}"
+        save_path = os.path.join(self.MODELS_DIR, filename)
+        
+        try:
+            print(f"Downloading {filename}...")
+            response = requests.get(url, stream=True)
+            response.raise_for_status()
+            
+            with open(save_path, 'wb') as f, tqdm(
+                desc=filename,
+                total=int(response.headers.get('content-length', 0)),
+                unit='B',
+                unit_scale=True
+            ) as pbar:
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
+                        pbar.update(len(chunk))
+            return True
+        except Exception as e:
+            print(f"Error downloading {filename}: {e}")
+            if os.path.exists(save_path):
+                os.remove(save_path)
+            return False
