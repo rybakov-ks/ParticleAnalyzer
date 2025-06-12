@@ -5,17 +5,17 @@
 3. 📥 [Installation Guide](#-installation-guide)
    - [Prerequisites](#prerequisites)
    - [Step-by-Step Setup](#step-by-step-setup)
-4. 🚀 [Launching the Application](#-launching-the-application)
-5. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
-6. 📊 [Analysis Outputs](#-analysis-outputs)
+4. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
+5. 📊 [Analysis Outputs](#-analysis-outputs)
    - [Statistical Data Table](#statistical-data-table)
    - [Size Distribution Visualization](#size-distribution-visualization)
-7. ⚙️ [Advanced Settings](#-advanced-settings)
-8. 📏 [Scale Calibration](#-scale-calibration)
-9. 📧 [Contributors](#-contributors)
+6. ⚙️ [Advanced Settings](#-advanced-settings)
+7. 📏 [Scale Calibration](#-scale-calibration)
+8. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
+[![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
 
 A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.
 <p align="center">
@@ -43,13 +43,35 @@ If the model fails to segment your images correctly, please send them to rybakov
 - **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 ## 🛠 Installation Guide
 
-### Prerequisites
-- Python 3.10 or higher
-- NVIDIA GPU with CUDA 11.8 support (recommended)
-- 16GB+ RAM for optimal performance
-- **10GB+** free disk space for models
+ ### 1. 📥 Install PyTorch with CUDA support
+Make sure your system has an NVIDIA GPU with CUDA. Install [PyTorch](https://pytorch.org/get-started/locally/) using the appropriate CUDA version (e.g., CUDA 11.8):
+   ```python
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+   ```
+If you do not have a CUDA-capable GPU, use the CPU version instead:
+   ```python
+   pip install torch torchvision torchaudio
+   ```
+### 🧪 2. Install Detectron2 (Optional)
 
-### Step-by-Step Setup
+If you want to enable advanced instance segmentation, install Detectron2:
+```python
+pip install 'git+https://github.com/facebookresearch/detectron2.git'
+```
+⚠️ *This step is optional. Detectron2 is only used for advanced analysis features.*
+
+### 📦 3. Install ParticleAnalyzer
+Finally, install ParticleAnalyzer from PyPI:
+```python
+pip install ParticleAnalyzer
+```
+✅ Now you're ready to run the application:
+```python
+ParticleAnalyzer run
+```
+Open in browser: http://127.0.0.1:8000
+
+### Advanced Installation
 
 1. **Clone the repository**:
    ```bash
@@ -60,11 +82,17 @@ If the model fails to segment your images correctly, please send them to rybakov
    ```
 2. **Install dependencies**:
    ```python
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+   ```
+   ```python
+   pip install 'git+https://github.com/facebookresearch/detectron2.git'
+   ```
+   ```python
    pip install -r requirements.txt
    ```
    **There may be problems with the installation of Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
-3. **Download AI models (3.4GB)**:
-   - Download model weights from [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing).
+4. **Download AI models (Optional)** :
+   - Download model weights from [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing) (3.4GB).
    - Place files in model/ directory:
    ```bash
       model/
@@ -81,12 +109,11 @@ If the model fails to segment your images correctly, please send them to rybakov
       ├── cascade_mask_rcnn_R_50_FPN_3x.yaml
       └── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml
    ```
-## 🚀 Launching the Application
-1. Run the server:
-   ```python
-   python app.py
-   ```
-2. Access the interface:
+3. 🚀 Launching the Application
+   - Run the server:
+      ```python
+      python app.py
+      ```
    - Open in browser: http://127.0.0.1:8000
 ## 🛠 Segmentation Optimization Guide
 🔧 Core Parameters:
