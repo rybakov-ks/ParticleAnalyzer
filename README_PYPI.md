@@ -37,7 +37,7 @@ If you want to enable advanced instance segmentation, install Detectron2:
 ```python
 pip install 'git+https://github.com/facebookresearch/detectron2.git'
 ```
-⚠️ *This step is optional. Detectron2 is only used for advanced analysis features.*
+⚠️ *There may be problems installing Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
 
 ### 📦 3. Install ParticleAnalyzer
 Finally, install ParticleAnalyzer from PyPI:
