@@ -8,8 +8,8 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.8", 
-    packages=find_packages(exclude=['tests*'])
+    version="0.1.10", 
+    packages=find_packages(exclude=['tests*']),
     package_data={
         'particleanalyzer': [
             'assets/**/*',
