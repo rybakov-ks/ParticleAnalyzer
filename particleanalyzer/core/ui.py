@@ -70,20 +70,32 @@ def create_interface():
                             interactive=False,
                             elem_id="dataframe-table"
                         )
-                    with gr.Row() as in_image_example_row:   
-                            gr.Examples(['https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/100%20r-.jpg'], 
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Tv30_1.png', 
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/A02-1.bmp',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Resolution%20in%20SEM%201.jpg',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/left_half.jpg'], in_image, label=i18n('Примеры'))
-                    with gr.Row(visible=False) as im_example_row:   
-                            gr.Examples(['https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/100%20r-.jpg'], 
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Tv30_1.png', 
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/A02-1.bmp',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Resolution%20in%20SEM%201.jpg',
-                            'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/left_half.jpg'], im, label=i18n('Примеры'))
+                    with gr.Row() as in_image_example_row:
+                        gr.Examples(
+                            examples=[
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.png',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.bmp',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/left_half.jpg'
+                            ],
+                            inputs=in_image,
+                            label=i18n('Примеры')
+                        )
+                    with gr.Row(visible=False) as im_example_row:
+                        gr.Examples(
+                            examples=[
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.png',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.bmp',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg',
+                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/left_half.jpg'
+                            ],
+                            inputs=im,
+                            label=i18n('Примеры')
+                        )
                     with gr.Row(visible=False) as scale_input_row:
                         scale_input = gr.Number(label=i18n("Instrument scale in µm"), value=1.0)
                     with gr.Row():
