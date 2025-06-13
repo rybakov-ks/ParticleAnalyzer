@@ -8,7 +8,7 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.14", 
+    version="0.1.15", 
     packages=find_packages(exclude=['tests*']),
     package_data={
         'particleanalyzer': [
@@ -23,7 +23,7 @@ setup(
         ],
     },
     install_requires=[
-        'gradio',
+        'gradio>=5.33.1',
         'matplotlib',
         'opencv-python',
         'opencv-python-headless',
