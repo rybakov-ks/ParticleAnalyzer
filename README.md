@@ -12,6 +12,7 @@
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 [![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
+[![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 
 A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.
 <p align="center">
@@ -28,15 +29,15 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
-- SAHI mode helps detect small objects in high-resolution images by using a sliding window approach
+- SAHI mode enables accurate detection of small particles in high-resolution images via a sliding window method
 - Comprehensive statistical analysis of particle characteristics
 - Interactive visualization of size distributions
-- Web-based interface for easy accessibility
-- **Dual-unit display**: toggle between pixels and micrometers (µm)
-- **Multiple AI models** supported (YOLOv11, YOLOv12, Detectron2)
-- **Advanced settings** for precision tuning
-- **Multi-language support**: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en-us)
-- **Online version** available at [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
+- Dual unit support — switch between pixels and micrometers (µm)
+- Supports multiple AI models: YOLOv11, YOLOv12, and Detectron2
+- Advanced configuration options for fine-tuning detection accuracy
+- Multi-language interface: English, Russian, Simplified Chinese, Traditional Chinese (en, ru, zh-CN, zh-TW)
+- Try it online: [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
+
 ## 🛠 Installation Guide
 
  ### 1. 📥 Install PyTorch with CUDA support
