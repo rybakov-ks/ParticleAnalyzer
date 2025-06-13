@@ -20,14 +20,31 @@
 
 ---
 
-## 📦 Installation
+## 🛠 Installation Guide
 
+ ### 1. 📥 Install PyTorch with CUDA support
+Make sure your system has an NVIDIA GPU with CUDA. Install [PyTorch](https://pytorch.org/get-started/locally/) using the appropriate CUDA version (e.g., CUDA 11.8):
+   ```python
+   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+   ```
+If you do not have a CUDA-capable GPU, use the CPU version instead:
+   ```python
+   pip install torch torchvision torchaudio
+   ```
+### 🧪 2. Install Detectron2 (Optional)
+
+If you want to enable advanced instance segmentation, install Detectron2:
+```python
+pip install 'git+https://github.com/facebookresearch/detectron2.git'
+```
+⚠️ *This step is optional. Detectron2 is only used for advanced analysis features.*
+
+### 📦 3. Install ParticleAnalyzer
+Finally, install ParticleAnalyzer from PyPI:
 ```python
 pip install ParticleAnalyzer
 ```
-
-## 🚀 Launch
-
+✅ Now you're ready to run the application:
 ```python
 ParticleAnalyzer run
 ```
