@@ -67,50 +67,6 @@ pip install ParticleAnalyzer
 ParticleAnalyzer run
 ```
 Open in browser: http://127.0.0.1:8000
-
-### Advanced Installation
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/your-username/ParticleAnalyzer.git
-   ```
-   ```bash
-   cd ParticleAnalyzer
-   ```
-2. **Install dependencies**:
-   ```python
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
-   ```
-   ```python
-   pip install 'git+https://github.com/facebookresearch/detectron2.git'
-   ```
-   ```python
-   pip install -r requirements.txt
-   ```
-   **There may be problems with the installation of Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
-4. **Download AI models (Optional)** :
-   - Download model weights from [Google Drive](https://drive.google.com/file/d/10nRH_xBKfq-TtdJuZkwDpdsZSfn7Yz1G/view?usp=sharing) (3.4GB).
-   - Place files in model/ directory:
-   ```bash
-      model/
-      ├── Yolo11_d1.pt
-      ├── Yolo11_d2.pt
-      ├── Yolo12_d1.pt
-      ├── Yolo12_d2.pt
-      ├── faster_rcnn_R_101_FPN_3x.pth
-      ├── faster_rcnn_X_101_32x8d_FPN_3x.pth
-      ├── cascade_mask_rcnn_R_50_FPN_3x.pth
-      ├── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.pth
-      ├── faster_rcnn_R_101_FPN_3x.yaml
-      ├── faster_rcnn_X_101_32x8d_FPN_3x.yaml
-      ├── cascade_mask_rcnn_R_50_FPN_3x.yaml
-      └── cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml
-   ```
-3. 🚀 Launching the Application
-      ```python
-      python app.py
-      ```
-   Open in browser: http://127.0.0.1:8000
 ## 🛠 Segmentation Optimization Guide
 🔧 Core Parameters:
    - Model Selection
