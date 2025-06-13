@@ -1,22 +1,22 @@
 ﻿from setuptools import setup, find_packages
 import os
 
-# Читаем README.md для long_description
+
 def read_file(filename):
     with open(os.path.join(os.path.dirname(__file__), filename), encoding='utf-8') as f:
         return f.read()
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.",  # Рекомендую семантическое версионирование (major.minor.patch)
-    packages=find_packages(exclude=['tests*']),  # Исключаем тестовые директории
+    version="0.1.8", 
+    packages=find_packages(exclude=['tests*'])
     package_data={
         'particleanalyzer': [
             'assets/**/*',
             'core/*',
         ],
     },
-    include_package_data=True,  # Важно для не-Python файлов
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'ParticleAnalyzer=particleanalyzer.cli:main',
@@ -26,7 +26,7 @@ setup(
         'gradio',
         'matplotlib',
         'opencv-python',
-        'opencv-python-headless',  # Обратите внимание на дефис вместо underscore
+        'opencv-python-headless',
         'Pillow',
         'plotly',
         'sahi',
