@@ -8,7 +8,7 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.13", 
+    version="0.1.14", 
     packages=find_packages(exclude=['tests*']),
     package_data={
         'particleanalyzer': [
@@ -43,7 +43,7 @@ setup(
     url="https://github.com/rybakov-ks/ParticleAnalyzer",
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: GLP-3.0 License',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
     ],
     keywords=[
