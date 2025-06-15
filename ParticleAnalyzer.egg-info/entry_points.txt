@@ -1,2 +1,0 @@
-[console_scripts]
-ParticleAnalyzer = particleanalyzer.cli:main
