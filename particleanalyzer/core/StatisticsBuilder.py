@@ -56,10 +56,9 @@ class StatisticsBuilder:
 
         fig = make_subplots(
             rows=5, cols=1,
-            subplot_titles=self._get_translation(
-                                            ("Распределение площади", "Распределение периметра", "Распределение диаметра",
-                                            "Распределение эксцентриситета", "Распределение интенсивности")
-                                        ),
+            subplot_titles=(self._get_translation("Распределение площади"), self._get_translation("Распределение периметра"),
+                            self._get_translation("Распределение диаметра"),
+                            self._get_translation("Распределение эксцентриситета"), self._get_translation("Распределение интенсивности")),
             specs=[[{"secondary_y": True}]] * 5,
             vertical_spacing=0.05
         )

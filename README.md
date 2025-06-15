@@ -65,7 +65,12 @@ pip install ParticleAnalyzer
 ```python
 ParticleAnalyzer run
 ```
-Open in browser: http://127.0.0.1:8000
+Open in browser: http://127.0.0.1:8000 
+
+You can specify the port if necessary:
+```python
+ParticleAnalyzer run --port 5000
+```
 ## 🛠 Segmentation Optimization Guide
 🔧 Core Parameters:
    - Model Selection

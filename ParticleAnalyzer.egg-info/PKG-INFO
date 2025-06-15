@@ -1,3 +1,42 @@
+Metadata-Version: 2.4
+Name: ParticleAnalyzer
+Version: 0.1.18
+Summary: SEM Image Analysis Tool
+Home-page: https://github.com/rybakov-ks/ParticleAnalyzer
+Author: Kirill Rybakov
+Author-email: rybakov-ks@ya.ru
+Project-URL: Bug Reports, https://github.com/rybakov-ks/ParticleAnalyzer/issues
+Project-URL: Source, https://github.com/rybakov-ks/ParticleAnalyzer
+Keywords: SEM,microscopy,image-analysis,particle-analysis,materials-science,nanoparticles,computer-vision,opencv,python,scientific-computing,microstructure,particle-size,image-processing,detectron2,YOLO,deep-learning,microscope-images,material-characterization,automated-measurements,research-tools
+Classifier: Programming Language :: Python :: 3.10
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: gradio>=5.33.1
+Requires-Dist: matplotlib
+Requires-Dist: opencv-python
+Requires-Dist: opencv-python-headless
+Requires-Dist: Pillow
+Requires-Dist: plotly
+Requires-Dist: sahi
+Requires-Dist: scipy
+Requires-Dist: tqdm
+Requires-Dist: ultralytics
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 # ParticleAnalyzer
 
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
@@ -49,7 +88,3 @@ pip install ParticleAnalyzer
 ParticleAnalyzer run
 ```
 Open in browser: http://127.0.0.1:8000
-
-You can specify the port if necessary:
-```python
-ParticleAnalyzer run --port 5000

@@ -1,11 +1,11 @@
 # Игнорировать все .pt и .pth файлы в model/
-model/*.pt
-model/*.pth
+particleanalyzer/model/*.pt
+particleanalyzer/model/*.pth
 
 # Игнорировать все .yaml файлы в model/
-model/*.yaml
+particleanalyzer/model/*.yaml
 
 # Игнорировать файлы в output/
-output/*.png
-output/*.jpg
-output/*.csv
+particleanalyzer/output/*.png
+particleanalyzer/output/*.jpg
+particleanalyzer/output/*.csv
