@@ -35,7 +35,7 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 - Dual unit support — switch between pixels and micrometers (µm)
 - Supports multiple AI models: YOLOv11, YOLOv12, and Detectron2
 - Advanced configuration options for fine-tuning detection accuracy
-- Multi-language interface: English, Russian, Simplified Chinese, Traditional Chinese (en, ru, zh-CN, zh-TW)
+- Multi-language interface: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en)
 - Try it online: [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
 ## 🛠 Installation Guide
