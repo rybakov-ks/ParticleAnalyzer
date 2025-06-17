@@ -25,8 +25,8 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
   <img src="Images/example.gif" alt="Example">
 </div>
 
-*If you encounter any errors while using ParticleAnalyzer, please open an issue in our GitHub repository or contact us directly at rybakov-ks@ya.ru for support.
-If the model fails to segment your images correctly, please send them to rybakov-ks@ya.ru. Your submissions will be used to retrain and improve the model’s performance.*
+*If you encounter any errors while using Particle Analyzer, please open an issue in the GitHub repository or contact me at rybakov-ks@ya.ru for support.
+If the model cannot segment your images correctly, please send them to rybakov-ks@ya.ru . Your images will be used to retrain the model.*
 ## ✨ Key Features
 - Automated particle segmentation in SEM images
 - SAHI mode enables accurate detection of small particles in high-resolution images via a sliding window method
