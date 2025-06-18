@@ -106,9 +106,14 @@ ParticleAnalyzer run --port 5000
 </div>
 
 *Comprehensive metrics including mean, median, min/max, standard deviation values for:*
+<div align="center">
+  <img src="Images/8.png" alt="Statistics Table">
+</div>
+
 - Area (px² or µm²)
 - Perimeter (px or µm)
 - Equivalent diameter (px or µm)
+- Feret diameters and angles (px or µm and °)
 - Eccentricity (unitless)
 - Intensity values (grayscale units)
 
@@ -155,7 +160,7 @@ Micrometer values are calculated by:
 
 *Note: For accurate µm measurements, please ensure:*
 - The scale bar is clearly visible in your image
-- You input the correct reference distance when prompted
+- Enter the correct scale
 - The scale bar was created at the same magnification as your particles
 
 ## 📧 Contributors
