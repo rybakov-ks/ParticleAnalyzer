@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 class LanguageContext:
     _current_lang = 'ru'
 

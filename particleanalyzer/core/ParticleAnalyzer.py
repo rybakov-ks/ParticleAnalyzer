@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-import cv2
+﻿import cv2
 import numpy as np
 import gradio as gr
 import pandas as pd
@@ -96,6 +95,7 @@ class ParticleAnalyzer:
                     round_value: int, slice_height: int, slice_width: int, 
                     overlap_height_ratio: float, overlap_width_ratio: float, 
                     sahi_mode: bool, number_of_bins: int, segment_mode: bool,
+                    show_Feret_diametr: bool,
                     request: gr.Request) -> Tuple:
         """
         Основной метод для анализа изображения.
@@ -143,7 +143,7 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio, 
-                    pbar, orig_image, gray_image, scale, scale_factor_glob)
+                    pbar, orig_image, gray_image, scale, scale_factor_glob, show_Feret_diametr)
             if output_image is None:
                 return self._create_error_return()
                 
@@ -190,7 +190,7 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio, 
-                    pbar, orig_image, gray_image, scale, scale_factor_glob):
+                    pbar, orig_image, gray_image, scale, scale_factor_glob, show_Feret_diametr):
         """Обработка с использованием YOLO"""
         model = self.model_manager.get_model(model_change)
         pbar.set_description(self._get_translation("YOLO обрабатывает изображение..."))
@@ -240,7 +240,8 @@ class ParticleAnalyzer:
                         particle_data=particle_data,
                         annotations=annotations,
                         raw_mask=mask2,
-                        scale_factor_glob=scale_factor_glob
+                        scale_factor_glob=scale_factor_glob,
+                        show_Feret_diametr=show_Feret_diametr
                     )
         pbar.update(1)  
         return output_image, particle_data, annotations
@@ -251,7 +252,7 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio,
-                    pbar, orig_image, gray_image, scale, scale_factor_glob):
+                    pbar, orig_image, gray_image, scale, scale_factor_glob, show_Feret_diametr):
         """Обработка с использованием Detectron2"""
         cfg = self.model_manager.get_model(model_change)
         cfg.TEST.DETECTIONS_PER_IMAGE = number_detections
@@ -296,7 +297,8 @@ class ParticleAnalyzer:
                 particle_data=particle_data,
                 annotations=annotations,
                 raw_mask=mask,
-                scale_factor_glob=scale_factor_glob
+                scale_factor_glob=scale_factor_glob,
+                show_Feret_diametr=show_Feret_diametr
             )
         pbar.update(1)    
         return output_image, particle_data, annotations 
@@ -307,7 +309,7 @@ class ParticleAnalyzer:
                     number_detections, model_change,
                     round_value, slice_height, slice_width, 
                     overlap_height_ratio, overlap_width_ratio,
-                    pbar, orig_image, gray_image, scale, scale_factor_glob):
+                    pbar, orig_image, gray_image, scale, scale_factor_glob, show_Feret_diametr):
         """Обработка с использованием SAHI"""
         model_type = self.model_manager.model_types[model_change]
        
@@ -370,28 +372,30 @@ class ParticleAnalyzer:
                     particle_data=particle_data,
                     annotations=None,
                     raw_mask=None,
-                    scale_factor_glob=scale_factor_glob
+                    scale_factor_glob=scale_factor_glob,
+                    show_Feret_diametr=show_Feret_diametr
                 )
         pbar.update(1)
-        return output_image, particle_data, annotations 
-     
+        return output_image, particle_data, annotations
+
     def _analyze_particle(self, points, gray_image,
-                         output_image, scale_selector,
-                         scale_input, scale, particle_counter,
-                         round_value, thickness, particle_data,
-                         annotations, raw_mask, scale_factor_glob) -> int:
-        """Анализ отдельной частицы"""
+                          output_image, scale_selector,
+                          scale_input, scale, particle_counter,
+                          round_value, thickness, particle_data,
+                          annotations, raw_mask, scale_factor_glob,
+                          show_Feret_diametr) -> int:
+        """Анализ отдельной частицы с расчетом Feret-диаметров"""
         if len(points) < 3:
             return particle_counter
 
         points = np.array(points, dtype=np.int32).reshape((-1, 1, 2))
-        
-        # Вычисление характеристик частицы
+
+        # Вычисление базовых характеристик
         area = cv2.contourArea(points)
         perimeter = cv2.arcLength(points, closed=True)
         distances = pdist(points[:, 0, :])
         diameter = np.max(distances) if len(distances) > 0 else 0
-        
+
         # Эксцентриситет
         eccentricity = 0
         if len(points) >= 5:
@@ -400,33 +404,108 @@ class ParticleAnalyzer:
             a, b = max(major_axis, minor_axis) / 2, min(major_axis, minor_axis) / 2
             eccentricity = np.sqrt(1 - (b ** 2 / a ** 2)) if a > b else 0
 
+        # Расчет Feret-диаметров и углов
+        def get_feret(contour, angles=np.arange(0, 180, 1)):
+            feret_values = []
+            feret_angles = []
+
+            for angle in angles:
+                M = cv2.getRotationMatrix2D((0, 0), angle, 1)
+                rotated = cv2.transform(contour, M)
+                x_coords = rotated[:, 0, 0]
+                feret = x_coords.max() - x_coords.min()
+                feret_values.append(feret)
+                feret_angles.append(angle)
+
+            feret_max = max(feret_values)
+            feret_min = min(feret_values)
+            feret_mean = np.mean(feret_values)
+            angle_max = feret_angles[feret_values.index(feret_max)]
+            angle_min = feret_angles[feret_values.index(feret_min)]
+
+            return feret_max, feret_min, feret_mean, angle_max, angle_min
+
+        feret_max, feret_min, feret_mean, angle_max, angle_min = get_feret(points)
+
         # Средняя интенсивность
         mask_img = np.zeros_like(gray_image, dtype=np.uint8)
         cv2.fillPoly(mask_img, [points], 255)
         mean_intensity = cv2.mean(gray_image, mask=mask_img)[0]
 
-        # Отрисовка контура
+        # Отрисовка контура и Feret-линий (опционально)
         cv2.polylines(output_image, [points], isClosed=True, color=(0, 255, 0), thickness=thickness)
-
+        if show_Feret_diametr:
+            self._draw_feret_lines(output_image, points, angle_max, (0, 255, 255))  # Желтый - Feret max
+            self._draw_feret_lines(output_image, points, angle_min, (255, 0, 0))    # Синий - Feret min
+    
         # Сохранение аннотации
         if annotations is not None and raw_mask is not None:
             annotations.append((raw_mask, f"Particle {particle_counter}"))
 
         # Масштабирование
-        scale_factor = float(scale_input) / float(scale) * scale_factor_glob if scale_selector == 'Instrument scale in µm' else 1 * scale_factor_glob
+        scale_factor = float(scale_input) / float(
+            scale) * scale_factor_glob if scale_selector == 'Instrument scale in µm' else 1 * scale_factor_glob
         scale_area = scale_factor ** 2
 
         # Добавление данных частицы
         particle_data.append({
             "№": round(particle_counter, round_value),
-            self._get_translation("S [мкм²]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("S [пикс²]"): round(area * scale_area, round_value),
-            self._get_translation("P [мкм]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("P [пикс]"): round(perimeter * scale_factor, round_value),
-            self._get_translation("D [мкм]") if scale_selector == self._get_translation('Instrument scale in µm') else self._get_translation("D [пикс]"): round(diameter * scale_factor, round_value),
+            self._get_translation("S [мкм²]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("S [пикс²]"): round(area * scale_area,
+                                                                                         round_value),
+            self._get_translation("P [мкм]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("P [пикс]"): round(perimeter * scale_factor,
+                                                                                        round_value),
+            self._get_translation("D [мкм]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("D [пикс]"): round(diameter * scale_factor,
+                                                                                        round_value),
+            self._get_translation("Dₘₐₓ [мкм]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("Dₘₐₓ [пикс]"): round(feret_max * scale_factor, round_value),
+            self._get_translation("Dₘᵢₙ [мкм]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("Dₘᵢₙ [пикс]"): round(feret_min * scale_factor, round_value),
+            self._get_translation("Dₘₑₐₙ [мкм]")if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("Dₘₑₐₙ [пикс]"): round(feret_mean * scale_factor, round_value),
+            self._get_translation("θₘₐₓ [°]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("θₘₐₓ [°]"): round(angle_max, round_value),
+            self._get_translation("θₘᵢₙ [°]") if scale_selector == self._get_translation(
+                'Instrument scale in µm') else self._get_translation("θₘᵢₙ [°]"): round(angle_min, round_value),
             "e": round(eccentricity, round_value),
             self._get_translation("I [ед.]"): round(mean_intensity, round_value)
         })
 
         return particle_counter + 1
+
+    def _draw_feret_lines(self, image, contour, angle, color=(0, 255, 0), thickness=2):
+        """Отрисовка Feret-линий"""
+        moments = cv2.moments(contour)
+        if moments["m00"] == 0:
+            return
+        cx = int(moments["m10"] / moments["m00"])
+        cy = int(moments["m01"] / moments["m00"])
+        center = (cx, cy)
+
+        M = cv2.getRotationMatrix2D(center, angle, 1.0)
+        
+        rotated = cv2.transform(contour, M)
+        
+        x_coords = rotated[:, 0, 0]
+        if len(x_coords) == 0:
+            return
+        
+        x_min, x_max = np.min(x_coords), np.max(x_coords)
+        y_center = np.mean(rotated[:, 0, 1])
+
+        pt1_rotated = np.array([[[x_min, y_center]]], dtype=np.float32)
+        pt2_rotated = np.array([[[x_max, y_center]]], dtype=np.float32)
+
+        M_inv = cv2.getRotationMatrix2D(center, -angle, 1.0)
+        pt1 = cv2.transform(pt1_rotated, M_inv)[0][0]
+        pt2 = cv2.transform(pt2_rotated, M_inv)[0][0]
+
+        cv2.line(image, 
+                 tuple(pt1.astype(int)), 
+                 tuple(pt2.astype(int)), 
+                 color, thickness)
 
     def _get_scaled_thickness(self, image_width: int, image_height: int, 
                              base_width: int = 300, base_thickness: int = 1) -> int:

@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-from sahi.models.detectron2 import Detectron2DetectionModel
+﻿from sahi.models.detectron2 import Detectron2DetectionModel
 from detectron2.config import get_cfg
 import os
 

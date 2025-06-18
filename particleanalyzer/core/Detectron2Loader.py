@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-import os
+﻿import os
 import torch
 from detectron2.config import get_cfg
 from detectron2.model_zoo import model_zoo

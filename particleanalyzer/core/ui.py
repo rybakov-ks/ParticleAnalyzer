@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-import os
+﻿import os
 import gradio as gr
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer 
 from particleanalyzer.core.utils import (
@@ -34,7 +33,7 @@ def create_interface():
     with demo:
         with gr.Column(elem_id="app-container"):
             gr.Markdown("# 🔎 ParticleAnalyzer")
-            gr.Markdown(i18n("При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM."))
+            gr.Markdown(i18n("При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"))
             mode_state = gr.State(value=i18n("Тёмный режим"))
             with gr.Tabs():
                 with gr.Tab(i18n("Анализ")):
@@ -212,6 +211,9 @@ def create_interface():
                             step=1,
                             label=i18n("Количество интервалов на гистограмме")
                         )
+                    with gr.Row():
+                        # Слайдер для number_of_bins 
+                        show_Feret_diametr = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить отображение диаметров Ферета?")) 
                         
             # Основная функция обработки изображений при нажатии кнопки
             process_button.click(
@@ -219,7 +221,7 @@ def create_interface():
                 inputs=[im, in_image, scale_input, confidence_threshold, scale_selector, 
                         confidence_iou, number_detections, solution, model_change, round_value, 
                         slice_height, slice_width, overlap_height_ratio, overlap_width_ratio, sahi_mode,
-                        number_of_bins, segment_mode],
+                        number_of_bins, segment_mode, show_Feret_diametr],
                 outputs=[output_image, output_table, output_plot, output_table2, download_output, label, label,
                         output_table, output_plot, output_table2, output_image2, question_row, buttons_row,
                         AnnotatedImage_row]
