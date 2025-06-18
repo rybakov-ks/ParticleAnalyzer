@@ -1,5 +1,4 @@
-﻿# -*- coding: utf-8 -*-
-import os
+﻿import os
 from ultralytics import YOLO
 
 """Работаем с моделями YOLO"""

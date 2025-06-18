@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import cv2
 import gradio as gr
 import pandas as pd
@@ -9,6 +8,9 @@ from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
 from particleanalyzer.core.languages import i18n
 
+base_path = os.path.dirname(__file__)
+assets_path = lambda name: os.path.join(base_path, "..", "assets", name)
+
 def get_translation(text):
     lang = LanguageContext.get_language()
     return translations.get(lang, {}).get(text, text)
@@ -16,27 +18,42 @@ def get_translation(text):
 # Создаем пустые DataFrame с нужными заголовками
 empty_df1 = pd.DataFrame(columns=[
     "№", 
-    get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
-    get_translation("P [мкм]"),   # Периметр в микрометрах
-    get_translation("D [мкм]"),   # Диаметр в микрометрах
-    "e",         # Эксцентриситет (безразмерная величина)
-    get_translation("I [ед.]")    # Интенсивность в условных единицах
+    get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
+    get_translation("P [мкм]"),      # Периметр в микрометрах
+    get_translation("D [мкм]"),      # Диаметр в микрометрах
+    get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
+    get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
+    get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
+    get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
+    get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра   
+    "e",                             # Эксцентриситет (безразмерная величина)
+    get_translation("I [ед.]")       # Интенсивность в условных единицах
 ])
 empty_df2 = pd.DataFrame(columns=[
     "№", 
-    get_translation("S [пикс²]"), # Площадь в квадратных пикселях 
-    get_translation("P [пикс]"),  # Периметр в пикселях
-    get_translation("D [пикс]"),  # Диаметр в пикселях
-    "e",         # Эксцентриситет (безразмерная величина)
-    get_translation("I [ед.]")    # Интенсивность в условных единицах
+    get_translation("S [пикс²]"),    # Площадь в квадратных пикселях 
+    get_translation("P [пикс]"),     # Периметр в пикселях
+    get_translation("D [пикс]"),     # Диаметр в пикселях
+    get_translation("Dₘₐₓ [пикс]"),   # Максимальны диаметр Ферета
+    get_translation("Dₘᵢₙ  [пикс]"),  # Минимальный диаметр Ферета
+    get_translation("Dₘₑₐₙ  [пикс]"), # Средний диаметр Ферета
+    get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
+    get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра   
+    "e",                             # Эксцентриситет (безразмерная величина)
+    get_translation("I [ед.]")       # Интенсивность в условных единицах
 ]).fillna("")
 empty_df2_2 = pd.DataFrame(columns=[
     "№", 
-    get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
-    get_translation("P [мкм]"),   # Периметр в микрометрах
-    get_translation("D [мкм]"),   # Диаметр в микрометрах
-    "e",         # Эксцентриситет (безразмерная величина)
-    get_translation("I [ед.]")    # Интенсивность в условных единицах
+    get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
+    get_translation("P [мкм]"),      # Периметр в микрометрах
+    get_translation("D [мкм]"),      # Диаметр в микрометрах
+    get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
+    get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
+    get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
+    get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
+    get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра   
+    "e",                             # Эксцентриситет (безразмерная величина)
+    get_translation("I [ед.]")       # Интенсивность в условных единицах
 ]).fillna("")
 empty_df3 = pd.DataFrame(columns=[
     get_translation("Параметр"),  # Параметр
@@ -87,11 +104,16 @@ def reset_interface(scale_value):
         None,  # Очищаем output_image
         pd.DataFrame(columns=[
             "№", 
-            get_translation("S [мкм²]"),  # Площадь в квадратных микрометрах
-            get_translation("P [мкм]"),   # Периметр в микрометрах
-            get_translation("D [мкм]"),   # Диаметр в микрометрах
-            "e",         # Эксцентриситет (безразмерная величина)
-            get_translation("I [ед.]")    # Интенсивность в условных единицах
+            get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
+            get_translation("P [мкм]"),      # Периметр в микрометрах
+            get_translation("D [мкм]"),      # Диаметр в микрометрах
+            get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
+            get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
+            get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
+            get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
+            get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра   
+            "e",                             # Эксцентриситет (безразмерная величина)
+            get_translation("I [ед.]")       # Интенсивность в условных единицах
         ]),
         pd.DataFrame(columns=[
             get_translation("Параметр"),  # Параметр
@@ -130,9 +152,9 @@ def save_data_to_csv(data_table: pd.DataFrame, data_table2: pd.DataFrame, output
 
 def toggle_theme(current_mode: str):
     """Переключает между темной и светлой темой"""
-    if current_mode == get_translation("Тёмный режим"):
-        return get_translation('Светлый режим'), gr.Button(value=i18n('Светлый режим'), icon='assets/icon/icons8-солнце-50.png')
-    return get_translation('Тёмный режим'), gr.Button(value=i18n('Тёмный режим'), icon='assets/icon/icons8-темный-режим-50.png')
+    if current_mode == get_translation("Тёмный режим") or current_mode.__class__.__name__ == 'I18nData':
+        return get_translation('Светлый режим'), gr.Button(value=i18n('Светлый режим'), icon=f'{assets_path("")}/icon/icons8-солнце-50.png')
+    return get_translation('Тёмный режим'), gr.Button(value=i18n('Тёмный режим'), icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png')
 
 def log_analytics(
     confidence_threshold: float,

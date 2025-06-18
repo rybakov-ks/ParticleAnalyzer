@@ -9,3 +9,9 @@ particleanalyzer/model/*.yaml
 particleanalyzer/output/*.png
 particleanalyzer/output/*.jpg
 particleanalyzer/output/*.csv
+output/*.png
+output/*.jpg
+output/*.csv
+
+# Игнорировать все в .idea
+.idea/*

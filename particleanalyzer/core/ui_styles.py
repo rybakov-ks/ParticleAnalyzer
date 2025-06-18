@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # CSS для стилизации интерфейса
 css = """
 #app-container {
