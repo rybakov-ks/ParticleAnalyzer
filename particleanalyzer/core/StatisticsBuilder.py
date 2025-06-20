@@ -3,7 +3,13 @@ import numpy as np
 from scipy.stats import norm
 from plotly.subplots import make_subplots
 import plotly.graph_objs as go
+import plotly.figure_factory as ff
 from particleanalyzer.core.languages import translations
+
+from PIL import Image
+from io import BytesIO
+import base64
+
 
 class StatisticsBuilder:
     def __init__(self, df, scale_selector, round_value, number_of_bins, lang='ru'):
@@ -58,13 +64,13 @@ class StatisticsBuilder:
 
         return pd.DataFrame(stats)
 
-    def build_distribution_fig(self):
+    def build_distribution_fig(self, image):
         if self.df.empty:
             return None
-
+        row_heights = [0.14, 0.14, 0.14, 0.14, 0.14, 0.30]
         # Создаем 3 строки и 2 колонки (последний график будет один в третьей строке)
         fig = make_subplots(
-            rows=5, cols=2,
+            rows=6, cols=2, row_heights=row_heights,
             subplot_titles=(
                 self._get_translation("Распределение площади"), 
                 self._get_translation("Распределение периметра"),
@@ -76,6 +82,8 @@ class StatisticsBuilder:
                 self._get_translation("Распределение угла Ферета"),
                 self._get_translation("Распределение эксцентриситета"), 
                 self._get_translation("Распределение интенсивности"),
+                self._get_translation("Векторное поле ориентации"),
+                ""
             ),
             specs=[
                 [{"secondary_y": True}, {"secondary_y": True}],
@@ -83,8 +91,9 @@ class StatisticsBuilder:
                 [{"secondary_y": True}, {"secondary_y": True}],
                 [{"secondary_y": True}, {"secondary_y": True}],
                 [{"secondary_y": True}, {"secondary_y": True}], 
+                [{"secondary_y": True, "colspan": 2}, None] 
             ],
-            vertical_spacing=0.08,
+            vertical_spacing=0.05,
             horizontal_spacing=0.2
         )
 
@@ -118,11 +127,14 @@ class StatisticsBuilder:
         for row, col, col_name, label, color in params:
             self._add_distribution(fig, row, col, self.df[col_name], label, color)
 
+        if 'centroid_x' in self.df.columns and 'centroid_y' in self.df.columns:
+            self._add_vector_field(fig, self.df, row=6, col=1, image=image)
+
         fig.update_layout(
-            height=1200,  # Уменьшил высоту, так как графики компактнее
+            height=1600,
             showlegend=False,
             plot_bgcolor="white",
-            margin=dict(l=50, r=50, b=50, t=50),  # Уменьшил отступы
+            margin=dict(l=50, r=50, b=50, t=50),
             modebar={
                 'orientation': 'h',
                 'remove': [
@@ -175,5 +187,94 @@ class StatisticsBuilder:
             row=row, col=col,
             mirror=True, linewidth=2, linecolor='black',
             ticks="inside", tickcolor='black', tickwidth=2, ticklen=5,
+            showgrid=False
+        )
+        
+
+
+    def _add_vector_field(self, fig, df, row, col, image):
+        image = np.flipud(image)
+        image_pil = Image.fromarray(image.astype(np.uint8))
+        buffer = BytesIO()
+        image_pil.save(buffer, format="PNG")
+        encoded_image = base64.b64encode(buffer.getvalue()).decode()
+        
+        fig.add_trace(
+            go.Image(
+                z=image,
+                opacity=1,
+                x0=0,
+                y0=image.shape[0],
+                dx=1,
+                dy=-1,
+                hoverinfo='skip',
+                name="Background Image"
+            ),
+            row=row,
+            col=col
+        )
+        
+        if not {'centroid_x', 'centroid_y'}.issubset(df.columns):
+            return
+
+        angle_column = self._get_translation("θₘₐₓ [°]")
+        if angle_column not in df.columns:
+            return
+
+        if self.scale_selector == self._get_translation('Instrument scale in µm'):
+            diameter_col = self._get_translation("Dₘₐₓ [мкм]")
+        else:
+            diameter_col = self._get_translation("Dₘₐₓ [пикс]")
+
+        if diameter_col not in df.columns:
+            return
+
+        x = df['centroid_x'].values
+        y = df['centroid_y'].values
+        theta_deg = df[angle_column].values
+        theta_rad = np.deg2rad(theta_deg)
+        diameters = df[diameter_col].values
+
+        min_length = 20  # минимальная длина стрелки
+        max_length = 60  # максимальная длина стрелки
+        if len(diameters) > 1:
+            normalized_lengths = min_length + (max_length - min_length) * (diameters - min(diameters)) / (max(diameters) - min(diameters))
+        else:
+            normalized_lengths = [min_length]
+
+        u = np.cos(theta_rad) * normalized_lengths
+        v = np.sin(theta_rad) * normalized_lengths
+
+        quiver_fig = ff.create_quiver(
+                                        x, y, u, v,
+                                        scale=1,
+                                        arrow_scale=0.3,
+                                        line=dict(
+                                            width=2,
+                                            color='yellow',
+                                            shape='spline'
+                                        )
+                                    )
+
+        for trace in quiver_fig.data:
+            fig.add_trace(trace, row=row, col=col)
+
+        fig.update_xaxes(
+            title_text=self._get_translation("X"),
+            row=row,
+            col=col,
+            range=[0, image.shape[1]],
+            constrain='domain',
+            showgrid=False
+        )
+
+        fig.update_yaxes(
+            title_text=self._get_translation("Y"),
+            row=row,
+            col=col,
+            range=[image.shape[0], 0],
+            scaleanchor=f"x{2*(row-1)+col}",
+            scaleratio=1,
+            constrain='domain',
             showgrid=False
         )

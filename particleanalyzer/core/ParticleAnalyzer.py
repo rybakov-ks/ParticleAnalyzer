@@ -156,7 +156,7 @@ class ParticleAnalyzer:
             pbar.update(1)
 
             pbar.set_description(self._get_translation("Построение графиков..."))
-            fig = builder.build_distribution_fig()
+            fig = builder.build_distribution_fig(image)
             pbar.update(1)
             
             return (
@@ -390,6 +390,14 @@ class ParticleAnalyzer:
 
         points = np.array(points, dtype=np.int32).reshape((-1, 1, 2))
 
+        # Вычисление центроида (геометрического центра)
+        moments = cv2.moments(points)
+        if moments["m00"] != 0:
+            centroid_x = moments["m10"] / moments["m00"]
+            centroid_y = moments["m01"] / moments["m00"]
+        else:
+            centroid_x, centroid_y = np.mean(points[:, 0, :], axis=0)
+
         # Вычисление базовых характеристик
         area = cv2.contourArea(points)
         perimeter = cv2.arcLength(points, closed=True)
@@ -450,6 +458,8 @@ class ParticleAnalyzer:
         # Добавление данных частицы
         particle_data.append({
             "№": round(particle_counter, round_value),
+            "centroid_x": round(centroid_x, round_value),
+            "centroid_y": round(centroid_y, round_value),
             self._get_translation("S [мкм²]") if scale_selector == self._get_translation(
                 'Instrument scale in µm') else self._get_translation("S [пикс²]"): round(area * scale_area,
                                                                                          round_value),
