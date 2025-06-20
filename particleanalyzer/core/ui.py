@@ -32,7 +32,7 @@ def create_interface():
 
     with demo:
         with gr.Column(elem_id="app-container"):
-            gr.Markdown("# 🔎 ParticleAnalyzer")
+            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.21")
             gr.Markdown(i18n("При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"))
             mode_state = gr.State(value=i18n("Тёмный режим"))
             with gr.Tabs():
@@ -82,19 +82,6 @@ def create_interface():
                             inputs=in_image,
                             label=i18n('Примеры')
                         )
-                    with gr.Row(visible=False) as im_example_row:
-                        gr.Examples(
-                            examples=[
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg',
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.png',
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.bmp',
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg',
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg',
-                                'https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/left_half.jpg'
-                            ],
-                            inputs=im,
-                            label=i18n('Примеры')
-                        )
                     with gr.Row(visible=False) as scale_input_row:
                         scale_input = gr.Number(label=i18n("Instrument scale in µm"), value=1.0)
                     with gr.Row():
@@ -114,7 +101,7 @@ def create_interface():
                             elem_id="dataframe-table2",
                             show_copy_button=True
                         )
-                    with gr.Row():
+                    with gr.Row(visible=False):
                         # Таблица с характеристиками
                         output_table = gr.Dataframe(
                             value=empty_df2,
@@ -167,9 +154,6 @@ def create_interface():
                             step=0.01,
                             label=i18n("Порог перекрытия (IoU)")
                         )
-                    with gr.Row() as solution_row:
-                        # Переключатель разрешения
-                        solution = gr.Radio(("Original", "640x640", "1024x1024"), value="1024x1024", label=i18n("Разрешение изображения"))
                     with gr.Row():
                         sahi_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить обработку с разбиением на фрагменты (SAHI)?"))       
                     with gr.Row(visible=False) as slice_row:
@@ -188,6 +172,9 @@ def create_interface():
                             value=0.1,
                             step=0.01, 
                             label=i18n("Перекрытие по ширине"))
+                    with gr.Row() as solution_row:
+                        # Переключатель разрешения
+                        solution = gr.Radio(("Original", "640x640", "1024x1024"), value="1024x1024", label=i18n("Разрешение изображения"))
                     with gr.Row() as segment_mode_row:
                         segment_mode = gr.Checkbox(label=i18n("Включить"), info=i18n("Включить режим анализа отдельных частиц?")) 
                     with gr.Row() as number_detections_row:
