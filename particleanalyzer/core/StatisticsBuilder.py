@@ -94,7 +94,7 @@ class StatisticsBuilder:
                 [{"secondary_y": True, "colspan": 2}, None] 
             ],
             vertical_spacing=0.05,
-            horizontal_spacing=0.2
+            horizontal_spacing=0.11
         )
 
         if self.scale_selector == self._get_translation('Instrument scale in µm'):
@@ -166,7 +166,7 @@ class StatisticsBuilder:
 
         # Обновляем оси только для текущего подграфика
         fig.update_yaxes(
-            title_text=self._get_translation("Количество"), 
+            title_text=self._get_translation("Количество") if col == 1 else "", 
             row=row, col=col, 
             automargin=True,
             mirror=True, linewidth=2, linecolor='black',
@@ -174,7 +174,7 @@ class StatisticsBuilder:
             showgrid=False
         )
         fig.update_yaxes(
-            title_text=self._get_translation("Плотность вероятности"), 
+            title_text=self._get_translation("Плотность вероятности") if col == 2 else "", 
             secondary_y=True, 
             row=row, col=col,
             automargin=True,
