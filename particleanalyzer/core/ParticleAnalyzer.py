@@ -9,7 +9,6 @@ import gc
 from tqdm import tqdm
 from typing import Optional, Tuple, List, Dict, Any, Union
 from scipy.spatial.distance import pdist
-
 try:
     from detectron2.engine import DefaultPredictor
     from particleanalyzer.core.CustomDetectron2Model import CustomDetectron2Model
@@ -136,7 +135,6 @@ class ParticleAnalyzer:
                 
             # Выбор стратегии обработки
             processor = self._select_processor(model_change, sahi_mode)
-
             output_image, particle_data, annotations = processor(image, 
                     scale_input, confidence_threshold,
                     scale_selector, confidence_iou, 

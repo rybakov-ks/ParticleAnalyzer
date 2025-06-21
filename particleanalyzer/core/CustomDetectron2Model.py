@@ -1,6 +1,4 @@
 ﻿from sahi.models.detectron2 import Detectron2DetectionModel
-from detectron2.config import get_cfg
-import os
 
 """Переопределяем load_model для скрытия ошибки"""
 class CustomDetectron2Model(Detectron2DetectionModel):
@@ -8,8 +6,7 @@ class CustomDetectron2Model(Detectron2DetectionModel):
         from detectron2.config import get_cfg
         from detectron2.data import MetadataCatalog
         from detectron2.engine import DefaultPredictor
-        from detectron2.model_zoo import model_zoo
-
+        
         cfg = get_cfg()
 
         try:  # Переделываем импорт конфига и модели для скрытия ошибки "{} not available in Model Zoo!"
