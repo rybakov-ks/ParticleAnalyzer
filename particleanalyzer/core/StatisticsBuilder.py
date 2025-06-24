@@ -233,7 +233,7 @@ class StatisticsBuilder:
             row=row,
             col=col
         )
-       
+        df = df.head(1000)
         required_columns = {'centroid_x', 'centroid_y'}
         if not required_columns.issubset(df.columns):
             return
