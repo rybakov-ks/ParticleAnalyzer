@@ -68,7 +68,6 @@ class StatisticsBuilder:
         if self.df.empty:
             return None
         row_heights = [0.14, 0.14, 0.14, 0.14, 0.14, 0.30]
-        # Создаем 3 строки и 2 колонки (последний график будет один в третьей строке)
         fig = make_subplots(
             rows=6, cols=2, row_heights=row_heights,
             subplot_titles=(
@@ -126,13 +125,36 @@ class StatisticsBuilder:
 
         for row, col, col_name, label, color in params:
             self._add_distribution(fig, row, col, self.df[col_name], label, color)
+            fig.update_traces(
+                showlegend=False,
+            )
 
         if 'centroid_x' in self.df.columns and 'centroid_y' in self.df.columns:
             self._add_vector_field(fig, self.df, row=6, col=1, image=image)
+            
+           # Включаем легенду только для векторного поля
+            fig.update_traces(
+                showlegend=True,
+                selector=dict(row=6, col=1)
+            )
+            # Настраиваем позицию легенды только для этого subplot
+            # Настраиваем позицию легенды только для этого subplot
+            fig.update_layout(
+                legend=dict(
+                    itemsizing='constant',
+                    itemclick='toggle',
+                    itemdoubleclick=False,
+                    orientation="h",  # Горизонтальная ориентация
+                    yanchor="top",   # Якорь по верхнему краю
+                    y=-0.025,          # Позиция ниже графика (отрицательное значение)
+                    xanchor="center", # Центрирование по горизонтали
+                    x=0.475,           # Центр по оси X
+                    font=dict(size=16)
+                )
+            )
 
         fig.update_layout(
             height=1600,
-            showlegend=False,
             plot_bgcolor="white",
             margin=dict(l=50, r=50, b=50, t=50),
             modebar={
@@ -190,8 +212,6 @@ class StatisticsBuilder:
             showgrid=False
         )
         
-
-
     def _add_vector_field(self, fig, df, row, col, image):
         image = np.flipud(image)
         image_pil = Image.fromarray(image.astype(np.uint8))
@@ -213,52 +233,84 @@ class StatisticsBuilder:
             row=row,
             col=col
         )
-        
-        if not {'centroid_x', 'centroid_y'}.issubset(df.columns):
+       
+        required_columns = {'centroid_x', 'centroid_y'}
+        if not required_columns.issubset(df.columns):
             return
 
-        angle_column = self._get_translation("θₘₐₓ [°]")
-        if angle_column not in df.columns:
+        angle_max_col = self._get_translation("θₘₐₓ [°]")
+        angle_min_col = self._get_translation("θₘᵢₙ [°]")
+        
+        if not all(col in df.columns for col in [angle_max_col, angle_min_col]):
             return
 
         if self.scale_selector == self._get_translation('Instrument scale in µm'):
-            diameter_col = self._get_translation("Dₘₐₓ [мкм]")
+            diameter_max_col = self._get_translation("Dₘₐₓ [мкм]")
+            diameter_min_col = self._get_translation("Dₘᵢₙ [мкм]")
         else:
-            diameter_col = self._get_translation("Dₘₐₓ [пикс]")
+            diameter_max_col = self._get_translation("Dₘₐₓ [пикс]")
+            diameter_min_col = self._get_translation("Dₘᵢₙ [пикс]")
 
-        if diameter_col not in df.columns:
+        if not all(col in df.columns for col in [diameter_max_col, diameter_min_col]):
             return
 
         x = df['centroid_x'].values
         y = df['centroid_y'].values
-        theta_deg = df[angle_column].values
-        theta_rad = np.deg2rad(theta_deg)
-        diameters = df[diameter_col].values
-
-        min_length = 20  # минимальная длина стрелки
-        max_length = 60  # максимальная длина стрелки
-        if len(diameters) > 1:
-            normalized_lengths = min_length + (max_length - min_length) * (diameters - min(diameters)) / (max(diameters) - min(diameters))
+        
+        theta_max_deg = df[angle_max_col].values
+        theta_max_rad = np.deg2rad(theta_max_deg)
+        diameters_max = df[diameter_max_col].values
+        
+        min_length = 20
+        max_length = 60
+        if len(diameters_max) > 1:
+            lengths_max = min_length + (max_length - min_length) * (diameters_max - min(diameters_max)) / (max(diameters_max) - min(diameters_max))
         else:
-            normalized_lengths = [min_length]
-
-        u = np.cos(theta_rad) * normalized_lengths
-        v = np.sin(theta_rad) * normalized_lengths
-
-        quiver_fig = ff.create_quiver(
-                                        x, y, u, v,
-                                        scale=1,
-                                        arrow_scale=0.3,
-                                        line=dict(
-                                            width=2,
-                                            color='yellow',
-                                            shape='spline'
-                                        )
-                                    )
-
-        for trace in quiver_fig.data:
+            lengths_max = [min_length]
+        
+        u_max = np.cos(theta_max_rad) * lengths_max
+        v_max = np.sin(theta_max_rad) * lengths_max
+        
+        theta_min_deg = df[angle_min_col].values
+        theta_min_rad = np.deg2rad(theta_min_deg)
+        diameters_min = df[diameter_min_col].values
+        
+        if len(diameters_min) > 1:
+            lengths_min = min_length + (max_length - min_length) * (diameters_min - min(diameters_min)) / (max(diameters_min) - min(diameters_min))
+        else:
+            lengths_min = [min_length]
+        
+        u_min = np.cos(theta_min_rad) * lengths_min
+        v_min = np.sin(theta_min_rad) * lengths_min
+        
+        quiver_max = ff.create_quiver(
+            x, y, u_max, v_max,
+            scale=1,
+            arrow_scale=0.3,
+            line=dict(
+                width=2,
+                color='yellow',
+                shape='spline'
+            ),
+            name=self._get_translation('Удлинение')
+        )
+        
+        quiver_min = ff.create_quiver(
+            x, y, u_min, v_min,
+            scale=1,
+            arrow_scale=0.25,
+            line=dict(
+                width=1.5,
+                color='cyan',
+                shape='spline'
+            ),
+            name=self._get_translation('Утолщение'),
+            visible='legendonly'
+        )
+        
+        for trace in quiver_max.data + quiver_min.data:
             fig.add_trace(trace, row=row, col=col)
-
+        
         fig.update_xaxes(
             title_text=self._get_translation("X"),
             row=row,
@@ -267,7 +319,7 @@ class StatisticsBuilder:
             constrain='domain',
             showgrid=False
         )
-
+        
         fig.update_yaxes(
             title_text=self._get_translation("Y"),
             row=row,
