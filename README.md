@@ -35,6 +35,7 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 - Dual unit support — switch between pixels and micrometers (µm)
 - Supports multiple AI models: YOLOv11, YOLOv12, and Detectron2
 - Advanced configuration options for fine-tuning detection accuracy
+- AI Interpretation of SEM Data
 - Multi-language interface: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en)
 - Try it online: [sem.rybakov-k.ru](https://sem.rybakov-k.ru/)
 
@@ -116,6 +117,11 @@ ParticleAnalyzer run --port 5000
 - Feret diameters and angles (px or µm and °)
 - Eccentricity (unitless)
 - Intensity values (grayscale units)
+
+**AI Interpretation of SEM Data**
+<div align="center">
+  <img src="Images/9.png" alt="Statistics Table">
+</div>
 
 ### Size Distribution Visualization
 <div align="center">
