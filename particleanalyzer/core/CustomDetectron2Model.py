@@ -1,12 +1,17 @@
-﻿from sahi.models.detectron2 import Detectron2DetectionModel
+import logging
+from sahi.models.detectron2 import Detectron2DetectionModel
+
+logger = logging.getLogger(__name__)
 
 """Переопределяем load_model для скрытия ошибки"""
+
+
 class CustomDetectron2Model(Detectron2DetectionModel):
     def load_model(self):
         from detectron2.config import get_cfg
         from detectron2.data import MetadataCatalog
         from detectron2.engine import DefaultPredictor
-        
+
         cfg = get_cfg()
 
         try:  # Переделываем импорт конфига и модели для скрытия ошибки "{} not available in Model Zoo!"
@@ -36,7 +41,8 @@ class CustomDetectron2Model(Detectron2DetectionModel):
                 category_names = metadata.thing_classes
                 self.category_names = category_names
                 self.category_mapping = {
-                    str(ind): category_name for ind, category_name in enumerate(self.category_names)
+                    str(ind): category_name
+                    for ind, category_name in enumerate(self.category_names)
                 }
             except Exception as e:
                 logger.warning(e)
@@ -45,11 +51,12 @@ class CustomDetectron2Model(Detectron2DetectionModel):
                     num_categories = cfg.MODEL.RETINANET.NUM_CLASSES
                 else:  # fasterrcnn/maskrcnn etc
                     num_categories = cfg.MODEL.ROI_HEADS.NUM_CLASSES
-                self.category_names = [str(category_id) for category_id in range(num_categories)]
+                self.category_names = [
+                    str(category_id) for category_id in range(num_categories)
+                ]
                 self.category_mapping = {
-                    str(ind): category_name for ind, category_name in enumerate(self.category_names)
+                    str(ind): category_name
+                    for ind, category_name in enumerate(self.category_names)
                 }
         else:
             self.category_names = list(self.category_mapping.values())
-
-

@@ -1,5 +1,5 @@
 class LanguageContext:
-    _current_lang = 'ru'
+    _current_lang = "ru"
 
     @classmethod
     def set_language(cls, lang):
