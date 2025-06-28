@@ -15,3 +15,6 @@ output/*.csv
 
 # Игнорировать все в .idea
 .idea/*
+
+# Игнорировать все в __pycache__
+__pycache__/
