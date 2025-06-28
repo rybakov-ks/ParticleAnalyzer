@@ -58,7 +58,6 @@ def sahi_mode_visibility(sahi_mode):
         gr.update(visible=not sahi_mode),
         gr.update(visible=not sahi_mode),
         gr.update(value=False if sahi_mode else None),
-        gr.update(visible=not sahi_mode),
     )
 
 

@@ -52,7 +52,7 @@ def create_interface(api_key):
     llm_amalysis = LLMAnalysis(api_key)
     demo = gr.Blocks(
         theme="snehilsanyal/scikit-learn",
-        title="ParticleAnalyzer — Инструмент для анализа изображений SEM",
+        title="ParticleAnalyzer — SEM Image Analysis Tool",
         head=custom_head,
         css=css,
         analytics_enabled=False,
@@ -228,66 +228,69 @@ def create_interface(api_key):
                             value="Pixels",
                             label=i18n("Режим масштабирования"),
                         )
-                    with gr.Row():
-                        model_change = gr.Dropdown(
-                            model_list,
-                            value="Yolo11 (dataset 2)",
-                            label=i18n("Модель обнаружения"),
-                        )
-                    with gr.Row():
-                        # Слайдер для точности обнаружения
-                        confidence_threshold = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.5,
-                            step=0.01,
-                            label=i18n("Точность обнаружения"),
-                        )
-                        # Слайдер для iou
-                        confidence_iou = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.7,
-                            step=0.01,
-                            label=i18n("Порог перекрытия (IoU)"),
-                        )
-                    with gr.Row():
-                        sahi_mode = gr.Checkbox(
-                            label=i18n("Включить"),
-                            info=i18n(
-                                "Включить обработку с разбиением на фрагменты (SAHI)?"
-                            ),
-                        )
-                    with gr.Row(visible=False) as slice_row:
-                        slice_height = gr.Number(value=640, label=i18n("Высота слайса"))
-                        slice_width = gr.Number(value=640, label=i18n("Ширина слайса"))
-                    with gr.Row(visible=False) as slice_row2:
-                        overlap_height_ratio = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.1,
-                            step=0.01,
-                            label=i18n("Перекрытие по высоте"),
-                        )
-                        overlap_width_ratio = gr.Slider(
-                            minimum=0.0,
-                            maximum=1.0,
-                            value=0.1,
-                            step=0.01,
-                            label=i18n("Перекрытие по ширине"),
-                        )
-                    with gr.Row() as solution_row:
-                        # Переключатель разрешения
-                        solution = gr.Radio(
-                            ("Original", "640x640", "1024x1024"),
-                            value="1024x1024",
-                            label=i18n("Разрешение изображения"),
-                        )
-                    with gr.Row() as segment_mode_row:
-                        segment_mode = gr.Checkbox(
-                            label=i18n("Включить"),
-                            info=i18n("Включить режим анализа отдельных частиц?"),
-                        )
+                    with gr.Group():
+                        with gr.Row():
+                            model_change = gr.Dropdown(
+                                model_list,
+                                value="Yolo11 (dataset 2)",
+                                label=i18n("Модель обнаружения"),
+                            )
+                        with gr.Row():
+                            # Слайдер для точности обнаружения
+                            confidence_threshold = gr.Slider(
+                                minimum=0.0,
+                                maximum=1.0,
+                                value=0.5,
+                                step=0.01,
+                                label=i18n("Точность обнаружения"),
+                            )
+                            # Слайдер для iou
+                            confidence_iou = gr.Slider(
+                                minimum=0.0,
+                                maximum=1.0,
+                                value=0.7,
+                                step=0.01,
+                                label=i18n("Порог перекрытия (IoU)"),
+                            )
+                    with gr.Group():
+                        with gr.Row():
+                            sahi_mode = gr.Checkbox(
+                                label=i18n("Включить"),
+                                info=i18n(
+                                    "Включить обработку с разбиением на фрагменты (SAHI)?"
+                                ),
+                            )
+                        with gr.Row(visible=False) as slice_row:
+                            slice_height = gr.Number(value=640, label=i18n("Высота слайса"))
+                            slice_width = gr.Number(value=640, label=i18n("Ширина слайса"))
+                        with gr.Row(visible=False) as slice_row2:
+                            overlap_height_ratio = gr.Slider(
+                                minimum=0.0,
+                                maximum=1.0,
+                                value=0.1,
+                                step=0.01,
+                                label=i18n("Перекрытие по высоте"),
+                            )
+                            overlap_width_ratio = gr.Slider(
+                                minimum=0.0,
+                                maximum=1.0,
+                                value=0.1,
+                                step=0.01,
+                                label=i18n("Перекрытие по ширине"),
+                            )
+                    with gr.Row(equal_height=True) as solution_and_segment_mode_row:
+                        with gr.Column():
+                            # Переключатель разрешения
+                            solution = gr.Radio(
+                                ("Original", "640x640", "1024x1024"),
+                                value="1024x1024",
+                                label=i18n("Разрешение изображения"),
+                            )
+                        with gr.Column():
+                            segment_mode = gr.Checkbox(
+                                label=i18n("Включить"),
+                                info=i18n("Включить режим анализа отдельных частиц?"),
+                            )
                     with gr.Row() as number_detections_row:
                         # Слайдер для number_detections
                         number_detections = gr.Slider(
@@ -297,14 +300,14 @@ def create_interface(api_key):
                             step=100,
                             label=i18n("Максимальное количество обнаружений"),
                         )
-                    with gr.Row():
+                    with gr.Row(visible=False):
                         # Выпадающий список для округления
                         round_value = gr.Dropdown(
                             [0, 1, 2, 3, 4, 5, 6],
-                            value=2,
+                            value=4,
                             label=i18n("Округлять результаты до"),
                         )
-                    with gr.Row():
+                    with gr.Row(equal_height=True):
                         with gr.Column(scale=1):
                             # Слайдер для number_of_bins
                             number_of_bins = gr.Slider(
@@ -367,7 +370,7 @@ def create_interface(api_key):
                 fn=chatbot_visibility, inputs=None, outputs=[chatbot_row2]
             )
             llm_run.click(
-                fn=llm_amalysis.analyze, inputs=[output_table2], outputs=[chatbot]
+                fn=llm_amalysis.analyze, inputs=[output_table2, label], outputs=[chatbot]
             )
             scale_selector.change(
                 scale_input_visibility,
@@ -395,9 +398,8 @@ def create_interface(api_key):
                     slice_row,
                     slice_row2,
                     number_detections_row,
-                    segment_mode_row,
+                    solution_and_segment_mode_row,
                     segment_mode,
-                    solution_row,
                 ],
             )
 
