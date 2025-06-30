@@ -8,7 +8,7 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.23", 
+    version="0.1.24", 
     packages=find_packages(exclude=['tests*']),
     package_data={
         'particleanalyzer': [
