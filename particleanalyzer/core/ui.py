@@ -70,7 +70,7 @@ def create_interface(api_key):
             </a>
             """
             )
-            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.23")
+            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.24")
             gr.Markdown(
                 i18n(
                     "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
@@ -370,7 +370,7 @@ def create_interface(api_key):
                 fn=chatbot_visibility, inputs=None, outputs=[chatbot_row2]
             )
             llm_run.click(
-                fn=llm_amalysis.analyze, inputs=[output_table2, label], outputs=[chatbot]
+                fn=llm_amalysis.analyze, inputs=[output_table], outputs=[chatbot]
             )
             scale_selector.change(
                 scale_input_visibility,

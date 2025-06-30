@@ -614,16 +614,6 @@ class ParticleAnalyzer:
                 "centroid_x": round(centroid_x, round_value),
                 "centroid_y": round(centroid_y, round_value),
                 (
-                    self._get_translation("S [мкм²]")
-                    if scale_selector == self._get_translation("Instrument scale in µm")
-                    else self._get_translation("S [пикс²]")
-                ): round(area * scale_area, round_value),
-                (
-                    self._get_translation("P [мкм]")
-                    if scale_selector == self._get_translation("Instrument scale in µm")
-                    else self._get_translation("P [пикс]")
-                ): round(perimeter * scale_factor, round_value),
-                (
                     self._get_translation("D [мкм]")
                     if scale_selector == self._get_translation("Instrument scale in µm")
                     else self._get_translation("D [пикс]")
@@ -653,6 +643,16 @@ class ParticleAnalyzer:
                     if scale_selector == self._get_translation("Instrument scale in µm")
                     else self._get_translation("θₘᵢₙ [°]")
                 ): round(angle_min, round_value),
+                (
+                    self._get_translation("S [мкм²]")
+                    if scale_selector == self._get_translation("Instrument scale in µm")
+                    else self._get_translation("S [пикс²]")
+                ): round(area * scale_area, round_value),
+                (
+                    self._get_translation("P [мкм]")
+                    if scale_selector == self._get_translation("Instrument scale in µm")
+                    else self._get_translation("P [пикс]")
+                ): round(perimeter * scale_factor, round_value),
                 "e": round(eccentricity, round_value),
                 self._get_translation("I [ед.]"): round(mean_intensity, round_value),
             }
