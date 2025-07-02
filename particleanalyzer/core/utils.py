@@ -65,7 +65,7 @@ def reset_interface(scale_value):
     """Функция для сброса интерфейса"""
     return (
         {"background": None, "layers": [], "composite": None},  # Очищаем im
-        None,  # Очищаем output_image
+        None,                                    # Очищаем output_image
         pd.DataFrame(
             columns=[
                 "№",
@@ -97,7 +97,6 @@ def reset_interface(scale_value):
         gr.update(visible=False),  # Скрываем графики
         None,                      # Очищаем input_image
         gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем label
         None,                     # Очищаем output_image2
         (
             empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2

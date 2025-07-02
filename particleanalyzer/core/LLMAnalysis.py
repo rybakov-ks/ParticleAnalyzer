@@ -13,8 +13,6 @@ class LLMAnalysis:
         self,
         api_key: str,
         provider: Literal["openrouter", "huggingface"] = "openrouter",
-        huggingface_model: str = "fireworks-ai",
-        openrouter_model: str = "deepseek/deepseek-chat:free",
     ):
         self.provider = provider
         self.api_key = api_key
@@ -24,10 +22,8 @@ class LLMAnalysis:
                 base_url="https://openrouter.ai/api/v1",
                 api_key=api_key,
             )
-            self.model = openrouter_model
         elif provider == "huggingface":
             self.client = InferenceClient(provider=huggingface_model, api_key=api_key)
-            self.model = huggingface_model
         else:
             raise ValueError("Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'")
         
@@ -93,7 +89,7 @@ class LLMAnalysis:
             "histogram": self._create_histogram(circ, num_bins)
         }
 
-    def analyze(self, df: pd.DataFrame) -> List[Tuple[None, str]]:
+    def analyze(self, df: pd.DataFrame, model_llm: str) -> List[Tuple[None, str]]:
         """Анализирует DataFrame с частицами и возвращает результаты LLM"""
         self.lang = LanguageContext.get_language()
         
@@ -106,6 +102,7 @@ class LLMAnalysis:
         
         try:
             prompt = self._build_prompt(stats, count_particles)
+            self.model = model_llm
             response = self._get_llm_response(prompt)
             return self._format_response(response)
         except Exception as e:
