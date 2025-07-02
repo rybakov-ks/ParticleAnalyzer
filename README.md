@@ -72,6 +72,12 @@ You can specify the port if necessary:
 ```python
 ParticleAnalyzer run --port 5000
 ```
+
+Launch with LLM support ([OpenRouter](https://openrouter.ai/settings/keys) API key required):
+```python
+ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
+```
+
 ## 🛠 Segmentation Optimization Guide
 🔧 Core Parameters:
    - Model Selection
