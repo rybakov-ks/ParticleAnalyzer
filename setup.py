@@ -8,7 +8,7 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="0.1.24", 
+    version="0.1.25", 
     packages=find_packages(exclude=['tests*']),
     package_data={
         'particleanalyzer': [
@@ -33,6 +33,11 @@ setup(
         'scipy',
         'tqdm',
         'ultralytics',
+        'huggingface_hub',
+        'openai',
+        'Requests',
+        'numpy',
+        'pandas',  
     ],
     python_requires='>=3.8',
     author="Kirill Rybakov",

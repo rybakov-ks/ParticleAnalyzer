@@ -70,7 +70,7 @@ def create_interface(api_key):
             </a>
             """
             )
-            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.24")
+            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.25")
             gr.Markdown(
                 i18n(
                     "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
@@ -148,9 +148,7 @@ def create_interface(api_key):
                             size="md",
                             icon=f'{assets_path("")}/icon/icons8-метла-50.png',
                         )
-                    # Таблица и графики на новой строке
-                    with gr.Row():
-                        label = gr.Label(label=i18n("Количество частиц"), visible=False)
+                        
                     # Таблица и графики на новой строке
                     with gr.Row():
                         # Таблица с характеристиками
@@ -182,6 +180,29 @@ def create_interface(api_key):
                         output_plot = gr.Plot(
                             label=i18n("Графики распределения"), visible=False
                         )
+                    with gr.Group(visible=False) as chatbot_row:
+                        with gr.Column(scale=1):
+
+                            model_llm = gr.Dropdown(
+                                ["deepseek/deepseek-chat:free", "deepseek/deepseek-chat-v3-0324", "google/gemini-2.0-flash-001", 
+                                "openai/gpt-4o-mini"],
+                                value="deepseek/deepseek-chat:free",
+                                label=i18n("Языковая модель (LLM)"),
+                            )
+                            with gr.Row() as chatbot_row2:
+                                chatbot = gr.Chatbot(
+                                    label=i18n("ИИ-интерпретация SEM-данных"),
+                                    height=600,
+                                    show_copy_all_button=True,
+                                    avatar_images=(None, f'{assets_path("")}/icon/ai.jpg'),
+                                    autoscroll=False,
+                                )
+                            llm_run = gr.Button(
+                                value=i18n("Запустить ИИ-анализ"),
+                                variant="primary",
+                                size="md",
+                                icon=f'{assets_path("")}/icon/ai.png',
+                            )
                     with gr.Row(visible=False) as question_row:
                         gr.Markdown(i18n("Вы удовлетворены качеством сегментации?"))
                     with gr.Row(visible=False) as buttons_row:
@@ -198,21 +219,6 @@ def create_interface(api_key):
                                 variant="stop",
                                 size="sm",
                                 icon=f'{assets_path("")}/icon/dislike.png',
-                            )
-                    with gr.Row(visible=False) as chatbot_row:
-                        with gr.Column(scale=1):
-                            with gr.Row(visible=False) as chatbot_row2:
-                                chatbot = gr.Chatbot(
-                                    label=i18n("ИИ-интерпретация SEM-данных"),
-                                    height=600,
-                                    show_copy_all_button=True,
-                                    avatar_images=(None, f'{assets_path("")}/icon/ai.jpg'),
-                                )
-                            llm_run = gr.Button(
-                                value=i18n("Запустить ИИ-анализ"),
-                                variant="primary",
-                                size="md",
-                                icon=f'{assets_path("")}/icon/ai.png',
                             )
                 with gr.Tab(i18n("Настройки")):
                     with gr.Row():
@@ -354,8 +360,6 @@ def create_interface(api_key):
                     output_plot,
                     output_table2,
                     download_output,
-                    label,
-                    label,
                     output_table,
                     output_plot,
                     output_table2,
@@ -366,11 +370,11 @@ def create_interface(api_key):
                     chatbot_row,
                 ],
             )
+            # llm_run.click(
+                # fn=chatbot_visibility, inputs=None, outputs=[chatbot_row2]
+            # )
             llm_run.click(
-                fn=chatbot_visibility, inputs=None, outputs=[chatbot_row2]
-            )
-            llm_run.click(
-                fn=llm_amalysis.analyze, inputs=[output_table], outputs=[chatbot]
+                fn=llm_amalysis.analyze, inputs=[output_table, model_llm], outputs=[chatbot]
             )
             scale_selector.change(
                 scale_input_visibility,
@@ -423,7 +427,6 @@ def create_interface(api_key):
                     output_plot,
                     in_image,
                     download_output,
-                    label,
                     output_image2,
                     output_table_image2,
                     question_row,
@@ -449,7 +452,6 @@ def create_interface(api_key):
                     output_plot,
                     in_image,
                     download_output,
-                    label,
                     output_image2,
                     output_table_image2,
                     question_row,

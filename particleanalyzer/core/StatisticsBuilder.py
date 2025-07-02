@@ -80,8 +80,33 @@ class StatisticsBuilder:
                 round(self.df[col_map[k]].std(), self.round_value) for k in col_map
             ],
         }
+        
+        df = pd.DataFrame(stats)
+        
+        empty_row = [""] * len(df.columns)
+        empty_row[0] = self._get_translation("Количество частиц")
+        empty_row[1] = len(self.df)
+        count_row = pd.DataFrame([empty_row], columns=df.columns)
+        df = pd.concat([df, count_row], ignore_index=True)
+        
+        styled_df = (
+            df.style
+            .apply(lambda row: ['font-weight: bold' if i == 0 else '' for i in range(len(row))], axis=1)
+            .apply(lambda row: ['background-color: lightgreen' if row.name == 0 else '' for _ in row], axis=1)
+            .apply(lambda row: ['background-color: #f0f0f0' if row.name == len(df)-1 else '' for _ in row], axis=1)
+            .format(self._format_value)
+        )
 
-        return pd.DataFrame(stats)
+        return styled_df
+
+    def _format_value(self, value):
+        if not isinstance(value, (int, float)):  # если не число — не форматируем
+            return value
+        if pd.isnull(value):
+            return ""
+        if value == int(value):
+            return str(int(value))
+        return f"{value:.{self.round_value}f}"
 
     def build_distribution_fig(self, image):
         if self.df.empty:
