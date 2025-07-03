@@ -132,11 +132,11 @@ def toggle_theme(current_mode: str):
         or current_mode.__class__.__name__ == "I18nData"
     ):
         return get_translation("Светлый режим"), gr.Button(
-            value=i18n("Светлый режим"),
-            icon=f'{assets_path("")}/icon/icons8-солнце-50.png',
+            value="",
+            icon=f'{assets_path("")}/icon/icons8-солнце-50_white.png',
         )
     return get_translation("Тёмный режим"), gr.Button(
-        value=i18n("Тёмный режим"),
+        value="",
         icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png',
     )
 
