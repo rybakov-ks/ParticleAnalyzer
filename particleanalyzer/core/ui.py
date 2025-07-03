@@ -60,6 +60,7 @@ def create_interface(api_key):
 
     with demo:
         api_key = gr.State(True if api_key else False)
+        mode_state = gr.State(value=i18n("Тёмный режим"))
         with gr.Column(elem_id="app-container"):
             gr.HTML(
                 """
@@ -70,23 +71,27 @@ def create_interface(api_key):
             </a>
             """
             )
-            gr.Markdown("# 🔎 ParticleAnalyzer v0.1.25")
-            gr.Markdown(
-                i18n(
-                    "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
+            with gr.Group(elem_id="gr-head"):
+                with gr.Row(equal_height=True):
+                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.25")
+                    toggle_dark = gr.Button(
+                        value="",
+                        icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png',
+                        elem_classes=["toggle-dark"],
+                        )
+                gr.Markdown(
+                    i18n(
+                        "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
+                    )
                 )
-            )
-            mode_state = gr.State(value=i18n("Тёмный режим"))
             with gr.Tabs():
                 with gr.Tab(i18n("Анализ")):
-                    # Основной интерфейс
                     with gr.Row():
                         with gr.Column(visible=False) as Paint_row:
-                            # Вход: изображение
                             im = gr.Paint(
                                 label=i18n("Изображение СЭМ"),
                                 type="numpy",
-                                canvas_size=(600, 600),  # Увеличиваем размер канваса
+                                canvas_size=(600, 600),
                                 sources=["upload"],
                                 brush=gr.Brush(
                                     color_mode="fixed",
@@ -103,16 +108,13 @@ def create_interface(api_key):
                             )
 
                         with gr.Column():
-                            # Выход: изображение с контурами
                             output_image = gr.Image(label=i18n("Результат сегментации"))
 
                     with gr.Row(visible=False) as AnnotatedImage_row:
-                        # Анализ отдельных частиц
                         output_image2 = gr.AnnotatedImage(
                             label=i18n("Результат сегментации")
                         )
                     with gr.Row(visible=False) as output_table_image2_row:
-                        # Таблица с характеристиками
                         output_table_image2 = gr.Dataframe(
                             value=empty_df2,
                             label=i18n("Характеристики частицы"),
@@ -148,10 +150,8 @@ def create_interface(api_key):
                             size="md",
                             icon=f'{assets_path("")}/icon/icons8-метла-50.png',
                         )
-                        
-                    # Таблица и графики на новой строке
+
                     with gr.Row():
-                        # Таблица с характеристиками
                         output_table2 = gr.Dataframe(
                             value=empty_df3,
                             label=i18n("Статистика по частицам"),
@@ -161,7 +161,6 @@ def create_interface(api_key):
                             show_copy_button=True,
                         )
                     with gr.Row(visible=False):
-                        # Таблица с характеристиками
                         output_table = gr.Dataframe(
                             value=empty_df2,
                             label=i18n("Характеристики частиц"),
@@ -176,7 +175,6 @@ def create_interface(api_key):
                             label=i18n("Файлы для скачивания"), visible=False
                         )
                     with gr.Row():
-                        # Графики распределения
                         output_plot = gr.Plot(
                             label=i18n("Графики распределения"), visible=False
                         )
@@ -222,13 +220,6 @@ def create_interface(api_key):
                             )
                 with gr.Tab(i18n("Настройки")):
                     with gr.Row():
-                        toggle_dark = gr.Button(
-                            value=i18n("Тёмный режим"),
-                            size="sm",
-                            icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png',
-                        )
-                    with gr.Row():
-                        # Селектор для масштаба
                         scale_selector = gr.Radio(
                             ("Pixels", "Instrument scale in µm"),
                             value="Pixels",
@@ -242,7 +233,6 @@ def create_interface(api_key):
                                 label=i18n("Модель обнаружения"),
                             )
                         with gr.Row():
-                            # Слайдер для точности обнаружения
                             confidence_threshold = gr.Slider(
                                 minimum=0.0,
                                 maximum=1.0,
@@ -250,7 +240,6 @@ def create_interface(api_key):
                                 step=0.01,
                                 label=i18n("Точность обнаружения"),
                             )
-                            # Слайдер для iou
                             confidence_iou = gr.Slider(
                                 minimum=0.0,
                                 maximum=1.0,
@@ -286,7 +275,6 @@ def create_interface(api_key):
                             )
                     with gr.Row(equal_height=True) as solution_and_segment_mode_row:
                         with gr.Column():
-                            # Переключатель разрешения
                             solution = gr.Radio(
                                 ("Original", "640x640", "1024x1024"),
                                 value="1024x1024",
@@ -298,7 +286,6 @@ def create_interface(api_key):
                                 info=i18n("Включить режим анализа отдельных частиц?"),
                             )
                     with gr.Row() as number_detections_row:
-                        # Слайдер для number_detections
                         number_detections = gr.Slider(
                             minimum=1,
                             maximum=10000,
@@ -307,7 +294,6 @@ def create_interface(api_key):
                             label=i18n("Максимальное количество обнаружений"),
                         )
                     with gr.Row(visible=False):
-                        # Выпадающий список для округления
                         round_value = gr.Dropdown(
                             [0, 1, 2, 3, 4, 5, 6],
                             value=4,
@@ -315,7 +301,6 @@ def create_interface(api_key):
                         )
                     with gr.Row(equal_height=True):
                         with gr.Column(scale=1):
-                            # Слайдер для number_of_bins
                             number_of_bins = gr.Slider(
                                 minimum=0.0,
                                 maximum=100,
@@ -324,13 +309,11 @@ def create_interface(api_key):
                                 label=i18n("Интервалов на гистограмме"),
                             )
                         with gr.Column(scale=1):
-                            # Слайдер для number_of_bins
                             show_Feret_diametr = gr.Checkbox(
                                 label=i18n("Включить"),
                                 info=i18n("Включить отображение диаметров Ферета?"),
                             )
 
-            # Основная функция обработки изображений при нажатии кнопки
             process_button.click(
                 fn=analyzer.analyze_image,
                 inputs=[

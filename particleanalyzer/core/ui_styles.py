@@ -25,6 +25,34 @@ footer {
 #dataframe-table2 th, #dataframe-table2 td {
     white-space: nowrap;
 }
+.toggle-dark {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;  /* Выравнивание вправо */
+    align-items: center !important;
+}
+.toggle-dark img {
+    width: 30px !important;
+    height: 30px !important;
+}
+#gr-head {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
+#gr-head > div {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+}
 """
 
 custom_head = """
