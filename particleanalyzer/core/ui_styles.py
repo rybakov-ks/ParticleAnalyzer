@@ -25,22 +25,6 @@ footer {
 #dataframe-table2 th, #dataframe-table2 td {
     white-space: nowrap;
 }
-.toggle-dark {
-    border: none !important;
-    background: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    min-width: auto !important;
-    min-height: auto !important;
-    display: flex !important;
-    justify-content: flex-end !important;  /* Выравнивание вправо */
-    align-items: center !important;
-}
-.toggle-dark img {
-    width: 30px !important;
-    height: 30px !important;
-}
 #gr-head {
     background-color: transparent !important;
     box-shadow: none !important;
@@ -53,6 +37,7 @@ footer {
     border: none !important;
     padding: 0 !important;
 }
+
 """
 
 custom_head = """
@@ -77,4 +62,66 @@ custom_head = """
 <meta property="twitter:url" content="https://sem.rybakov-k.ru/">
 
 <!-- Meta Tags Generated via https://www.opengraph.xyz/ -->
+"""
+
+darkModeToggle = """
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<style>
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #3b71ca;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+</style>
+
+<div style="display: flex; justify-content: flex-end;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-sun" style="font-size: 18px;"></i>
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+        </label>
+        <i class="fas fa-moon" style="font-size: 18px;"></i>
+    </div>
+</div>
 """
