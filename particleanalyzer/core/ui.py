@@ -14,7 +14,7 @@ from particleanalyzer.core.utils import (
     toggle_theme,
     chatbot_visibility,
 )
-from particleanalyzer.core.ui_styles import css, custom_head
+from particleanalyzer.core.ui_styles import css, custom_head, darkModeToggle
 from particleanalyzer.core.languages import i18n
 from particleanalyzer.core.LLMAnalysis import LLMAnalysis
 
@@ -74,11 +74,30 @@ def create_interface(api_key):
             with gr.Group(elem_id="gr-head"):
                 with gr.Row(equal_height=True):
                     gr.Markdown("# 🔎 ParticleAnalyzer v0.1.25")
-                    toggle_dark = gr.Button(
-                        value="",
-                        icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png',
-                        elem_classes=["toggle-dark"],
-                        )
+                    gr.HTML(darkModeToggle)
+                    demo.load(
+                        None,
+                        None,
+                        js="""
+                        () => {
+                            function toggleTheme() {
+                                document.body.classList.toggle('dark');
+                                localStorage.setItem('gradioDarkMode', document.body.classList.contains('dark'));
+                            }
+                            
+                            const toggle = document.getElementById('darkModeToggle');
+                            if (toggle) {
+                                toggle.addEventListener('change', toggleTheme);
+                            }
+
+                            const isDark = localStorage.getItem('gradioDarkMode') === 'true';
+                            if (isDark) {
+                                document.body.classList.add('dark');
+                                if (toggle) toggle.checked = true;
+                            }
+                        }
+                        """
+                    )
                 gr.Markdown(
                     i18n(
                         "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
@@ -472,17 +491,6 @@ def create_interface(api_key):
                 fn=save_data_to_csv,
                 inputs=[output_table, output_table2],
                 outputs=download_output,
-            )
-
-            toggle_dark.click(
-                toggle_theme,
-                inputs=[mode_state],
-                outputs=[mode_state, toggle_dark],
-                js="""
-                () => {
-                    document.body.classList.toggle('dark')
-                }
-                """,
             )
 
     return demo
