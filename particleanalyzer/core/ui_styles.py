@@ -62,9 +62,7 @@ custom_head = """
 <meta property="twitter:url" content="https://sem.rybakov-k.ru/">
 
 <!-- Meta Tags Generated via https://www.opengraph.xyz/ -->
-"""
 
-darkModeToggle = """
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
@@ -113,15 +111,4 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 </style>
-
-<div style="display: flex; justify-content: flex-end;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-sun" style="font-size: 18px;"></i>
-        <label class="switch">
-            <input type="checkbox" id="darkModeToggle">
-            <span class="slider"></span>
-        </label>
-        <i class="fas fa-moon" style="font-size: 18px;"></i>
-    </div>
-</div>
 """

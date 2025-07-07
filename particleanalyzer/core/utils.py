@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
-from particleanalyzer.core.languages import i18n
 
 
 def assets_path(name: str):

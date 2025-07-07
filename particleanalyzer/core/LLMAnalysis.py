@@ -1,11 +1,10 @@
 import json
-from typing import Dict, List, Tuple, Literal, Optional
+from typing import Dict, List, Tuple, Literal
 import pandas as pd
 import numpy as np
 from openai import OpenAI
 from huggingface_hub import InferenceClient
 from particleanalyzer.core.language_context import LanguageContext
-from particleanalyzer.core.languages import translations
 
 
 class LLMAnalysis:
@@ -17,13 +16,18 @@ class LLMAnalysis:
         self.provider = provider
         self.api_key = api_key
         
-        if provider == "openrouter":
+        if self.api_key.startswith("hf_"):
+            provider == "huggingface"
+            self.client = InferenceClient(provider="fireworks-ai", api_key=api_key)
+            self.model_list = ["deepseek-ai/DeepSeek-V3"]
+        elif self.api_key.startswith("sk-or-"):
             self.client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
                 api_key=api_key,
             )
-        elif provider == "huggingface":
-            self.client = InferenceClient(provider=huggingface_model, api_key=api_key)
+            self.model_list = ["deepseek/deepseek-chat:free", "deepseek/deepseek-chat-v3-0324", "google/gemini-2.0-flash-001", 
+                                "openai/gpt-4o-mini"]
+            provider == "openrouter"
         else:
             raise ValueError("Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'")
         
