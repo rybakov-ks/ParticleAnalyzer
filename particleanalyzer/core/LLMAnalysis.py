@@ -32,7 +32,7 @@ class LLMAnalysis:
             raise ValueError("Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'")
         
     def _calculate_stats(self, df: pd.DataFrame, num_bins: int = 5) -> Dict[str, Dict]:
-        """Вычисляет статистику, сохраняя оригинальные названия столбцов"""
+        """Вычисляет статистику"""
         stats = {
             "particles_count": len(df),
             "parameters": {}
@@ -41,7 +41,6 @@ class LLMAnalysis:
         numeric_cols = df.select_dtypes(include=[np.number]).columns
         
         for col in numeric_cols:
-            # Базовые статистики
             stats["parameters"][col] = {
                 "mean": float(df[col].mean()),
                 "median": float(df[col].median()),
@@ -55,7 +54,6 @@ class LLMAnalysis:
                 "histogram": self._create_histogram(df[col], num_bins)
             }
             
-            # Специальные расчеты (по оригинальным названиям)
             if "Dₘₐₓ" in col and any("Dₘᵢₙ" in c for c in df.columns):
                 stats["parameters"]["aspect_ratio"] = self._calc_aspect_ratio(df, num_bins)
                 
