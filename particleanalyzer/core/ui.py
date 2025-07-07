@@ -11,45 +11,34 @@ from particleanalyzer.core.utils import (
     empty_df2,
     empty_df3,
     save_data_to_csv,
-    toggle_theme,
-    chatbot_visibility,
 )
-from particleanalyzer.core.ui_styles import css, custom_head, darkModeToggle
+from particleanalyzer.core.ui_styles import css, custom_head
 from particleanalyzer.core.languages import i18n
 from particleanalyzer.core.LLMAnalysis import LLMAnalysis
-
+from .YOLOLoader import YOLOLoader
 try:
-    import detectron2  # noqa: F401
-
-    model_list = [
-        "Yolo11 (dataset 1)",
-        "Yolo12 (dataset 1)",
-        "Yolo11 (dataset 2)",
-        "Yolo12 (dataset 2)",
-        "R101",
-        "X101",
-        "Cascade_R50",
-        "Cascade_X152",
-    ]
+    import detectron2 # noqa: F401
+    from .Detectron2Loader import Detectron2Loader
+    DETECTRON2_AVAILABLE = True
 except ImportError:
-    model_list = [
-        "Yolo11 (dataset 1)",
-        "Yolo12 (dataset 1)",
-        "Yolo11 (dataset 2)",
-        "Yolo12 (dataset 2)",
-    ]
+    DETECTRON2_AVAILABLE = False
 
+
+def get_available_models():
+    yolo_models = list(YOLOLoader.MODEL_MAPPING.keys())
+    if not DETECTRON2_AVAILABLE:
+        return yolo_models
+    return yolo_models + list(Detectron2Loader.MODEL_MAPPING.keys())
 
 def assets_path(name: str):
     return os.path.join(base_path, "..", "assets", name)
 
-
 base_path = os.path.dirname(__file__)
 analyzer = ParticleAnalyzer()
 
-
 def create_interface(api_key):
     llm_amalysis = LLMAnalysis(api_key)
+    
     demo = gr.Blocks(
         theme="snehilsanyal/scikit-learn",
         title="ParticleAnalyzer — SEM Image Analysis Tool",
@@ -60,21 +49,32 @@ def create_interface(api_key):
 
     with demo:
         api_key = gr.State(True if api_key else False)
-        mode_state = gr.State(value=i18n("Тёмный режим"))
         with gr.Column(elem_id="app-container"):
             gr.HTML(
                 """
-            <a href="https://github.com/rybakov-ks/ParticleAnalyzer" target="_blank" 
-               style="position: fixed; bottom: 20px; right: 20px;">
-               <img src="https://rybakov-k.ru/images/pngwing.com.png" 
-                    width="60" height="60">
-            </a>
+                <a href="https://github.com/rybakov-ks/ParticleAnalyzer" target="_blank" 
+                   style="position: fixed; bottom: 20px; right: 20px;">
+                   <img src="https://rybakov-k.ru/images/pngwing.com.png" 
+                        width="60" height="60">
+                </a>
             """
             )
             with gr.Group(elem_id="gr-head"):
                 with gr.Row(equal_height=True):
-                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.25")
-                    gr.HTML(darkModeToggle)
+                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.26")
+                    gr.HTML(
+                        """
+                        <div style="display: flex; justify-content: flex-end;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-sun" style="font-size: 18px;"></i>
+                                <label class="switch">
+                                    <input type="checkbox" id="darkModeToggle">
+                                    <span class="slider"></span>
+                                </label>
+                                <i class="fas fa-moon" style="font-size: 18px;"></i>
+                            </div>
+                        </div>
+                    """)
                     demo.load(
                         None,
                         None,
@@ -201,12 +201,11 @@ def create_interface(api_key):
                         with gr.Column(scale=1):
 
                             model_llm = gr.Dropdown(
-                                ["deepseek/deepseek-chat:free", "deepseek/deepseek-chat-v3-0324", "google/gemini-2.0-flash-001", 
-                                "openai/gpt-4o-mini"],
-                                value="deepseek/deepseek-chat:free",
+                                llm_amalysis.model_list,
+                                value=llm_amalysis.model_list[0],
                                 label=i18n("Языковая модель (LLM)"),
                             )
-                            with gr.Row() as chatbot_row2:
+                            with gr.Row():
                                 chatbot = gr.Chatbot(
                                     label=i18n("ИИ-интерпретация SEM-данных"),
                                     height=600,
@@ -247,7 +246,7 @@ def create_interface(api_key):
                     with gr.Group():
                         with gr.Row():
                             model_change = gr.Dropdown(
-                                model_list,
+                                get_available_models(),
                                 value="Yolo11 (dataset 2)",
                                 label=i18n("Модель обнаружения"),
                             )

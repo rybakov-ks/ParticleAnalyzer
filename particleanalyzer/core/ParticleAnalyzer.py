@@ -229,17 +229,15 @@ class ParticleAnalyzer:
         finally:
             self._cleanup(pbar)
 
-    def _select_processor(self, model_change: str, sahi_mode: bool):
+    def _select_processor(self, model_name: str, sahi_mode: bool):
         """Выбор стратегии обработки в зависимости от модели и режима"""
-        model_type = self.model_manager.model_types[model_change]
         if sahi_mode:
             return self._process_with_sahi
-        elif model_type == "yolo":
+        if model_name in self.model_manager.yolo_loader.MODEL_MAPPING:
             return self._process_with_yolo
-        elif model_type == "detectron":
+        if model_name in self.model_manager.detectron_loader.MODEL_MAPPING:
             return self._process_with_detectron
-        else:
-            raise ValueError(f"Неизвестный тип модели: {model_type}")
+        raise ValueError(f"Неизвестная модель или неподдерживаемый тип: {model_name}")
 
     def _process_with_yolo(
         self,
@@ -429,16 +427,14 @@ class ParticleAnalyzer:
         show_Feret_diametr,
     ):
         """Обработка с использованием SAHI"""
-        model_type = self.model_manager.model_types[model_change]
-
-        if model_type == "yolo":
+        if model_change in self.model_manager.yolo_loader.MODEL_MAPPING:
             detection_model = AutoDetectionModel.from_pretrained(
                 model_type="ultralytics",
                 model_path=self.model_manager.get_model_path(model_change),
                 confidence_threshold=confidence_threshold,
                 device="cuda",
             )
-        else:
+        elif model_change in self.model_manager.detectron_loader.MODEL_MAPPING:
             detection_model = CustomDetectron2Model(
                 model_path=self.model_manager.get_model_path(model_change),
                 config_path=self.model_manager.get_config_path(model_change),
