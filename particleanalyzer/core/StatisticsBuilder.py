@@ -92,8 +92,8 @@ class StatisticsBuilder:
         styled_df = (
             df.style
             .apply(lambda row: ['font-weight: bold' if i == 0 else '' for i in range(len(row))], axis=1)
-            .apply(lambda row: ['background-color: lightgreen' if row.name == 0 else '' for _ in row], axis=1)
-            .apply(lambda row: ['background-color: #f0f0f0' if row.name == len(df)-1 else '' for _ in row], axis=1)
+            .apply(lambda row: ['background-color: #ED7D31' if row.name == 0 else '' for _ in row], axis=1)
+            .apply(lambda row: ['background-color: #5B9BD5' if row.name == len(df)-1 else '' for _ in row], axis=1)
             .format(self._format_value)
         )
 
