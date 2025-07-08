@@ -55,7 +55,7 @@ You can specify the port if necessary:
 ParticleAnalyzer run --port 5000
 ```
 
-Launch with LLM support ([OpenRouter](https://openrouter.ai/settings/keys) API key required):
+Launch with LLM support ([OpenRouter](https://openrouter.ai/settings/keys) or [Hugging Face](https://huggingface.co/settings/tokens) API key required):
 ```python
 ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 ```
