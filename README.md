@@ -46,7 +46,7 @@ Make sure your system has an NVIDIA GPU with CUDA. Install [PyTorch](https://pyt
    ```python
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
    ```
-If you do not have a CUDA-capable GPU, use the CPU version instead:
+If you do not have a CUDA-capable GPU, use the CPU version instead—however, in this case, ParticleAnalyzer will run significantly slower:
    ```python
    pip install torch torchvision torchaudio
    ```
