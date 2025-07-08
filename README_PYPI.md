@@ -27,7 +27,7 @@ Make sure your system has an NVIDIA GPU with CUDA. Install [PyTorch](https://pyt
    ```python
    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
    ```
-If you do not have a CUDA-capable GPU, use the CPU version instead:
+If you do not have a CUDA-capable GPU, use the CPU version instead—however, in this case, ParticleAnalyzer will run significantly slower:
    ```python
    pip install torch torchvision torchaudio
    ```
@@ -37,8 +37,8 @@ If you want to enable advanced instance segmentation, install Detectron2:
 ```python
 pip install 'git+https://github.com/facebookresearch/detectron2.git'
 ```
-⚠️ *There may be problems installing Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
-
+> [!WARNING]
+> *There may be problems installing Detectron2. Use the official [documentation](https://detectron2.readthedocs.io/en/latest/tutorials/install.html).*
 ### 📦 3. Install ParticleAnalyzer
 Finally, install ParticleAnalyzer from PyPI:
 ```python
@@ -48,7 +48,7 @@ pip install ParticleAnalyzer
 ```python
 ParticleAnalyzer run
 ```
-Open in browser: http://127.0.0.1:8000
+Open in browser: http://127.0.0.1:8000 
 
 You can specify the port if necessary:
 ```python
