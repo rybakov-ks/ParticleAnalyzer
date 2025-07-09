@@ -37,12 +37,14 @@ class ImagePreprocessor:
         solution: str,
         request: gr.Request,
         pbar: tqdm,
+        pr: tqdm,
         sahi_mode: bool,
         lang: str,
     ):
         """Основной метод предварительной обработки изображения."""
         self.lang = lang
         pbar.set_description(self._get_translation("Загрузка изображения..."))
+        pr(0.25, desc=self._get_translation("Загрузка изображения..."))
         try:
             # Обработка шкалы прибора
             scale = None

@@ -77,13 +77,13 @@ class ModelManager:
         """Возвращает модель по имени"""
         if model_name in self.yolo_loader.MODEL_MAPPING:
             return self.yolo_loader.get_model(model_name)
-        elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_CONFIGS:
+        elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             return self.detectron_loader.get_config(model_name)
         raise ValueError(f"Unknown model: {model_name}")
 
     def get_predictor(self, model_name: str):
         """Для Detectron возвращает готовый predictor"""
-        if DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_CONFIGS:
+        if DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             cfg = self.detectron_loader.get_config(model_name)
             return DefaultPredictor(cfg)
         return None
@@ -92,12 +92,12 @@ class ModelManager:
         """Возвращает путь к модели по её имени"""
         if model_name in self.yolo_loader.MODEL_MAPPING:
             return self.yolo_loader.get_model_path(model_name)
-        elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_CONFIGS:
+        elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             return self.detectron_loader.get_model_path(model_name)
         raise ValueError(f"Model {model_name} not found")
 
     def get_config_path(self, model_name: str) -> str:
         """Возвращает путь к конфигу (только для Detectron)"""
-        if DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_CONFIGS:
+        if DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             return self.detectron_loader.get_config_path(model_name)
         raise ValueError(f"Config for {model_name} not available")

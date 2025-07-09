@@ -16,11 +16,11 @@ class LLMAnalysis:
         self.provider = provider
         self.api_key = api_key
         
-        if self.api_key.startswith("hf_"):
+        if api_key and self.api_key.startswith("hf_"):
             provider == "huggingface"
             self.client = InferenceClient(provider="fireworks-ai", api_key=api_key)
             self.model_list = ["deepseek-ai/DeepSeek-V3"]
-        elif self.api_key.startswith("sk-or-"):
+        elif api_key and self.api_key.startswith("sk-or-"):
             self.client = OpenAI(
                 base_url="https://openrouter.ai/api/v1",
                 api_key=api_key,
@@ -28,8 +28,10 @@ class LLMAnalysis:
             self.model_list = ["deepseek/deepseek-chat:free", "deepseek/deepseek-chat-v3-0324", "google/gemini-2.0-flash-001", 
                                 "openai/gpt-4o-mini"]
             provider == "openrouter"
-        else:
+        elif api_key:
             raise ValueError("Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'")
+        else:
+            self.model_list = [None]
         
     def _calculate_stats(self, df: pd.DataFrame, num_bins: int = 5) -> Dict[str, Dict]:
         """Вычисляет статистику"""
