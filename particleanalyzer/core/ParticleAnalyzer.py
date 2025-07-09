@@ -26,6 +26,7 @@ from particleanalyzer.core.StatisticsBuilder import StatisticsBuilder
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
 
+
 lang = "ru"
 
 
@@ -124,6 +125,7 @@ class ParticleAnalyzer:
         show_Feret_diametr: bool,
         api_key: bool,
         request: gr.Request,
+        pr=gr.Progress()
     ) -> Tuple:
         """
         Основной метод для анализа изображения.
@@ -137,7 +139,7 @@ class ParticleAnalyzer:
                 desc=self._get_translation("Подготовка..."),
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]",
             )
-
+            pr(0, desc=self._get_translation("Подготовка..."))
             if (
                 image["background"] is None
                 and image["composite"] is None
@@ -145,7 +147,6 @@ class ParticleAnalyzer:
             ) and (image2 is None):
                 gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
                 return self._create_error_return()
-
             image, orig_image, gray_image, scale, scale_factor_glob = (
                 self.preprocessor.preprocess_image(
                     image=image,
@@ -154,6 +155,7 @@ class ParticleAnalyzer:
                     solution=solution,
                     request=request,
                     pbar=pbar,
+                    pr=pr,
                     sahi_mode=sahi_mode,
                     lang=self.lang,
                 )
@@ -180,6 +182,7 @@ class ParticleAnalyzer:
                 overlap_height_ratio,
                 overlap_width_ratio,
                 pbar,
+                pr,
                 orig_image,
                 gray_image,
                 scale,
@@ -193,6 +196,8 @@ class ParticleAnalyzer:
             df = pd.DataFrame(particle_data)
 
             pbar.set_description(self._get_translation("Построение таблицы..."))
+            pr(0.75, desc=self._get_translation("Построение таблицы..."))
+            
             builder = StatisticsBuilder(
                 df,
                 scale_selector,
@@ -204,9 +209,10 @@ class ParticleAnalyzer:
             pbar.update(1)
 
             pbar.set_description(self._get_translation("Построение графиков..."))
+            pr(0.9, desc=self._get_translation("Построение графиков..."))
             fig = builder.build_distribution_fig(image)
             pbar.update(1)
-
+            pr(1, desc=self._get_translation("Готово!"))
             return (
                 output_image,
                 df,
@@ -254,6 +260,7 @@ class ParticleAnalyzer:
         overlap_height_ratio,
         overlap_width_ratio,
         pbar,
+        pr,
         orig_image,
         gray_image,
         scale,
@@ -263,6 +270,7 @@ class ParticleAnalyzer:
         """Обработка с использованием YOLO"""
         model = self.model_manager.get_model(model_change)
         pbar.set_description(self._get_translation("YOLO обрабатывает изображение..."))
+        pr(0.5, desc=self._get_translation("YOLO обрабатывает изображение..."))
 
         try:
             with torch.no_grad():
@@ -297,6 +305,7 @@ class ParticleAnalyzer:
         pbar.update(1)
 
         pbar.set_description(self._get_translation("Обработка частиц..."))
+        pr(0.62, desc=self._get_translation("Обработка частиц..."))
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
@@ -339,6 +348,7 @@ class ParticleAnalyzer:
         overlap_height_ratio,
         overlap_width_ratio,
         pbar,
+        pr,
         orig_image,
         gray_image,
         scale,
@@ -354,6 +364,7 @@ class ParticleAnalyzer:
         pbar.set_description(
             self._get_translation("Detectron2 обрабатывает изображение...")
         )
+        pr(0.5, desc=self._get_translation("Detectron2 обрабатывает изображение..."))
         try:
             predictor = DefaultPredictor(cfg)
             results = predictor(image)
@@ -373,6 +384,7 @@ class ParticleAnalyzer:
         pbar.update(1)
 
         pbar.set_description(self._get_translation("Обработка частиц..."))
+        pr(0.62, desc=self._get_translation("Обработка частиц..."))
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
@@ -420,6 +432,7 @@ class ParticleAnalyzer:
         overlap_height_ratio,
         overlap_width_ratio,
         pbar,
+        pr,
         orig_image,
         gray_image,
         scale,
@@ -443,6 +456,7 @@ class ParticleAnalyzer:
             )
 
         pbar.set_description(self._get_translation("SAHI обрабатывает изображение..."))
+        pr(0.5, desc=self._get_translation("SAHI обрабатывает изображение..."))
         try:
             results = get_sliced_prediction(
                 image,
@@ -463,6 +477,7 @@ class ParticleAnalyzer:
         pbar.update(1)
 
         pbar.set_description(self._get_translation("Обработка частиц..."))
+        pr(0.62, desc=self._get_translation("Обработка частиц..."))
         output_image = orig_image.copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]

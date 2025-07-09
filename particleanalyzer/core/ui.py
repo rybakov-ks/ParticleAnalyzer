@@ -61,7 +61,7 @@ def create_interface(api_key):
             )
             with gr.Group(elem_id="gr-head"):
                 with gr.Row(equal_height=True):
-                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.26")
+                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.27")
                     gr.HTML(
                         """
                         <div style="display: flex; justify-content: flex-end;">
@@ -370,6 +370,7 @@ def create_interface(api_key):
                     AnnotatedImage_row,
                     chatbot_row,
                 ],
+                show_progress_on=output_image
             )
             # llm_run.click(
                 # fn=chatbot_visibility, inputs=None, outputs=[chatbot_row2]
@@ -406,6 +407,9 @@ def create_interface(api_key):
                     solution_and_segment_mode_row,
                     segment_mode,
                 ],
+                show_progress="hide",
+                show_progress_on=slice_row
+                
             )
 
             output_image2.select(
