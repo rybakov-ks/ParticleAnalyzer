@@ -33,7 +33,7 @@ class ImagePreprocessor:
         self,
         image: np.ndarray,
         image2: Optional[np.ndarray],
-        scale_selector: str,
+        scale_selector: dict,
         solution: str,
         request: gr.Request,
         pbar: tqdm,
@@ -48,7 +48,7 @@ class ImagePreprocessor:
         try:
             # Обработка шкалы прибора
             scale = None
-            if scale_selector == self._get_translation("Instrument scale in µm"):
+            if scale_selector["scale"]:
                 scale = self._determine_pixel_scale(image)
                 if scale is None:
                     return None, None, None, None
@@ -69,8 +69,8 @@ class ImagePreprocessor:
             pbar.update(1)
             return image, orig_image, gray_image, scale, scale_factor_glob
 
-        except Exception:
-            # print(f"Ошибка при обработке изображения: {e}")
+        except Exception as e:
+            print(f"Ошибка при обработке изображения: {e}")
             return None, None, None, None, None
 
     def _convert_image_channels(self, image: np.ndarray) -> np.ndarray:

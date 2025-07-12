@@ -5,32 +5,79 @@ import os
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
-
+from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
 
 def assets_path(name: str):
-    return os.path.join(base_path, "..", "assets", name)
+    return os.path.join(os.path.dirname(__file__), "..", "assets", name)
 
+
+def determine_language(accept_language: str):
+    """Определение языка на основе заголовка Accept-Language"""
+    if not accept_language:
+        return "en"
+
+    lang_code = accept_language.split(",")[0].lower()
+
+    language_mapping = {
+        "en-us": "en",
+        "en": "en",
+        "ru": "ru",
+        "zh-cn": "zh-cn",
+        "zh-tw": "zh-tw",
+    }
+
+    return language_mapping.get(
+        lang_code, language_mapping.get(lang_code.split("-")[0], "en")
+    )
 
 def get_translation(text):
     lang = LanguageContext.get_language()
     return translations.get(lang, {}).get(text, text)
 
 
+def get_columns(scale_value):
+    """Генерирует колонки DataFrame в зависимости от выбранного масштаба"""
+    unit = get_translation(ParticleAnalyzer.SCALE_OPTIONS[scale_value]["unit"])
+    columns = [
+        "№",
+        f"S [{unit}²]",
+        f"P [{unit}]",
+        f"D [{unit}]",
+        f"Dₘₐₓ [{unit}]",
+        f"Dₘᵢₙ' [{unit}]",
+        f"Dₘₑₐₙ [{unit}]",
+        "'θₘₐₓ' [°]",
+        "'θₘᵢₙ' [°]",
+        "e",
+        f"I [{get_translation('ед.')}]"
+        f"{get_translation('Количество частиц')}"
+    ]
+    return pd.DataFrame(columns=columns)
+
+
+def get_stats_columns():
+    """Возвращает колонки для таблицы статистики"""
+    columns = [
+        get_translation("Параметр"),
+        get_translation("Среднее"),
+        get_translation("Медиана"),
+        get_translation("Максимум"),
+        get_translation("Минимум"),
+        get_translation("СО"),
+    ]
+    return pd.DataFrame(columns=columns)
+
+
 def scale_input_visibility(scale_value):
     """Показываем масштабную шкалу"""
+    is_scaled = ParticleAnalyzer.SCALE_OPTIONS[scale_value]["scale"]
     return (
-        gr.update(visible=(scale_value == get_translation("Instrument scale in µm"))),
-        gr.update(visible=(scale_value == get_translation("Instrument scale in µm"))),
-        gr.update(visible=(scale_value == get_translation("Pixels"))),
-        gr.update(
-            value=(empty_df2 if scale_value == get_translation("Pixels") else empty_df1)
-        ),
-        gr.update(visible=(scale_value == get_translation("Pixels"))),
-        gr.update(
-            value=(
-                empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2
-            )
-        ),
+        gr.update(visible=(is_scaled)),
+        gr.update(visible=(is_scaled)),
+        gr.update(visible=(not is_scaled)),
+        gr.update(value=(get_columns(scale_value))),
+        gr.update(visible=(not is_scaled)),
+        gr.update(value=(get_columns(scale_value))),
     )
 
 
@@ -46,7 +93,7 @@ def select_section(evt: gr.SelectData, output_table):
     if 0 <= evt.index < len(output_table):
         return output_table.iloc[[evt.index]], gr.update(visible=True)
     else:
-        return empty_df2, gr.update(visible=False)
+        return empty_df_ParticleCharacteristics, gr.update(visible=False)
 
 
 def sahi_mode_visibility(sahi_mode):
@@ -65,41 +112,13 @@ def reset_interface(scale_value):
     return (
         {"background": None, "layers": [], "composite": None},  # Очищаем im
         None,                                    # Очищаем output_image
-        pd.DataFrame(
-            columns=[
-                "№",
-                get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
-                get_translation("P [мкм]"),      # Периметр в микрометрах
-                get_translation("D [мкм]"),      # Диаметр в микрометрах
-                get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
-                get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
-                get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
-                get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
-                get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра
-                "e",                             # Эксцентриситет (безразмерная величина)
-                get_translation("I [ед.]"),      # Интенсивность в условных единицах
-            ]
-        ),
-        pd.DataFrame(
-            columns=[
-                get_translation("Параметр"),  # Параметр
-                get_translation("Среднее"),   # Среднее
-                get_translation("Медиана"),   # Медиана
-                get_translation("Максимум"),  # Максимум
-                get_translation("Минимум"),   # Минимум
-                get_translation("СО"),        # Стандартное отклонение
-            ]
-        ),
-        None,  # Очищаем графики
+        None,                      # Очищаем графики
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем графики
         None,                      # Очищаем input_image
         gr.update(visible=False),  # Скрываем таблицу
-        None,                     # Очищаем output_image2
-        (
-            empty_df2 if scale_value == get_translation("Pixels") else empty_df2_2
-        ),                         # Очищаем output_table_image2
+        None,                      # Очищаем output_image2
         gr.update(visible=False),  # Скрываем таблицу
         gr.update(visible=False),  # Скрываем label
         gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
@@ -107,7 +126,34 @@ def reset_interface(scale_value):
         [(None, None)],            # Очищаем строку chatbot_row
         gr.update(visible=False),  # Скрываем строку chatbot_row
     )
+    
+def reset_interface2(scale_value):
+    """Функция для сброса интерфейса"""
+    return (
+        None,                      # Очищаем output_image
+        None,                      # Очищаем графики
+        gr.update(visible=False),  # Скрываем таблицу
+        gr.update(visible=False),  # Скрываем таблицу
+        gr.update(visible=False),  # Скрываем графики
+        None,                      # Очищаем input_image
+        gr.update(visible=False),  # Скрываем таблицу
+        None,                      # Очищаем output_image2
+        gr.update(visible=False),  # Скрываем таблицу
+        gr.update(visible=False),  # Скрываем label
+        gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
+        gr.update(visible=False),  # Скрываем строку output_table_image2_row
+        [(None, None)],            # Очищаем строку chatbot_row
+        gr.update(visible=False),  # Скрываем строку chatbot_row
+    )
+    
 
+def scale_input_unit_measurement(scale_selector, request: gr.Request):
+    """Установка лейбла для длины шкалы прибора"""
+    lang = determine_language(request.headers.get("Accept-Language", ""))
+    LanguageContext.set_language(lang)
+    unit = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]["unit"]
+    label = get_translation(f"Длина шкалы в {unit}")
+    return gr.update(label=label)
 
 def save_data_to_csv(
     data_table: pd.DataFrame, data_table2: pd.DataFrame, output_dir: str = "output"
@@ -122,23 +168,6 @@ def save_data_to_csv(
     data_table2.to_csv(stats_path, index=False, encoding="utf-8-sig")
 
     return [particle_path, stats_path]
-
-
-def toggle_theme(current_mode: str):
-    """Переключает между темной и светлой темой"""
-    if (
-        current_mode == get_translation("Тёмный режим")
-        or current_mode.__class__.__name__ == "I18nData"
-    ):
-        return get_translation("Светлый режим"), gr.Button(
-            value="",
-            icon=f'{assets_path("")}/icon/icons8-солнце-50_white.png',
-        )
-    return get_translation("Тёмный режим"), gr.Button(
-        value="",
-        icon=f'{assets_path("")}/icon/icons8-темный-режим-50.png',
-    )
-
 
 def log_analytics(
     confidence_threshold: float,
@@ -188,60 +217,63 @@ def log_analytics(
 def chatbot_visibility():
     return gr.update(visible=True)
 
-base_path = os.path.dirname(__file__)
 
-empty_df1 = pd.DataFrame(
-    columns=[
-        "№",
-        get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
-        get_translation("P [мкм]"),      # Периметр в микрометрах
-        get_translation("D [мкм]"),      # Диаметр в микрометрах
-        get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
-        get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
-        get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
-        get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
-        get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра
-        "e",                             # Эксцентриситет (безразмерная величина)
-        get_translation("I [ед.]"),      # Интенсивность в условных единицах
-    ]
-)
-empty_df2 = pd.DataFrame(
-    columns=[
-        "№",
-        get_translation("S [пикс²]"),     # Площадь в квадратных пикселях
-        get_translation("P [пикс]"),      # Периметр в пикселях
-        get_translation("D [пикс]"),      # Диаметр в пикселях
-        get_translation("Dₘₐₓ [пикс]"),   # Максимальны диаметр Ферета
-        get_translation("Dₘᵢₙ  [пикс]"),  # Минимальный диаметр Ферета
-        get_translation("Dₘₑₐₙ  [пикс]"), # Средний диаметр Ферета
-        get_translation("θₘₐₓ [°]"),      # Угл ориентации для max диаметра
-        get_translation("θₘᵢₙ [°]"),      # Угл ориентации для min диаметра
-        "e",                              # Эксцентриситет (безразмерная величина)
-        get_translation("I [ед.]"),       # Интенсивность в условных единицах
-    ]
-).fillna("")
-empty_df2_2 = pd.DataFrame(
-    columns=[
-        "№",
-        get_translation("S [мкм²]"),     # Площадь в квадратных микрометрах
-        get_translation("P [мкм]"),      # Периметр в микрометрах
-        get_translation("D [мкм]"),      # Диаметр в микрометрах
-        get_translation("Dₘₐₓ [мкм]"),   # Максимальны диаметр Ферета
-        get_translation("Dₘᵢₙ  [мкм]"),  # Минимальный диаметр Ферета
-        get_translation("Dₘₑₐₙ  [мкм]"), # Средний диаметр Ферета
-        get_translation("θₘₐₓ [°]"),     # Угл ориентации для max диаметра
-        get_translation("θₘᵢₙ [°]"),     # Угл ориентации для min диаметра
-        "e",                             # Эксцентриситет (безразмерная величина)
-        get_translation("I [ед.]"),      # Интенсивность в условных единицах
-    ]
-).fillna("")
-empty_df3 = pd.DataFrame(
-    columns=[
-        get_translation("Параметр"),  # Параметр
-        get_translation("Среднее"),   # Среднее
-        get_translation("Медиана"),   # Медиана
-        get_translation("Максимум"),  # Максимум
-        get_translation("Минимум"),   # Минимум
-        get_translation("СО"),        # Стандартное отклонение
-    ]
-)
+empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
+empty_df_ParticleStatistics = get_stats_columns()
+
+toggleTheme = """
+() => {
+    // Функция переключения темы
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark');
+        localStorage.setItem('gradioDarkMode', isDark);
+    }
+    
+    // Проверка системных настроек
+    function getSystemTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    const toggle = document.getElementById('darkModeToggle');
+    if (toggle) {
+        // Инициализация темы
+        const savedTheme = localStorage.getItem('gradioDarkMode');
+        const systemTheme = getSystemTheme();
+        
+        // Приоритет: сохранённая тема > системная тема
+        const isDark = savedTheme !== null 
+            ? savedTheme === 'true' 
+            : systemTheme === 'dark';
+        
+        // Применяем тему и синхронизируем переключатель
+        if (isDark) {
+            document.body.classList.add('dark');
+            toggle.checked = true;  // Важно: переключатель в положение "темная тема"
+        } else {
+            document.body.classList.remove('dark');
+            toggle.checked = false;  // Явно устанавливаем в положение "светлая тема"
+        }
+        
+        // Обработчик переключения
+        toggle.addEventListener('change', toggleTheme);
+        
+        // Следим за изменениями системной темы (если нет сохранённой)
+        if (savedTheme === null) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            const handleSystemThemeChange = (e) => {
+                if (e.matches) {
+                    document.body.classList.add('dark');
+                    toggle.checked = true;
+                } else {
+                    document.body.classList.remove('dark');
+                    toggle.checked = false;
+                }
+            };
+            mediaQuery.addEventListener('change', handleSystemThemeChange);
+            
+            // Инициализация при загрузке (на случай, если обработчик не сработал)
+            handleSystemThemeChange(mediaQuery);
+        }
+    }
+}
+"""

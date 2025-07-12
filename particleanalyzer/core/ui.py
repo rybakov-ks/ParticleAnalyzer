@@ -7,10 +7,13 @@ from particleanalyzer.core.utils import (
     sahi_mode_visibility,
     select_section,
     reset_interface,
+    reset_interface2,
     log_analytics,
-    empty_df2,
-    empty_df3,
+    empty_df_ParticleCharacteristics,
+    empty_df_ParticleStatistics,
     save_data_to_csv,
+    scale_input_unit_measurement,
+    toggleTheme,
 )
 from particleanalyzer.core.ui_styles import css, custom_head
 from particleanalyzer.core.languages import i18n
@@ -31,9 +34,8 @@ def get_available_models():
     return yolo_models + list(Detectron2Loader.MODEL_MAPPING.keys())
 
 def assets_path(name: str):
-    return os.path.join(base_path, "..", "assets", name)
+    return os.path.join(os.path.dirname(__file__), "..", "assets", name)
 
-base_path = os.path.dirname(__file__)
 analyzer = ParticleAnalyzer()
 
 def create_interface(api_key):
@@ -45,6 +47,7 @@ def create_interface(api_key):
         head=custom_head,
         css=css,
         analytics_enabled=False,
+        
     )
 
     with demo:
@@ -61,7 +64,7 @@ def create_interface(api_key):
             )
             with gr.Group(elem_id="gr-head"):
                 with gr.Row(equal_height=True):
-                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.27")
+                    gr.Markdown("# 🔎 ParticleAnalyzer v0.1.28")
                     gr.HTML(
                         """
                         <div style="display: flex; justify-content: flex-end;">
@@ -74,30 +77,10 @@ def create_interface(api_key):
                                 <i class="fas fa-moon" style="font-size: 18px;"></i>
                             </div>
                         </div>
-                    """)
-                    demo.load(
-                        None,
-                        None,
-                        js="""
-                        () => {
-                            function toggleTheme() {
-                                document.body.classList.toggle('dark');
-                                localStorage.setItem('gradioDarkMode', document.body.classList.contains('dark'));
-                            }
-                            
-                            const toggle = document.getElementById('darkModeToggle');
-                            if (toggle) {
-                                toggle.addEventListener('change', toggleTheme);
-                            }
-
-                            const isDark = localStorage.getItem('gradioDarkMode') === 'true';
-                            if (isDark) {
-                                document.body.classList.add('dark');
-                                if (toggle) toggle.checked = true;
-                            }
-                        }
                         """
                     )
+
+                    demo.load(None, None, js=toggleTheme)
                 gr.Markdown(
                     i18n(
                         "При помощи данного инструмента можно анализировать размерные характеристики частиц на изображениях SEM.<br>В случае проблем с сегментацией изображения или возникновения ошибок, пожалуйста, направляйте материалы на электронную почту: rybakov-ks@ya.ru"
@@ -105,7 +88,7 @@ def create_interface(api_key):
                 )
             with gr.Tabs():
                 with gr.Tab(i18n("Анализ")):
-                    with gr.Row():
+                    with gr.Row(equal_height=True):
                         with gr.Column(visible=False) as Paint_row:
                             im = gr.Paint(
                                 label=i18n("Изображение СЭМ"),
@@ -135,11 +118,22 @@ def create_interface(api_key):
                         )
                     with gr.Row(visible=False) as output_table_image2_row:
                         output_table_image2 = gr.Dataframe(
-                            value=empty_df2,
+                            value=empty_df_ParticleCharacteristics,
                             label=i18n("Характеристики частицы"),
                             interactive=False,
                             elem_id="dataframe-table",
                         )
+                    with gr.Group():
+                        with gr.Row():
+                            scale_selector = gr.Dropdown(
+                                list(analyzer.SCALE_OPTIONS.keys()),
+                                value=list(analyzer.SCALE_OPTIONS.keys())[0],
+                                label=i18n("Режим масштабирования"),
+                            )
+                        with gr.Row(visible=False) as scale_input_row:
+                            scale_input = gr.Number(
+                                label="Длина шкалы в мкм", value=1.0
+                            )
                     with gr.Row() as in_image_example_row:
                         gr.Examples(
                             examples=[
@@ -153,10 +147,7 @@ def create_interface(api_key):
                             inputs=in_image,
                             label=i18n("Примеры"),
                         )
-                    with gr.Row(visible=False) as scale_input_row:
-                        scale_input = gr.Number(
-                            label=i18n("Instrument scale in µm"), value=1.0
-                        )
+
                     with gr.Row():
                         process_button = gr.Button(
                             value=i18n("Анализировать"),
@@ -172,7 +163,7 @@ def create_interface(api_key):
 
                     with gr.Row():
                         output_table2 = gr.Dataframe(
-                            value=empty_df3,
+                            value=empty_df_ParticleStatistics,
                             label=i18n("Статистика по частицам"),
                             interactive=False,
                             visible=False,
@@ -181,7 +172,7 @@ def create_interface(api_key):
                         )
                     with gr.Row(visible=False):
                         output_table = gr.Dataframe(
-                            value=empty_df2,
+                            value=empty_df_ParticleCharacteristics,
                             label=i18n("Характеристики частиц"),
                             interactive=False,
                             visible=False,
@@ -237,12 +228,6 @@ def create_interface(api_key):
                                 icon=f'{assets_path("")}/icon/dislike.png',
                             )
                 with gr.Tab(i18n("Настройки")):
-                    with gr.Row():
-                        scale_selector = gr.Radio(
-                            ("Pixels", "Instrument scale in µm"),
-                            value="Pixels",
-                            label=i18n("Режим масштабирования"),
-                        )
                     with gr.Group():
                         with gr.Row():
                             model_change = gr.Dropdown(
@@ -389,6 +374,8 @@ def create_interface(api_key):
                     in_image_example_row,
                     output_table_image2,
                 ],
+            show_progress="hide",
+            show_progress_on=scale_input_row
             )
 
             segment_mode.change(
@@ -424,8 +411,6 @@ def create_interface(api_key):
                 outputs=[
                     im,
                     output_image,
-                    output_table,
-                    output_table2,
                     output_plot,
                     output_table,
                     output_table2,
@@ -433,7 +418,6 @@ def create_interface(api_key):
                     in_image,
                     download_output,
                     output_image2,
-                    output_table_image2,
                     question_row,
                     buttons_row,
                     AnnotatedImage_row,
@@ -441,16 +425,15 @@ def create_interface(api_key):
                     chatbot,
                     chatbot_row,
                 ],
+                show_progress="hide",
+                show_progress_on=question_row
             )
 
             scale_selector.change(
-                fn=reset_interface,
+                fn=reset_interface2,
                 inputs=[scale_selector],
                 outputs=[
-                    im,
                     output_image,
-                    output_table,
-                    output_table2,
                     output_plot,
                     output_table,
                     output_table2,
@@ -458,7 +441,6 @@ def create_interface(api_key):
                     in_image,
                     download_output,
                     output_image2,
-                    output_table_image2,
                     question_row,
                     buttons_row,
                     AnnotatedImage_row,
@@ -466,6 +448,16 @@ def create_interface(api_key):
                     chatbot,
                     chatbot_row,
                 ],
+                show_progress="hide",
+                show_progress_on=question_row
+            )
+
+            scale_selector.change(
+                fn=scale_input_unit_measurement,
+                inputs=[scale_selector],
+                outputs=[scale_input],
+                show_progress="hide",
+                show_progress_on=question_row
             )
 
             yes_button.click(
