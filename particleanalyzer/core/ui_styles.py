@@ -4,9 +4,7 @@ css = """
     max-width: 750px; /* Устанавливаем максимальную ширину приложения */
     margin: 0 auto; /* Центрируем контейнер */
 }
-footer {
-    visibility: hidden;
-}
+footer { display: none !important; }
 #author-note {
     text-align: right;
     font-size: 14px;

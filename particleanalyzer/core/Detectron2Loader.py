@@ -53,7 +53,7 @@ class Detectron2Loader:
 
     def _init_model_config(self, model_name):
         cfg = get_cfg()
-        model_data = self.MODEL_MAPPING[model_name]
+        model_data = self.__class__.MODEL_MAPPING[model_name]
         
         cfg.merge_from_file(model_zoo.get_config_file(model_data["config_file"]))
         cfg.OUTPUT_DIR = self._base_path
@@ -66,17 +66,17 @@ class Detectron2Loader:
     def _init_models(self):
         self.configs = {
             name: self._init_model_config(name)
-            for name in self.MODEL_MAPPING
+            for name in self.__class__.MODEL_MAPPING
         }
         
         self.config_paths = {
-            name: self._model_path(self.MODEL_MAPPING[name]["config_path"])
-            for name in self.MODEL_MAPPING
+            name: self._model_path(self.__class__.MODEL_MAPPING[name]["config_path"])
+            for name in self.__class__.MODEL_MAPPING
         }
         
         self.model_paths = {
-            name: self._model_path(self.MODEL_MAPPING[name]["weights_file"])
-            for name in self.MODEL_MAPPING
+            name: self._model_path(self.__class__.MODEL_MAPPING[name]["weights_file"])
+            for name in self.__class__.MODEL_MAPPING
         }
         
         self._save_configs()

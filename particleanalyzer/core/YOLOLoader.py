@@ -14,7 +14,7 @@ class YOLOLoader:
 
         self.models = {
             display_name: YOLO(self._model_path(file_name))
-            for display_name, file_name in self.MODEL_MAPPING.items()
+            for display_name, file_name in self.__class__.MODEL_MAPPING.items()
         }
 
     def _model_path(self, name: str) -> str:
@@ -24,6 +24,6 @@ class YOLOLoader:
         return self.models.get(model_name)
 
     def get_model_path(self, model_name: str):
-        if model_name in self.MODEL_MAPPING:
-            return self._model_path(self.MODEL_MAPPING[model_name])
+        if model_name in self.__class__.MODEL_MAPPING:
+            return self._model_path(self.__class__.MODEL_MAPPING[model_name])
         return None

@@ -25,32 +25,22 @@ class StatisticsBuilder:
         if self.df.empty:
             return pd.DataFrame()
 
-        if self.scale_selector == self._get_translation("Instrument scale in µm"):
-            col_map = {
-                "D": self._get_translation("D [мкм]"),
-                "Dₘₐₓ": self._get_translation("Dₘₐₓ [мкм]"),
-                "Dₘᵢₙ": self._get_translation("Dₘᵢₙ [мкм]"),
-                "Dₘₑₐₙ": self._get_translation("Dₘₑₐₙ [мкм]"),
-                "θₘₐₓ": self._get_translation("θₘₐₓ [°]"),
-                "θₘᵢₙ": self._get_translation("θₘᵢₙ [°]"),
-                "S": self._get_translation("S [мкм²]"),
-                "P": self._get_translation("P [мкм]"),
-                "e": "e",
-                "I": self._get_translation("I [ед.]"),
-            }
-        else:
-            col_map = {
-                "D": self._get_translation("D [пикс]"),
-                "Dₘₐₓ": self._get_translation("Dₘₐₓ [пикс]"),
-                "Dₘᵢₙ": self._get_translation("Dₘᵢₙ [пикс]"),
-                "Dₘₑₐₙ": self._get_translation("Dₘₑₐₙ [пикс]"),
-                "θₘₐₓ": self._get_translation("θₘₐₓ [°]"),
-                "θₘᵢₙ": self._get_translation("θₘᵢₙ [°]"),
-                "S": self._get_translation("S [пикс²]"),
-                "P": self._get_translation("P [пикс]"),
-                "e": "e",
-                "I": self._get_translation("I [ед.]"),
-            }
+        # Получаем единицу измерения из scale_selector
+        unit = self._get_translation(self.scale_selector["unit"])
+
+        # Создаем маппинг колонок с динамической подстановкой единиц измерения
+        col_map = {
+            "D": "D [{}]".format(unit),
+            "Dₘₐₓ": "Dₘₐₓ [{}]".format(unit),
+            "Dₘᵢₙ": "Dₘᵢₙ [{}]".format(unit),
+            "Dₘₑₐₙ": "Dₘₑₐₙ [{}]".format(unit),
+            "θₘₐₓ": "θₘₐₓ [°]",
+            "θₘᵢₙ": "θₘᵢₙ [°]",
+            "S": "S [{}²]".format(unit),
+            "P": "P [{}]".format(unit),
+            "e": "e",
+            "I": f'I [{self._get_translation("ед.")}]',
+        }
         stats = {
             self._get_translation("Параметр"): [
                 col_map["D"],
@@ -142,140 +132,41 @@ class StatisticsBuilder:
             horizontal_spacing=0.11,
         )
 
-        if self.scale_selector == self._get_translation("Instrument scale in µm"):
-            params = [
-                (
-                    1,
-                    1,
-                    self._get_translation("D [мкм]"),
-                    self._get_translation("Диаметр [мкм]"),
-                    "red",
-                ),
-                (
-                    1,
-                    2,
-                    self._get_translation("Dₘₑₐₙ [мкм]"),
-                    self._get_translation("Средний диаметр [мкм]"),
-                    "darksalmon",
-                ),
-                (
-                    2,
-                    1,
-                    self._get_translation("Dₘₐₓ [мкм]"),
-                    self._get_translation("Максимальный диаметр [мкм]"),
-                    "goldenrod",
-                ),
-                (
-                    2,
-                    2,
-                    self._get_translation("Dₘᵢₙ [мкм]"),
-                    self._get_translation("Минимальный диаметр [мкм]"),
-                    "lightsteelblue",
-                ),
-                (
-                    3,
-                    1,
-                    self._get_translation("θₘₐₓ [°]"),
-                    self._get_translation("Максимальный угол [°]"),
-                    "olive",
-                ),
-                (
-                    3,
-                    2,
-                    self._get_translation("θₘᵢₙ [°]"),
-                    self._get_translation("Минимальный угол [°]"),
-                    "orange",
-                ),
-                (
-                    4,
-                    1,
-                    self._get_translation("S [мкм²]"),
-                    self._get_translation("Площадь [мкм²]"),
-                    "green",
-                ),
-                (
-                    4,
-                    2,
-                    self._get_translation("P [мкм]"),
-                    self._get_translation("Периметр [мкм]"),
-                    "blue",
-                ),
-                (5, 1, "e", self._get_translation("Эксцентриситет"), "magenta"),
-                (
-                    5,
-                    2,
-                    self._get_translation("I [ед.]"),
-                    self._get_translation("Интенсивность"),
-                    "cyan",
-                ),
-            ]
-        else:
-            params = [
-                (
-                    1,
-                    1,
-                    self._get_translation("D [пикс]"),
-                    self._get_translation("Диаметр [пикс]"),
-                    "red",
-                ),
-                (
-                    1,
-                    2,
-                    self._get_translation("Dₘₑₐₙ [пикс]"),
-                    self._get_translation("Средний диаметр [пикс]"),
-                    "darksalmon",
-                ),
-                (
-                    2,
-                    1,
-                    self._get_translation("Dₘₐₓ [пикс]"),
-                    self._get_translation("Максимальный диаметр [пикс]"),
-                    "goldenrod",
-                ),
-                (
-                    2,
-                    2,
-                    self._get_translation("Dₘᵢₙ [пикс]"),
-                    self._get_translation("Минимальный диаметр [пикс]"),
-                    "lightsteelblue",
-                ),
-                (
-                    3,
-                    1,
-                    self._get_translation("θₘₐₓ [°]"),
-                    self._get_translation("Максимальный угол [°]"),
-                    "olive",
-                ),
-                (
-                    3,
-                    2,
-                    self._get_translation("θₘᵢₙ [°]"),
-                    self._get_translation("Минимальный угол [°]"),
-                    "orange",
-                ),
-                (
-                    4,
-                    1,
-                    self._get_translation("S [пикс²]"),
-                    self._get_translation("Площадь [пикс²]"),
-                    "green",
-                ),
-                (
-                    4,
-                    2,
-                    self._get_translation("P [пикс]"),
-                    self._get_translation("Периметр [пикс]"),
-                    "blue",
-                ),
-                (5, 1, "e", self._get_translation("Эксцентриситет"), "magenta"),
-                (
-                    5,
-                    2,
-                    self._get_translation("I [ед.]"),
-                    self._get_translation("Интенсивность"),
-                    "cyan",
-                ),
-            ]
+        # Базовые параметры (одинаковые для всех режимов)
+        base_params = [
+            (1, 1, "D", self._get_translation("Диаметр"), "red"),
+            (1, 2, "Dₘₑₐₙ", self._get_translation("Средний диаметр"), "darksalmon"),
+            (2, 1, "Dₘₐₓ", self._get_translation("Максимальный диаметр"), "goldenrod"),
+            (2, 2, "Dₘᵢₙ", self._get_translation("Минимальный диаметр"), "lightsteelblue"),
+            (3, 1, "θₘₐₓ", self._get_translation("Максимальный угол"), "olive"),
+            (3, 2, "θₘᵢₙ", self._get_translation("Минимальный угол"), "orange"),
+            (4, 1, "S", self._get_translation("Площадь"), "green"),
+            (4, 2, "P", self._get_translation("Периметр"), "blue"),
+            (5, 1, "e", self._get_translation("Эксцентриситет"), "magenta"),
+            (5, 2, "I", self._get_translation("Интенсивность"), "cyan")
+        ]
+
+        # Получаем единицу измерения из scale_selector
+        unit = self._get_translation(self.scale_selector["unit"])
+
+        # Формируем финальный список параметров
+        params = []
+        for row, col, short_name, full_name, color in base_params:
+            if short_name in ["D", "Dₘₑₐₙ", "Dₘₐₓ", "Dₘᵢₙ", "P"]:
+                unit_format = " [{}]".format(unit)
+            elif short_name == "S":
+                unit_format = " [{}²]".format(unit)
+            elif short_name in ["θₘₐₓ", "θₘᵢₙ"]:
+                unit_format = " [°]"
+            elif short_name == "I":
+                unit_format = f' [{self._get_translation("ед.")}]'
+            else:
+                unit_format = ""
+
+            full_param_name = self._get_translation(full_name) + unit_format
+            short_param_name = (self._get_translation(short_name) if short_name != "e" else "e") + unit_format
+            
+            params.append((row, col, short_param_name, full_param_name, color))
 
         for row, col, col_name, label, color in params:
             self._add_distribution(fig, row, col, self.df[col_name], label, color)
@@ -436,12 +327,9 @@ class StatisticsBuilder:
         if not all(col in df.columns for col in [angle_max_col, angle_min_col]):
             return
 
-        if self.scale_selector == self._get_translation("Instrument scale in µm"):
-            diameter_max_col = self._get_translation("Dₘₐₓ [мкм]")
-            diameter_min_col = self._get_translation("Dₘᵢₙ [мкм]")
-        else:
-            diameter_max_col = self._get_translation("Dₘₐₓ [пикс]")
-            diameter_min_col = self._get_translation("Dₘᵢₙ [пикс]")
+        unit = self._get_translation(self.scale_selector["unit"])
+        diameter_max_col = "Dₘₐₓ [{}]".format(unit)
+        diameter_min_col = "Dₘᵢₙ [{}]".format(unit)
 
         if not all(col in df.columns for col in [diameter_max_col, diameter_min_col]):
             return
