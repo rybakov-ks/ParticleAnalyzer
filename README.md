@@ -110,13 +110,14 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 
 ### Statistical Data Table
 <div align="center">
+  <img src="Images/8.png" alt="Statistics Table">
+</div>
+
+<div align="center">
   <img src="Images/2.png" alt="Statistics Table">
 </div>
 
 *Comprehensive metrics including mean, median, min/max, standard deviation values for:*
-<div align="center">
-  <img src="Images/8.png" alt="Statistics Table">
-</div>
 
 - Area (px² or µm²)
 - Perimeter (px or µm)
@@ -125,17 +126,17 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 - Eccentricity (unitless)
 - Intensity values (grayscale units)
 
-**AI Interpretation of SEM Data**
-<div align="center">
-  <img src="Images/9.png" alt="Statistics Table">
-</div>
-
 ### Size Distribution Visualization
 <div align="center">
   <img src="Images/3.png" alt="Distribution Plots">
 </div>
 
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
+
+**AI Interpretation of SEM Data**
+<div align="center">
+  <img src="Images/9.png" alt="Statistics Table">
+</div>
 
 ## Advanced Settings Panel
 <div align="center">
