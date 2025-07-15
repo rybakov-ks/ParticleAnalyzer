@@ -1,7 +1,7 @@
 ## 📑 Table of Contents
 
 1. 🔎 [ParticleAnalyzer](#particleanalyzer)
-2. ✅ [Examples](#examples)
+2. ✅ [Examples](#-examples)
 3. ✨ [Key Features](#-key-features)
 4. 📥 [Installation Guide](#-installation-guide)
 5. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
