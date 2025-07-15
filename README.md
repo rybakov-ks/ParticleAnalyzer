@@ -1,7 +1,7 @@
 ## 📑 Table of Contents
 
 1. 🔎 [ParticleAnalyzer](#particleanalyzer)
-2. ✨ [Examples](#-examples)
+2. ✅ [Examples](#examples)
 3. ✨ [Key Features](#-key-features)
 4. 📥 [Installation Guide](#-installation-guide)
 5. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
@@ -30,7 +30,6 @@ A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in 
 If the model cannot segment your images correctly, please send them to rybakov-ks@ya.ru . Your images will be used to retrain the model's.*
 
 ## Examples
-
 <table>
 <tr>
 <td width="50%">
