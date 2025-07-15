@@ -1,13 +1,14 @@
 ## 📑 Table of Contents
 
 1. 🔎 [ParticleAnalyzer](#particleanalyzer)
-2. ✨ [Key Features](#-key-features)
-3. 📥 [Installation Guide](#-installation-guide)
-4. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
-5. 📊 [Analysis Outputs](#-analysis-outputs)
-6. ⚙️ [Advanced Settings](#-advanced-settings)
-7. 📏 [Scale Calibration](#-scale-calibration)
-8. 📧 [Contributors](#-contributors)
+2. ✨ [Examples](#-examples)
+3. ✨ [Key Features](#-key-features)
+4. 📥 [Installation Guide](#-installation-guide)
+5. 🛠 [Segmentation Optimization Guide](#-segmentation-optimization-guide)
+6. 📊 [Analysis Outputs](#-analysis-outputs)
+7. ⚙️ [Advanced Settings](#-advanced-settings)
+8. 📏 [Scale Calibration](#-scale-calibration)
+9. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
