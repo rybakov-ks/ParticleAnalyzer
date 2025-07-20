@@ -7,6 +7,7 @@ from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
 
+
 def assets_path(name: str):
     return os.path.join(os.path.dirname(__file__), "..", "assets", name)
 
@@ -30,6 +31,7 @@ def determine_language(accept_language: str):
         lang_code, language_mapping.get(lang_code.split("-")[0], "en")
     )
 
+
 def get_translation(text):
     lang = LanguageContext.get_language()
     return translations.get(lang, {}).get(text, text)
@@ -49,8 +51,7 @@ def get_columns(scale_value):
         "'θₘₐₓ' [°]",
         "'θₘᵢₙ' [°]",
         "e",
-        f"I [{get_translation('ед.')}]"
-        f"{get_translation('Количество частиц')}"
+        f"I [{get_translation('ед.')}]" f"{get_translation('Количество частиц')}",
     ]
     return pd.DataFrame(columns=columns)
 
@@ -111,41 +112,30 @@ def reset_interface(scale_value):
     """Функция для сброса интерфейса"""
     return (
         {"background": None, "layers": [], "composite": None},  # Очищаем im
-        None,                                    # Очищаем output_image
-        None,                      # Очищаем графики
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем графики
-        None,                      # Очищаем input_image
-        gr.update(visible=False),  # Скрываем таблицу
-        None,                      # Очищаем output_image2
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем label
+        None,  # Очищаем output_image
+        None,  # Очищаем графики
+        None,  # Очищаем input_image
+        None,  # Очищаем output_image2
         gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
-        [(None, None)],            # Очищаем строку chatbot_row
-        gr.update(visible=False),  # Скрываем строку chatbot_row
+        [(None, None)],  # Очищаем chatbot
+        gr.update(visible=False),  # Скрываем строку results_row
     )
-    
+
+
 def reset_interface2(scale_value):
     """Функция для сброса интерфейса"""
     return (
-        None,                      # Очищаем output_image
-        None,                      # Очищаем графики
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем графики
-        None,                      # Очищаем input_image
-        gr.update(visible=False),  # Скрываем таблицу
-        None,                      # Очищаем output_image2
-        gr.update(visible=False),  # Скрываем таблицу
-        gr.update(visible=False),  # Скрываем label
+        None,  # Очищаем output_image
+        None,  # Очищаем графики
+        None,  # Очищаем input_image
+        None,  # Очищаем output_image2
         gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
-        [(None, None)],            # Очищаем строку chatbot_row
-        gr.update(visible=False),  # Скрываем строку chatbot_row
+        [(None, None)],  # Очищаем chatbot
+        gr.update(visible=False),  # Скрываем строку results_row
     )
-    
+
 
 def scale_input_unit_measurement(scale_selector, request: gr.Request):
     """Установка лейбла для длины шкалы прибора"""
@@ -154,6 +144,7 @@ def scale_input_unit_measurement(scale_selector, request: gr.Request):
     unit = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]["unit"]
     label = get_translation(f"Длина шкалы в {unit}")
     return gr.update(label=label)
+
 
 def save_data_to_csv(
     data_table: pd.DataFrame, data_table2: pd.DataFrame, output_dir: str = "output"
@@ -168,6 +159,7 @@ def save_data_to_csv(
     data_table2.to_csv(stats_path, index=False, encoding="utf-8-sig")
 
     return [particle_path, stats_path]
+
 
 def log_analytics(
     confidence_threshold: float,
@@ -212,8 +204,9 @@ def log_analytics(
             ]
         )
 
-    return gr.update(visible=False), gr.update(visible=False)
-    
+    return gr.update(visible=False), gr.update(selected=1)
+
+
 def chatbot_visibility():
     return gr.update(visible=True)
 
@@ -223,41 +216,34 @@ empty_df_ParticleStatistics = get_stats_columns()
 
 toggleTheme = """
 () => {
-    // Функция переключения темы
     function toggleTheme() {
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('gradioDarkMode', isDark);
     }
     
-    // Проверка системных настроек
     function getSystemTheme() {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     
     const toggle = document.getElementById('darkModeToggle');
     if (toggle) {
-        // Инициализация темы
         const savedTheme = localStorage.getItem('gradioDarkMode');
         const systemTheme = getSystemTheme();
         
-        // Приоритет: сохранённая тема > системная тема
         const isDark = savedTheme !== null 
             ? savedTheme === 'true' 
             : systemTheme === 'dark';
-        
-        // Применяем тему и синхронизируем переключатель
+
         if (isDark) {
             document.body.classList.add('dark');
-            toggle.checked = true;  // Важно: переключатель в положение "темная тема"
+            toggle.checked = true;
         } else {
             document.body.classList.remove('dark');
-            toggle.checked = false;  // Явно устанавливаем в положение "светлая тема"
+            toggle.checked = false; 
         }
         
-        // Обработчик переключения
         toggle.addEventListener('change', toggleTheme);
         
-        // Следим за изменениями системной темы (если нет сохранённой)
         if (savedTheme === null) {
             const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
             const handleSystemThemeChange = (e) => {
@@ -270,8 +256,7 @@ toggleTheme = """
                 }
             };
             mediaQuery.addEventListener('change', handleSystemThemeChange);
-            
-            // Инициализация при загрузке (на случай, если обработчик не сработал)
+
             handleSystemThemeChange(mediaQuery);
         }
     }

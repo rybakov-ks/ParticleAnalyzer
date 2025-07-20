@@ -70,20 +70,35 @@ class StatisticsBuilder:
                 round(self.df[col_map[k]].std(), self.round_value) for k in col_map
             ],
         }
-        
+
         df = pd.DataFrame(stats)
-        
+
         empty_row = [""] * len(df.columns)
         empty_row[0] = self._get_translation("Количество частиц")
         empty_row[1] = len(self.df)
         count_row = pd.DataFrame([empty_row], columns=df.columns)
         df = pd.concat([df, count_row], ignore_index=True)
-        
+
         styled_df = (
-            df.style
-            .apply(lambda row: ['font-weight: bold' if i == 0 else '' for i in range(len(row))], axis=1)
-            .apply(lambda row: ['background-color: #ED7D31' if row.name == 0 else '' for _ in row], axis=1)
-            .apply(lambda row: ['background-color: #5B9BD5' if row.name == len(df)-1 else '' for _ in row], axis=1)
+            df.style.apply(
+                lambda row: [
+                    "font-weight: bold" if i == 0 else "" for i in range(len(row))
+                ],
+                axis=1,
+            )
+            .apply(
+                lambda row: [
+                    "background-color: #ED7D31" if row.name == 0 else "" for _ in row
+                ],
+                axis=1,
+            )
+            .apply(
+                lambda row: [
+                    "background-color: #5B9BD5" if row.name == len(df) - 1 else ""
+                    for _ in row
+                ],
+                axis=1,
+            )
             .format(self._format_value)
         )
 
@@ -137,13 +152,19 @@ class StatisticsBuilder:
             (1, 1, "D", self._get_translation("Диаметр"), "red"),
             (1, 2, "Dₘₑₐₙ", self._get_translation("Средний диаметр"), "darksalmon"),
             (2, 1, "Dₘₐₓ", self._get_translation("Максимальный диаметр"), "goldenrod"),
-            (2, 2, "Dₘᵢₙ", self._get_translation("Минимальный диаметр"), "lightsteelblue"),
+            (
+                2,
+                2,
+                "Dₘᵢₙ",
+                self._get_translation("Минимальный диаметр"),
+                "lightsteelblue",
+            ),
             (3, 1, "θₘₐₓ", self._get_translation("Максимальный угол"), "olive"),
             (3, 2, "θₘᵢₙ", self._get_translation("Минимальный угол"), "orange"),
             (4, 1, "S", self._get_translation("Площадь"), "green"),
             (4, 2, "P", self._get_translation("Периметр"), "blue"),
             (5, 1, "e", self._get_translation("Эксцентриситет"), "magenta"),
-            (5, 2, "I", self._get_translation("Интенсивность"), "cyan")
+            (5, 2, "I", self._get_translation("Интенсивность"), "cyan"),
         ]
 
         # Получаем единицу измерения из scale_selector
@@ -164,8 +185,10 @@ class StatisticsBuilder:
                 unit_format = ""
 
             full_param_name = self._get_translation(full_name) + unit_format
-            short_param_name = (self._get_translation(short_name) if short_name != "e" else "e") + unit_format
-            
+            short_param_name = (
+                self._get_translation(short_name) if short_name != "e" else "e"
+            ) + unit_format
+
             params.append((row, col, short_param_name, full_param_name, color))
 
         for row, col, col_name, label, color in params:

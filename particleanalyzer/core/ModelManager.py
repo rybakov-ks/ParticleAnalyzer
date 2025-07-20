@@ -6,6 +6,7 @@ from .YOLOLoader import YOLOLoader
 try:
     from detectron2.engine import DefaultPredictor
     from .Detectron2Loader import Detectron2Loader
+
     DETECTRON2_AVAILABLE = True
 except ImportError:
     DETECTRON2_AVAILABLE = False
@@ -15,7 +16,7 @@ class ModelManager:
     def __init__(self, device=None):
         self.device = device
         self.SERVER_URL = "https://rybakov-k.ru/model/"
-        
+
         # Инициализация путей
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         self.MODELS_DIR = os.path.join(base_path, "model")
@@ -33,7 +34,9 @@ class ModelManager:
 
         # Инициализация загрузчиков
         self.yolo_loader = YOLOLoader()
-        self.detectron_loader = Detectron2Loader(device=self.device) if DETECTRON2_AVAILABLE else None
+        self.detectron_loader = (
+            Detectron2Loader(device=self.device) if DETECTRON2_AVAILABLE else None
+        )
 
     def _ensure_models_available(self, required_files):
         """Проверяет и загружает необходимые файлы моделей"""

@@ -1,12 +1,11 @@
 import os
 from ultralytics import YOLO
 
+
 class YOLOLoader:
     MODEL_MAPPING = {
-        "Yolo11 (dataset 1)": "Yolo11_d1.pt",
-        "Yolo12 (dataset 1)": "Yolo12_d1.pt",
-        "Yolo11 (dataset 2)": "Yolo11_d2.pt",
-        "Yolo12 (dataset 2)": "Yolo12_d2.pt",
+        "Yolo11 (dataset 5)": "Yolo11_d5.pt",
+        "Yolo12 (dataset 5)": "Yolo12_d5.pt",
     }
 
     def __init__(self):

@@ -13,27 +13,13 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 """Работаем с моделями Detectron2"""
 
+
 class Detectron2Loader:
     MODEL_MAPPING = {
-        "R101": {
-            "config_file": "COCO-InstanceSegmentation/mask_rcnn_R_101_FPN_3x.yaml",
-            "weights_file": "faster_rcnn_R_101_FPN_3x.pth",
-            "config_path": "faster_rcnn_R_101_FPN_3x.yaml"
-        },
-        "X101": {
-            "config_file": "COCO-InstanceSegmentation/mask_rcnn_X_101_32x8d_FPN_3x.yaml",
-            "weights_file": "faster_rcnn_X_101_32x8d_FPN_3x.pth",
-            "config_path": "faster_rcnn_X_101_32x8d_FPN_3x.yaml"
-        },
-        "Cascade_R50": {
-            "config_file": "Misc/cascade_mask_rcnn_R_50_FPN_3x.yaml",
-            "weights_file": "cascade_mask_rcnn_R_50_FPN_3x.pth",
-            "config_path": "cascade_mask_rcnn_R_50_FPN_3x.yaml"
-        },
-        "Cascade_X152": {
+        "Mask R-CNN X152 (dataset 5)": {
             "config_file": "Misc/cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
-            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.pth",
-            "config_path": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml"
+            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv_d5.pth",
+            "config_path": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
         }
     }
 
@@ -54,31 +40,30 @@ class Detectron2Loader:
     def _init_model_config(self, model_name):
         cfg = get_cfg()
         model_data = self.__class__.MODEL_MAPPING[model_name]
-        
+
         cfg.merge_from_file(model_zoo.get_config_file(model_data["config_file"]))
         cfg.OUTPUT_DIR = self._base_path
         cfg.MODEL.WEIGHTS = self._model_path(model_data["weights_file"])
         cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
         cfg.MODEL.DEVICE = self.device
-        
+
         return cfg
 
     def _init_models(self):
         self.configs = {
-            name: self._init_model_config(name)
-            for name in self.__class__.MODEL_MAPPING
+            name: self._init_model_config(name) for name in self.__class__.MODEL_MAPPING
         }
-        
+
         self.config_paths = {
             name: self._model_path(self.__class__.MODEL_MAPPING[name]["config_path"])
             for name in self.__class__.MODEL_MAPPING
         }
-        
+
         self.model_paths = {
             name: self._model_path(self.__class__.MODEL_MAPPING[name]["weights_file"])
             for name in self.__class__.MODEL_MAPPING
         }
-        
+
         self._save_configs()
 
     def _save_configs(self):

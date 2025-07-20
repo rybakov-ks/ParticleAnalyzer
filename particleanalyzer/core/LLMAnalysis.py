@@ -15,7 +15,7 @@ class LLMAnalysis:
     ):
         self.provider = provider
         self.api_key = api_key
-        
+
         if api_key and self.api_key.startswith("hf_"):
             provider == "huggingface"
             self.client = InferenceClient(provider="fireworks-ai", api_key=api_key)
@@ -25,23 +25,26 @@ class LLMAnalysis:
                 base_url="https://openrouter.ai/api/v1",
                 api_key=api_key,
             )
-            self.model_list = ["deepseek/deepseek-chat:free", "deepseek/deepseek-chat-v3-0324", "google/gemini-2.0-flash-001", 
-                                "openai/gpt-4o-mini"]
+            self.model_list = [
+                "deepseek/deepseek-chat:free",
+                "deepseek/deepseek-chat-v3-0324",
+                "google/gemini-2.0-flash-001",
+                "openai/gpt-4o-mini",
+            ]
             provider == "openrouter"
         elif api_key:
-            raise ValueError("Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'")
+            raise ValueError(
+                "Неизвестный провайдер. Доступные варианты: 'openrouter', 'huggingface'"
+            )
         else:
             self.model_list = [None]
-        
+
     def _calculate_stats(self, df: pd.DataFrame, num_bins: int = 5) -> Dict[str, Dict]:
         """Вычисляет статистику"""
-        stats = {
-            "particles_count": len(df),
-            "parameters": {}
-        }
-        
+        stats = {"particles_count": len(df), "parameters": {}}
+
         numeric_cols = df.select_dtypes(include=[np.number]).columns
-        
+
         for col in numeric_cols:
             stats["parameters"][col] = {
                 "mean": float(df[col].mean()),
@@ -53,23 +56,24 @@ class LLMAnalysis:
                 "q3": df[col].quantile(0.75),
                 "skewness": df[col].skew(),
                 "kurtosis": df[col].kurtosis(),
-                "histogram": self._create_histogram(df[col], num_bins)
+                "histogram": self._create_histogram(df[col], num_bins),
             }
-            
+
             if "Dₘₐₓ" in col and any("Dₘᵢₙ" in c for c in df.columns):
-                stats["parameters"]["aspect_ratio"] = self._calc_aspect_ratio(df, num_bins)
-                
+                stats["parameters"]["aspect_ratio"] = self._calc_aspect_ratio(
+                    df, num_bins
+                )
+
             if "P [" in col and any("S [" in c for c in df.columns):
-                stats["parameters"]["circularity"] = self._calc_circularity(df, num_bins)
+                stats["parameters"]["circularity"] = self._calc_circularity(
+                    df, num_bins
+                )
         return stats
 
     def _create_histogram(self, data, num_bins):
         """Создает гистограмму"""
         counts, bins = np.histogram(data, bins=num_bins)
-        return {
-            "bins": [float(x) for x in bins],
-            "counts": [int(x) for x in counts]
-        }
+        return {"bins": [float(x) for x in bins], "counts": [int(x) for x in counts]}
 
     def _calc_aspect_ratio(self, df, num_bins):
         """Вычисляет аспектное соотношение"""
@@ -79,7 +83,7 @@ class LLMAnalysis:
         return {
             "mean": float(ar.mean()),
             "median": float(ar.median()),
-            "histogram": self._create_histogram(ar, num_bins)
+            "histogram": self._create_histogram(ar, num_bins),
         }
 
     def _calc_circularity(self, df, num_bins):
@@ -90,20 +94,20 @@ class LLMAnalysis:
         return {
             "mean": float(circ.mean()),
             "median": float(circ.median()),
-            "histogram": self._create_histogram(circ, num_bins)
+            "histogram": self._create_histogram(circ, num_bins),
         }
 
     def analyze(self, df: pd.DataFrame, model_llm: str) -> List[Tuple[None, str]]:
         """Анализирует DataFrame с частицами и возвращает результаты LLM"""
         self.lang = LanguageContext.get_language()
-        
+
         if df.empty:
             return [(None, "No particles detected")]
-            
+
         # Вычисляем статистику
         stats = self._calculate_stats(df)
         count_particles = len(df)
-        
+
         try:
             prompt = self._build_prompt(stats, count_particles)
             self.model = model_llm

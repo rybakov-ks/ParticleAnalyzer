@@ -28,6 +28,7 @@ from particleanalyzer.core.language_context import LanguageContext
 
 lang = "en"
 
+
 class ParticleAnalyzer:
     SCALE_OPTIONS = {
         "Pixels": {
@@ -35,23 +36,24 @@ class ParticleAnalyzer:
             "unit": "пикс",
             "unit_short": "px",
             "correction_factor": 1,
-            "description": "Работа в пикселях без масштабирования"
+            "description": "Работа в пикселях без масштабирования",
         },
         "Micrometers (µm)": {
             "scale": True,
             "unit": "мкм",
             "unit_short": "µm",
             "correction_factor": 1,
-            "description": "Масштабирование в микронах (1 µm = 1e-6 m)"
+            "description": "Масштабирование в микронах (1 µm = 1e-6 m)",
         },
         "Nanometers (nm)": {
             "scale": True,
             "unit": "нм",
             "unit_short": "nm",
             "correction_factor": 1,
-            "description": "Масштабирование в нанометрах (1 nm = 1e-9 m)"
-        }
+            "description": "Масштабирование в нанометрах (1 nm = 1e-9 m)",
+        },
     }
+
     def __init__(self, default_lang="en", device=None):
         """Инициализация анализатора частиц с настройкой окружения"""
         self._setup_environment(device)
@@ -65,6 +67,10 @@ class ParticleAnalyzer:
     def _setup_environment(self, device=None):
         """Настройка параметров окружения и CUDA"""
         os.environ["GRADIO_TEMP_DIR"] = os.path.expanduser("~/.gradio_temp")
+        os.environ["GRADIO_ANALYTICS_ENABLED"] = "False"
+        os.environ["GRADIO_CACHE_EXAMPLES"] = "True"
+        # os.environ["GRADIO_SSR_MODE"] = "True"
+
         if device is None:
             self.device = torch_device("cuda" if torch.cuda.is_available() else "cpu")
         else:
@@ -113,12 +119,7 @@ class ParticleAnalyzer:
             None,
             None,
             None,
-            gr.update(visible=False),
-            gr.update(visible=False),
-            gr.update(visible=False),
-            gr.update(visible=False),
             None,
-            gr.update(visible=False),
             gr.update(visible=False),
             gr.update(visible=False),
             gr.update(visible=False),
@@ -146,7 +147,7 @@ class ParticleAnalyzer:
         show_Feret_diametr: bool,
         api_key: bool,
         request: gr.Request,
-        pr=gr.Progress()
+        pr=gr.Progress(),
     ) -> Tuple:
         """
         Основной метод для анализа изображения.
@@ -162,17 +163,24 @@ class ParticleAnalyzer:
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]",
             )
             pr(0, desc=self._get_translation("Подготовка..."))
-            if (
-                image["background"] is None
-                and image["composite"] is None
-                and not image["layers"]
-            ) and (image2 is None):
+            selected_image = image if scale_selector["scale"] else image2
+            if scale_selector["scale"]:
+                if (
+                    image.get("background") is None
+                    and image.get("composite") is None
+                    and not image.get("layers")
+                ):
+                    gr.Warning(
+                        self._get_translation("Ошибка: изображение отсутствует...")
+                    )
+                    return self._create_error_return()
+            elif image2 is None:
                 gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
                 return self._create_error_return()
+
             image, orig_image, gray_image, scale, scale_factor_glob = (
                 self.preprocessor.preprocess_image(
-                    image=image,
-                    image2=image2,
+                    image=selected_image,
                     scale_selector=scale_selector,
                     solution=solution,
                     request=request,
@@ -217,7 +225,7 @@ class ParticleAnalyzer:
 
             pbar.set_description(self._get_translation("Построение таблицы..."))
             pr(0.75, desc=self._get_translation("Построение таблицы..."))
-            
+
             builder = StatisticsBuilder(
                 df,
                 scale_selector,
@@ -238,15 +246,10 @@ class ParticleAnalyzer:
                 df,
                 fig,
                 stats_df,
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=True),
-                gr.update(visible=True),
                 (orig_image, annotations) if segment_mode else None,
-                gr.update(visible=True),
-                gr.update(visible=True),
                 gr.update(visible=segment_mode),
                 gr.update(visible=api_key),
+                gr.update(visible=True),
             )
         except Exception as e:
             self._handle_error(e)
@@ -627,33 +630,44 @@ class ParticleAnalyzer:
             annotations.append((raw_mask, f"Particle {particle_counter}"))
 
         # Масштабирование
-        
+
         scale_factor = (
-            float(scale_input) / float(scale) * scale_factor_glob / scale_selector["correction_factor"]
+            float(scale_input)
+            / float(scale)
+            * scale_factor_glob
+            / scale_selector["correction_factor"]
             if scale_selector["scale"]
             else 1 * scale_factor_glob
         )
         scale_area = scale_factor**2
 
         # Добавление данных частицы
-        unit = self._get_translation(scale_selector["unit"])  # Переводим единицу измерения
-        
-        particle_data.append({
-            "№": round(particle_counter, round_value),
-            "centroid_x": round(centroid_x, round_value),
-            "centroid_y": round(centroid_y, round_value),
-            "D [{}]".format(unit): round(diameter * scale_factor, round_value),
-            "Dₘₐₓ [{}]".format(unit): round(feret_max * scale_factor, round_value),
-            "Dₘᵢₙ [{}]".format(unit): round(feret_min * scale_factor, round_value),
-            "Dₘₑₐₙ [{}]".format(unit): round(feret_mean * scale_factor, round_value),
-            "θₘₐₓ [°]": round(angle_max, round_value),
-            "θₘᵢₙ [°]": round(angle_min, round_value),
-            "S [{}²]".format(unit): round(area * scale_area, round_value),
-            "P [{}]".format(unit): round(perimeter * scale_factor, round_value),
-            "e": round(eccentricity, round_value),
-            f'I [{self._get_translation("ед.")}]': round(mean_intensity, round_value),
-        })
-        
+        unit = self._get_translation(
+            scale_selector["unit"]
+        )  # Переводим единицу измерения
+
+        particle_data.append(
+            {
+                "№": round(particle_counter, round_value),
+                "centroid_x": round(centroid_x, round_value),
+                "centroid_y": round(centroid_y, round_value),
+                "D [{}]".format(unit): round(diameter * scale_factor, round_value),
+                "Dₘₐₓ [{}]".format(unit): round(feret_max * scale_factor, round_value),
+                "Dₘᵢₙ [{}]".format(unit): round(feret_min * scale_factor, round_value),
+                "Dₘₑₐₙ [{}]".format(unit): round(
+                    feret_mean * scale_factor, round_value
+                ),
+                "θₘₐₓ [°]": round(angle_max, round_value),
+                "θₘᵢₙ [°]": round(angle_min, round_value),
+                "S [{}²]".format(unit): round(area * scale_area, round_value),
+                "P [{}]".format(unit): round(perimeter * scale_factor, round_value),
+                "e": round(eccentricity, round_value),
+                f'I [{self._get_translation("ед.")}]': round(
+                    mean_intensity, round_value
+                ),
+            }
+        )
+
         return particle_counter + 1
 
     def _draw_feret_lines(self, image, contour, angle, color=(0, 255, 0), thickness=2):
