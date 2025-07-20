@@ -5,7 +5,6 @@ import numpy as np
 import math
 from tqdm import tqdm
 import gradio as gr
-from typing import Optional
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 
@@ -32,7 +31,6 @@ class ImagePreprocessor:
     def preprocess_image(
         self,
         image: np.ndarray,
-        image2: Optional[np.ndarray],
         scale_selector: dict,
         solution: str,
         request: gr.Request,
@@ -55,7 +53,7 @@ class ImagePreprocessor:
                 image = image["background"]
                 image = self._convert_image_channels(image)
             else:
-                image = np.array(image2)
+                image = np.array(image)
 
             # Сохранение метаданных
             self._save_image_metadata(image, request)
