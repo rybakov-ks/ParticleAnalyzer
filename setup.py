@@ -1,7 +1,5 @@
 ﻿from setuptools import setup, find_packages
-from particleanalyzer.version import __version__
 import os
-
 
 def read_file(filename):
     with open(os.path.join(os.path.dirname(__file__), filename), encoding="utf-8") as f:
