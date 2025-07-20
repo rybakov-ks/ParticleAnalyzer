@@ -7,7 +7,6 @@ function getBrowserLanguage() {
 document.currentLang = getBrowserLanguage();
 
 function startIntro(lang = document.currentLang) {
-  console.log('Определен язык браузера:', lang );
   // Словарь переводов
   const translations = {
     'ru': {
