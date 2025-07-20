@@ -85,6 +85,10 @@ Finally, install ParticleAnalyzer from PyPI:
 ```python
 pip install ParticleAnalyzer
 ```
+For update:
+```python
+pip install --upgrade particleanalyzer
+```
 ✅ Now you're ready to run the application:
 ```python
 ParticleAnalyzer run
@@ -122,9 +126,9 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
    
 | Model       | Best For                   | Speed     | Recommended Use Case               |
 |-------------|----------------------------|-----------|------------------------------------|
-| **YOLOv11** | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
-| **YOLOv12** | High precision detection    | ⚡⚡ Medium | Critical measurements              |
-| **Cascade_X152** | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
+| **YOLOv11** 🆕 | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
+| **YOLOv12** 🆕 | High precision detection    | ⚡⚡⚡ Fast | Critical measurements              |
+| **Mask R-CNN X152** 🆕 | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
 
 </div>
 
