@@ -94,7 +94,7 @@ pip install ParticleAnalyzer
 ```
 For update:
 ```python
-pip install --upgrade particleanalyzer
+pip install --upgrade ParticleAnalyzer
 ```
 ✅ Now you're ready to run the application:
 ```python
