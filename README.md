@@ -47,6 +47,13 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 <video width="100%" src="https://github.com/user-attachments/assets/345695f4-f00c-4410-87d9-edcee64c6df3" controls></video>
 </td>
 </tr>
+<tr>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/ff6f07ce-e778-4451-b044-718e604f73a1" controls></video>
+</td>
+<td width="50%">
+</td>
+</tr>
 </table>
 
 ## ✨ Key Features
