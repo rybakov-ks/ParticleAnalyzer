@@ -235,7 +235,7 @@ function startIntro(lang = document.currentLang) {
         position: 'right'
       },
       {
-        element: '#cancel-btn',
+        element: '#clear-btn',
         intro: t.cancelButtonText,
         disableInteraction: true,
         position: 'bottom'
