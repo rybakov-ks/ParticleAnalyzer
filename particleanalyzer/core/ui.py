@@ -63,8 +63,22 @@ def create_interface(api_key):
                     gr.HTML(
                         f"""
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <h1 style="margin: 0; display: inline-block;">🔎 ParticleAnalyzer</h1>
-                            <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="display: inline-block; margin-right: 20px;">
+                                <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                                           xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
+                                    <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                                        <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
+                                            <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                                        </text>
+                                        <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
+                                            SEM Image Analysis Tool
+                                        </text>
+                                    </g>
+                                    <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+                                </svg>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
                                 <button onclick="startIntro()" style="
                                     background: #4285f4;
                                     color: white;
@@ -88,7 +102,7 @@ def create_interface(api_key):
                                         <circle cx="12" cy="9" r="3" fill="#4285f4"/>
                                         <path d="M12 12C15.5 12 18 14 18 16V18H6V16C6 14 8.5 12 12 12Z" fill="#4285f4"/>
                                     </svg>
-                                    {i18n('Показать руководство')}
+                                    {i18n('Помощь')}
                                 </button>
                                 <i class="fas fa-sun" style="font-size: 18px;"></i>
                                 <label class="switch">
@@ -111,6 +125,13 @@ def create_interface(api_key):
                                 label=i18n("Режим масштабирования"),
                                 elem_id="scale-selector",
                             )
+                        with gr.Row(visible=False) as row_instruction:
+                            with gr.Accordion(i18n("Как задать масштаб?"), open=False):
+                                gr.HTML(
+                                    """
+                                    <img src="https://rybakov-k.ru/images/instruction.gif" alt="Instructions for setting the scale">
+                                """
+                                )
                         with gr.Row(equal_height=True):
                             with gr.Column(visible=False) as Paint_row:
                                 im = gr.Paint(
@@ -140,7 +161,6 @@ def create_interface(api_key):
                                     label=i18n("Результат сегментации"),
                                     elem_id="output-image",
                                 )
-
                         with gr.Row(visible=False) as AnnotatedImage_row:
                             output_image2 = gr.AnnotatedImage(
                                 label=i18n("Результат сегментации")
@@ -159,30 +179,22 @@ def create_interface(api_key):
                                 value=1.0,
                                 elem_id="scale-input",
                             )
+                        with gr.Row():
+                            process_button = gr.Button(
+                                value=i18n("Анализировать"),
+                                variant="primary",
+                                size="md",
+                                icon=f'{assets_path("")}/icon/icons8-химия-50.png',
+                                elem_id="process-button",
+                            )
+                            clear_button = gr.Button(
+                                value=i18n("Очистить"),
+                                size="md",
+                                variant="secondary",
+                                icon=f'{assets_path("")}/icon/icons8-метла-50.png',
+                                elem_id="clear-btn",
+                            )
 
-                    with gr.Row(elem_classes="btn-group"):
-                        process_button = gr.Button(
-                            value=i18n("Анализировать"),
-                            variant="primary",
-                            size="md",
-                            icon=f'{assets_path("")}/icon/icons8-химия-50.png',
-                            elem_id="process-button",
-                        )
-                        cancel_button = gr.Button(
-                            value=i18n("Отменить"),
-                            size="md",
-                            variant="secondary",
-                            icon=f'{assets_path("")}/icon/incorrect.png',
-                            elem_classes="custom-cancel-btn",
-                            elem_id="cancel-btn",
-                        )
-                        clear_button = gr.Button(
-                            value=i18n("Очистить"),
-                            size="md",
-                            variant="secondary",
-                            icon=f'{assets_path("")}/icon/icons8-метла-50.png',
-                            elem_id="clear-btn",
-                        )
                     with gr.Row() as in_image_example_row:
                         gr.Examples(
                             examples=[
@@ -430,7 +442,6 @@ def create_interface(api_key):
                 ],
                 show_progress_on=output_image,
             )
-            cancel_button.click(None, None, None, cancels=[analyze])
 
             llm_start = llm_run.click(
                 fn=llm_amalysis.analyze,
@@ -449,6 +460,7 @@ def create_interface(api_key):
                     output_table,
                     in_image_example_row,
                     output_table_image2,
+                    row_instruction,
                 ],
                 show_progress="hide",
                 show_progress_on=scale_input_row,
@@ -494,6 +506,7 @@ def create_interface(api_key):
                     chatbot,
                     results_row,
                 ],
+                cancels=[analyze],
                 show_progress="hide",
                 show_progress_on=question_row,
             )

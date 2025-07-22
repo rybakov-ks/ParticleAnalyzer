@@ -79,6 +79,7 @@ def scale_input_visibility(scale_value):
         gr.update(value=(get_columns(scale_value))),
         gr.update(visible=(not is_scaled)),
         gr.update(value=(get_columns(scale_value))),
+        gr.update(visible=(is_scaled)),
     )
 
 
@@ -220,45 +221,47 @@ toggleTheme = """
         const isDark = document.body.classList.toggle('dark');
         localStorage.setItem('gradioDarkMode', isDark);
     }
-    
+
     function getSystemTheme() {
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    
+
     const toggle = document.getElementById('darkModeToggle');
-    if (toggle) {
-        const savedTheme = localStorage.getItem('gradioDarkMode');
-        const systemTheme = getSystemTheme();
-        
-        const isDark = savedTheme !== null 
-            ? savedTheme === 'true' 
-            : systemTheme === 'dark';
+    if (!toggle) return;
 
-        if (isDark) {
-            document.body.classList.add('dark');
-            toggle.checked = true;
-        } else {
-            document.body.classList.remove('dark');
-            toggle.checked = false; 
-        }
-        
-        toggle.addEventListener('change', toggleTheme);
-        
-        if (savedTheme === null) {
-            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            const handleSystemThemeChange = (e) => {
-                if (e.matches) {
-                    document.body.classList.add('dark');
-                    toggle.checked = true;
-                } else {
-                    document.body.classList.remove('dark');
-                    toggle.checked = false;
-                }
-            };
-            mediaQuery.addEventListener('change', handleSystemThemeChange);
+    const savedTheme = localStorage.getItem('gradioDarkMode');
+    const systemTheme = getSystemTheme();
 
-            handleSystemThemeChange(mediaQuery);
-        }
+    const isDark = savedTheme !== null 
+        ? savedTheme === 'true' 
+        : systemTheme === 'dark';
+
+    if (isDark) {
+        document.body.classList.add('dark');
+        toggle.checked = true;
+    } else {
+        document.body.classList.remove('dark');
+        toggle.checked = false;
+    }
+
+    toggle.addEventListener('change', toggleTheme);
+
+    if (savedTheme === null) {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleSystemThemeChange = (e) => {
+            if (e.matches) {
+                document.body.classList.add('dark');
+                toggle.checked = true;
+            } else {
+                document.body.classList.remove('dark');
+                toggle.checked = false;
+            }
+        };
+
+        handleSystemThemeChange(mediaQuery);
+
+        mediaQuery.addEventListener('change', handleSystemThemeChange);
     }
 }
+
 """

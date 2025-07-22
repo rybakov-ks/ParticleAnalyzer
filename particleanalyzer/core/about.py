@@ -35,7 +35,19 @@ about_ru = f"""
         box-shadow:var(--block-shadow)
     ">
         <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <h2 style="margin:0;color:var(--header-text-color);font-weight:600">🔎 ParticleAnalyzer</h2>
+            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
+                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
+                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                    </text>
+                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
+                        SEM Image Analysis Tool
+                    </text>
+                </g>
+                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+            </svg>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             Инструмент для анализа <strong style="color:var(--block-label-text-color)">размерных характеристик частиц</strong> 
@@ -125,7 +137,19 @@ about_en = f"""
         box-shadow:var(--block-shadow)
     ">
         <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <h2 style="margin:0;color:var(--header-text-color);font-weight:600">🔎 ParticleAnalyzer</h2>
+            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
+                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
+                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                    </text>
+                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
+                        SEM Image Analysis Tool
+                    </text>
+                </g>
+                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+            </svg>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             A tool for analyzing <strong style="color:var(--block-label-text-color)">particle size characteristics</strong> 
@@ -215,7 +239,19 @@ about_zh_cn = f"""
         box-shadow:var(--block-shadow)
     ">
         <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <h2 style="margin:0;color:var(--header-text-color);font-weight:600">🔎 颗粒分析器</h2>
+            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
+                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
+                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                    </text>
+                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
+                        SEM Image Analysis Tool
+                    </text>
+                </g>
+                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+            </svg>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             一款用于分析<strong style="color:var(--block-label-text-color)">颗粒尺寸特征</strong>的工具，
@@ -304,7 +340,19 @@ about_zh_tw = f"""
         box-shadow:var(--block-shadow)
     ">
         <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <h2 style="margin:0;color:var(--header-text-color);font-weight:600">🔎 粒子分析器</h2>
+            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
+                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
+                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                    </text>
+                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
+                        SEM Image Analysis Tool
+                    </text>
+                </g>
+                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+            </svg>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             用於分析<strong style="color:var(--block-label-text-color)">粒子尺寸特徵</strong>的工具，
