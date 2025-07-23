@@ -258,21 +258,22 @@ class StatisticsBuilder:
         )
 
         mu, std = norm.fit(data.dropna())
-        x = np.linspace(min(data), max(data), 100)
-        y = norm.pdf(x, mu, std)
+        if not np.isclose(std, 0):
+            x = np.linspace(min(data), max(data), 100)
+            y = norm.pdf(x, mu, std)
 
-        fig.add_trace(
-            go.Scatter(
-                x=x,
-                y=y,
-                mode="lines",
-                name=f'{title} {self._get_translation("(норм. распр.)")}',
-                line=dict(color="black", width=2, dash="dash"),
-            ),
-            row=row,
-            col=col,
-            secondary_y=True,
-        )
+            fig.add_trace(
+                go.Scatter(
+                    x=x,
+                    y=y,
+                    mode="lines",
+                    name=f'{title} {self._get_translation("(норм. распр.)")}',
+                    line=dict(color="black", width=2, dash="dash"),
+                ),
+                row=row,
+                col=col,
+                secondary_y=True,
+            )
 
         fig.update_yaxes(
             title_text=self._get_translation("Количество") if col == 1 else "",
