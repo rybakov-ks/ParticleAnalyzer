@@ -26,8 +26,9 @@ class LLMAnalysis:
                 api_key=api_key,
             )
             self.model_list = [
-                "deepseek/deepseek-chat:free",
                 "deepseek/deepseek-chat-v3-0324",
+                "deepseek/deepseek-r1-distill-llama-70b",
+                "deepseek/deepseek-r1-0528:free",
                 "google/gemini-2.0-flash-001",
                 "openai/gpt-4o-mini",
             ]
