@@ -94,10 +94,6 @@ pip install 'git+https://github.com/facebookresearch/detectron2.git'
 ### 📦 3. Install ParticleAnalyzer
 Finally, install ParticleAnalyzer from PyPI:
 ```python
-pip install ParticleAnalyzer
-```
-For update:
-```python
 pip install --upgrade ParticleAnalyzer
 ```
 ✅ Now you're ready to run the application:
