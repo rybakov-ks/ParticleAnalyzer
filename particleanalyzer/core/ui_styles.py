@@ -314,7 +314,7 @@ footer {
   display: none !important;
 }
 
-#analyze-row, #button-row, #button-row, #example-row {
+#button-row, #example-row {
     margin-top: -10px; /* расстояние между строками */
 }
 #button-row {
