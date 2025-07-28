@@ -18,4 +18,5 @@ def main(port=8000, api_key=""):
         ssr_mode=True,
         show_api=False,
         inbrowser=True,
+        allowed_paths=[assets_path("")],
     )
