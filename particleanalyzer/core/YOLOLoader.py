@@ -4,8 +4,7 @@ from ultralytics import YOLO
 
 class YOLOLoader:
     MODEL_MAPPING = {
-        "Yolo11 (dataset 5)": "Yolo11_d5.pt",
-        "Yolo12 (dataset 5)": "Yolo12_d5.pt",
+        "Yolo11 (dataset 7)": "Yolo11_d7.pt",
     }
 
     def __init__(self):

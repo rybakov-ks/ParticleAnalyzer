@@ -37,6 +37,14 @@ def get_translation(text):
     return translations.get(lang, {}).get(text, text)
 
 
+def translate_chatbot():
+    text_chatbot = get_translation(
+        """🔬 **Добро пожаловать в систему анализа SEM-изображений!**
+        Я – ваш виртуальный ассистент в сканирующей электронной микроскопии. Готов провести детальный анализ морфологии и размерных характеристик частиц."""
+    )
+    return gr.update(value=[[None, text_chatbot]])
+
+
 def get_columns(scale_value):
     """Генерирует колонки DataFrame в зависимости от выбранного масштаба"""
     unit = get_translation(ParticleAnalyzer.SCALE_OPTIONS[scale_value]["unit"])

@@ -14,8 +14,10 @@ from particleanalyzer.core.utils import (
     save_data_to_csv,
     scale_input_unit_measurement,
     toggleTheme,
+    translate_chatbot,
 )
 from particleanalyzer.core.about import about_ru
+from particleanalyzer.core.parameter_information import reference_ru
 from particleanalyzer.core.ui_styles import css, custom_head
 from particleanalyzer.core.languages import i18n
 from particleanalyzer.core.LLMAnalysis import LLMAnalysis
@@ -43,12 +45,17 @@ def assets_path(name: str):
 
 analyzer = ParticleAnalyzer()
 
+my_theme = gr.Theme.load(f"{assets_path('')}/themes/theme_schema@0.0.1.json").set(
+    checkbox_label_background_fill='#2196f3',
+    input_background_fill_focus='white',
+)
+
 
 def create_interface(api_key):
     llm_amalysis = LLMAnalysis(api_key)
 
     demo = gr.Blocks(
-        theme="snehilsanyal/scikit-learn",
+        theme=my_theme,
         title="ParticleAnalyzer — SEM Image Analysis Tool",
         head=custom_head,
         css=css,
@@ -58,144 +65,155 @@ def create_interface(api_key):
     with demo:
         api_key = gr.State(True if api_key else False)
         with gr.Column(elem_id="app-container"):
-            with gr.Group(elem_id="gr-head"):
-                with gr.Row(equal_height=True):
-                    gr.HTML(
-                        f"""
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: inline-block; margin-right: 20px;">
-                                <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                    <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                                           xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
-                                    <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                                        <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
-                                            <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                                        </text>
-                                        <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
-                                            SEM Image Analysis Tool
-                                        </text>
-                                    </g>
-                                    <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-                                </svg>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <button onclick="startIntro()" style="
-                                    background: #4285f4;
-                                    color: white;
-                                    border: none;
-                                    border-radius: 20px;
-                                    padding: 7px 16px 7px 12px;
-                                    cursor: pointer;
-                                    font-size: 14px;
-                                    font-weight: 500;
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 8px;
-                                    transition: all 0.3s;
-                                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                                    position: relative;
-                                    top: 3px;
-                                " onmouseover="this.style.background='#3367d6'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'" 
-                                 onmouseout="this.style.background='#4285f4'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1px;">
-                                        <circle cx="12" cy="12" r="10" fill="white"/>
-                                        <circle cx="12" cy="9" r="3" fill="#4285f4"/>
-                                        <path d="M12 12C15.5 12 18 14 18 16V18H6V16C6 14 8.5 12 12 12Z" fill="#4285f4"/>
-                                    </svg>
-                                    {i18n('Помощь')}
-                                </button>
-                                <i class="fas fa-sun" style="font-size: 18px;"></i>
-                                <label class="switch">
-                                    <input type="checkbox" id="darkModeToggle">
-                                    <span class="slider"></span>
-                                </label>
-                                <i class="fas fa-moon" style="font-size: 18px;"></i>
-                            </div>
+            with gr.Row(equal_height=True, elem_id="gr-head"):
+                gr.HTML(
+                    f"""
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: inline-block; margin-right: 20px;">
+                            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                <image x="2" y="4" width="46" height="46" preserveAspectRatio="xMidYMid meet"
+                                       xlink:href="https://rybakov-k.ru/assets/icon/305079-2196f3.svg"/>
+                                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
+                                    <text x="55" y="29" font-size="22" font-weight="600" letter-spacing="-0.3">
+                                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
+                                    </text>
+                                    <text x="56" y="44" font-size="11" fill="#64748b" font-weight="500">
+                                        SEM Image Analysis Tool
+                                    </text>
+                                </g>
+                                <line x1="49" y1="4" x2="49" y2="54" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
+                            </svg>
                         </div>
-                        """
-                    )
-                    demo.load(None, None, js=toggleTheme)
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <button onclick="startIntro()" style="
+                                background: #4285f4;
+                                color: white;
+                                border: none;
+                                border-radius: 20px;
+                                padding: 7px 16px 7px 12px;
+                                cursor: pointer;
+                                font-size: 14px;
+                                font-weight: 500;
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                transition: all 0.3s;
+                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                                position: relative;
+                                top: 3px;
+                            " onmouseover="this.style.background='#3367d6'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'" 
+                             onmouseout="this.style.background='#4285f4'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1px;">
+                                    <circle cx="12" cy="12" r="10" fill="white"/>
+                                    <circle cx="12" cy="9" r="3" fill="#4285f4"/>
+                                    <path d="M12 12C15.5 12 18 14 18 16V18H6V16C6 14 8.5 12 12 12Z" fill="#4285f4"/>
+                                </svg>
+                                {i18n('Помощь')}
+                            </button>
+                            <i class="fas fa-sun" style="font-size: 18px;"></i>
+                            <label class="switch">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="slider"></span>
+                            </label>
+                            <i class="fas fa-moon" style="font-size: 18px;"></i>
+                        </div>
+                    </div>
+                    """
+                )
+                demo.load(None, None, js=toggleTheme)
             with gr.Tabs(elem_id="tabs"):
                 with gr.Tab(i18n("Анализ")):
-                    with gr.Group():
-                        with gr.Row():
-                            scale_selector = gr.Dropdown(
-                                list(analyzer.SCALE_OPTIONS.keys()),
-                                value=list(analyzer.SCALE_OPTIONS.keys())[0],
-                                label=i18n("Режим масштабирования"),
-                                elem_id="scale-selector",
-                            )
-                        with gr.Row(visible=False) as row_instruction:
-                            with gr.Accordion(i18n("Как задать масштаб?"), open=False):
-                                gr.HTML(
+                    with gr.Row(elem_id="analyze-row"):
+                        with gr.Column():
+                            with gr.Row():
+                                scale_selector = gr.Dropdown(
+                                    list(analyzer.SCALE_OPTIONS.keys()),
+                                    value=list(analyzer.SCALE_OPTIONS.keys())[0],
+                                    label=i18n("Режим масштабирования"),
+                                    elem_id="scale-selector",
+                                )
+                            with gr.Row(
+                                visible=False, variant="default"
+                            ) as row_instruction:
+                                with gr.Accordion(
+                                    i18n("Как задать масштаб?"), open=False
+                                ):
+                                    gr.HTML(
+                                        """
+                                        <img src="https://rybakov-k.ru/images/instruction.gif" alt="Instructions for setting the scale">
                                     """
-                                    <img src="https://rybakov-k.ru/images/instruction.gif" alt="Instructions for setting the scale">
-                                """
-                                )
-                        with gr.Row(equal_height=True):
-                            with gr.Column(visible=False) as Paint_row:
-                                im = gr.Paint(
-                                    label=i18n("Изображение СЭМ"),
-                                    type="numpy",
-                                    canvas_size=(600, 600),
-                                    sources=["upload"],
-                                    brush=gr.Brush(
-                                        color_mode="fixed",
-                                        default_color="green",
-                                        colors=["green"],
-                                    ),
-                                    transforms="crop",
-                                    layers=False,
-                                    eraser=gr.Eraser(default_size=200),
-                                    elem_id="in-image-paint",
-                                )
-                            with gr.Column() as Image_row:
-                                in_image = gr.Image(
-                                    sources=["upload"],
-                                    label=i18n("Изображение СЭМ"),
-                                    elem_id="in-image",
-                                )
+                                    )
+                            with gr.Row(equal_height=True):
+                                with gr.Column(visible=False) as Paint_row:
+                                    im = gr.Paint(
+                                        label=i18n("Изображение СЭМ"),
+                                        type="numpy",
+                                        canvas_size=(600, 600),
+                                        sources=["upload"],
+                                        brush=gr.Brush(
+                                            color_mode="fixed",
+                                            default_color="green",
+                                            colors=["green"],
+                                        ),
+                                        transforms="crop",
+                                        layers=False,
+                                        eraser=gr.Eraser(default_size=200),
+                                        elem_id="in-image-paint",
+                                    )
+                                with gr.Column() as Image_row:
+                                    in_image = gr.Image(
+                                        sources=["upload"],
+                                        label=i18n("Изображение СЭМ"),
+                                        elem_id="in-image",
+                                    )
 
-                            with gr.Column():
-                                output_image = gr.Image(
-                                    label=i18n("Результат сегментации"),
-                                    elem_id="output-image",
-                                )
-                        with gr.Row(visible=False) as AnnotatedImage_row:
-                            output_image2 = gr.AnnotatedImage(
-                                label=i18n("Результат сегментации")
+                                with gr.Column():
+                                    output_image = gr.Image(
+                                        label=i18n("Результат сегментации"),
+                                        elem_id="output-image",
+                                    )
+                                with gr.Row(visible=False) as AnnotatedImage_row:
+                                    output_image2 = gr.AnnotatedImage(
+                                        label=i18n("Результат сегментации")
+                                    )
+                                with gr.Row(visible=False) as output_table_image2_row:
+                                    output_table_image2 = gr.Dataframe(
+                                        value=empty_df_ParticleCharacteristics,
+                                        label=i18n("Характеристики частицы"),
+                                        interactive=False,
+                                        elem_id="dataframe-table",
+                                    )
+
+                                with gr.Row(visible=False) as scale_input_row:
+                                    scale_input = gr.Number(
+                                        label="Длина шкалы в мкм",
+                                        value=1.0,
+                                        elem_id="scale-input",
+                                    )
+
+                    with gr.Row(elem_id="button-row"):
+                        with gr.Column():
+                            process_button = gr.HTML(
+                                f"""
+                            <button class="custom-btn btn-analyze" id="process-button" onclick="analyze()">
+                                <img src='https://rybakov-k.ru/assets/icon/icons8-химия-50.png' 
+                                     alt='Chemistry icon'/> 
+                                {i18n('Анализировать')}
+                            </button>
+                            """
                             )
-                        with gr.Row(visible=False) as output_table_image2_row:
-                            output_table_image2 = gr.Dataframe(
-                                value=empty_df_ParticleCharacteristics,
-                                label=i18n("Характеристики частицы"),
-                                interactive=False,
-                                elem_id="dataframe-table",
+                        with gr.Column():
+                            clear_button = gr.HTML(
+                                f"""
+                            <button class="custom-btn btn-clear" id="clear-btn" onclick="clear()">
+                                <img src='https://rybakov-k.ru/assets/icon/icons8-метла-50.png' 
+                                     alt='Chemistry icon'/> 
+                                {i18n('Очистить')}
+                            </button>
+                            """
                             )
 
-                        with gr.Row(visible=False) as scale_input_row:
-                            scale_input = gr.Number(
-                                label="Длина шкалы в мкм",
-                                value=1.0,
-                                elem_id="scale-input",
-                            )
-                        with gr.Row():
-                            process_button = gr.Button(
-                                value=i18n("Анализировать"),
-                                variant="primary",
-                                size="md",
-                                icon=f'{assets_path("")}/icon/icons8-химия-50.png',
-                                elem_id="process-button",
-                            )
-                            clear_button = gr.Button(
-                                value=i18n("Очистить"),
-                                size="md",
-                                variant="secondary",
-                                icon=f'{assets_path("")}/icon/icons8-метла-50.png',
-                                elem_id="clear-btn",
-                            )
-
-                    with gr.Row() as in_image_example_row:
+                    with gr.Row(elem_id="example-row") as in_image_example_row:
                         gr.Examples(
                             examples=[
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg",
@@ -218,7 +236,7 @@ def create_interface(api_key):
                                     </div>
                                     """
                             )
-                            with gr.Tabs() as tabs_row:
+                            with gr.Tabs(elem_id="tabs_result") as tabs_row:
                                 with gr.Tab(i18n("Статистика"), id=1):
                                     with gr.Row():
                                         output_table2 = gr.Dataframe(
@@ -228,6 +246,11 @@ def create_interface(api_key):
                                             elem_id="dataframe-table2",
                                             show_copy_button=True,
                                         )
+                                    with gr.Row():
+                                        with gr.Accordion(
+                                            i18n("Справочник параметров"), open=False
+                                        ):
+                                            gr.HTML(i18n(reference_ru))
                                     with gr.Row(visible=False):
                                         output_table = gr.Dataframe(
                                             value=empty_df_ParticleCharacteristics,
@@ -443,6 +466,8 @@ def create_interface(api_key):
                 show_progress_on=output_image,
             )
 
+            process_button.click(translate_chatbot, None, chatbot)
+
             llm_start = llm_run.click(
                 fn=llm_amalysis.analyze,
                 inputs=[output_table, model_llm],
@@ -493,6 +518,44 @@ def create_interface(api_key):
             )
 
             clear_button.click(
+                fn=reset_interface,
+                inputs=[scale_selector],
+                outputs=[
+                    im,
+                    output_image,
+                    output_plot,
+                    in_image,
+                    output_image2,
+                    AnnotatedImage_row,
+                    output_table_image2_row,
+                    chatbot,
+                    results_row,
+                ],
+                cancels=[analyze],
+                show_progress="hide",
+                show_progress_on=question_row,
+            )
+
+            in_image.clear(
+                fn=reset_interface,
+                inputs=[scale_selector],
+                outputs=[
+                    im,
+                    output_image,
+                    output_plot,
+                    in_image,
+                    output_image2,
+                    AnnotatedImage_row,
+                    output_table_image2_row,
+                    chatbot,
+                    results_row,
+                ],
+                cancels=[analyze],
+                show_progress="hide",
+                show_progress_on=question_row,
+            )
+
+            im.clear(
                 fn=reset_interface,
                 inputs=[scale_selector],
                 outputs=[
