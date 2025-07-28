@@ -2,50 +2,184 @@ from particleanalyzer.core.tour import tour
 
 # CSS для стилизации интерфейса
 css = """
+/* ==========================================================================
+   🌗 ПЕРЕМЕННЫЕ ТЕМЫ
+   ========================================================================== */
+:root {
+  --primary: #3b82f6;
+  --primary-dark: #2563eb;
+  --text: #1e293b;
+  --text-light: #64748b;
+  --bg: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --text: #f1f5f9;
+  --text-light: #94a3b8;
+  --bg: #0f172a;
+  --card-bg: #1e293b;
+  --border: #334155;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================================
+   🧱 ОСНОВНАЯ СЕТКА
+   ========================================================================== */
+.gradio-container {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%) !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .gradio-container {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+}
+
+.gradio-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 50%, rgba(123, 179, 255, 0.15) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(255, 153, 102, 0.15) 0%, transparent 40%);
+  animation: gradientShift 15s ease infinite alternate;
+  z-index: 0;
+}
+
+.dark .gradio-container::before {
+  background: radial-gradient(circle at 20% 50%, rgba(56, 132, 255, 0.1) 0%, transparent 40%),
+              radial-gradient(circle at 80% 70%, rgba(255, 107, 107, 0.1) 0%, transparent 40%);
+}
+
 #app-container {
-    max-width: 750px;
-    margin: 0 auto;
+  max-width: 790px;
+  margin: 0 auto;
 }
-footer { display: none !important; }
-#author-note {
-    text-align: right;
-    font-size: 14px;
-}
-#dataframe-table {
-    width: 100%;
-    table-layout: auto;
-}
-#dataframe-table th, #dataframe-table td {
-    white-space: nowrap;
-}
-#dataframe-table2 {
-    width: 100%;
-    table-layout: auto;
-}
-#dataframe-table2 th, #dataframe-table2 td {
-    white-space: nowrap;
-}
+
+/* ==========================================================================
+   🧩 ХЕДЕР
+   ========================================================================== */
 #gr-head {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  box-shadow: var(--shadow) !important;
 }
-#gr-head > div {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
+
+/* ==========================================================================
+   📑 ТАБЫ И КОНТЕНТ
+   ========================================================================== */
+.tabs {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  margin-top: 0 !important;
+  box-shadow: var(--shadow) !important;
 }
-.btn-group {
-    gap: 20px !important;
+
+.tabitem {
+  padding: 0 16px !important;
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.custom-cancel-btn {
-    background: #5E936C !important;
+
+/* ===== Контейнер вкладок результатов ===== */
+#tabs_result {
+  margin-top: 0 !important;
+  background: var(--card-bg) !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden !important;
 }
-.custom-cancel-btn:hover {
-    background: #3E5F44 !important;
+
+/* ===== Навигация по вкладкам ===== */
+#tabs_result .tab-nav {
+  background: var(--card-bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 0 16px !important;
 }
+
+#tabs_result .tab-button {
+  padding: 12px 24px !important;
+  font-weight: 500 !important;
+  color: var(--text-light) !important;
+  border: none !important;
+  background: transparent !important;
+  transition: all 0.3s ease !important;
+}
+
+#tabs_result .tab-button.selected {
+  color: var(--primary) !important;
+  position: relative;
+}
+
+#tabs_result .tab-button.selected::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--primary);
+}
+
+#tabs_result .tabitem {
+  padding: 0 !important;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* ==========================================================================
+   🧾 ТАБЛИЦЫ
+   ========================================================================== */
+#dataframe-table,
+#dataframe-table2 {
+  width: 100%;
+  table-layout: auto;
+  border-radius: 8px !important;
+}
+
+#dataframe-table th, #dataframe-table td,
+#dataframe-table2 th, #dataframe-table2 td {
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   🖼 ИЗОБРАЖЕНИЯ
+   ========================================================================== */
+#in-image-paint,
+#in-image,
+#output-image {
+  border-radius: 12px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  background: var(--card-bg) !important;
+  padding: 8px !important;
+  object-fit: contain;
+  width: 100%;
+  transition: all 0.4s ease;
+}
+
+#analyze {
+  background-color: var(--card-bg) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow) !important;
+  transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+   🌘 ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ
+   ========================================================================== */
 .switch {
   position: relative;
   display: inline-block;
@@ -62,24 +196,21 @@ footer { display: none !important; }
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   background-color: #ccc;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 24px;
 }
 
 .slider:before {
-  position: absolute;
   content: "";
+  position: absolute;
   height: 16px;
   width: 16px;
   left: 4px;
   bottom: 4px;
   background-color: white;
-  transition: .4s;
+  transition: 0.4s;
   border-radius: 50%;
 }
 
@@ -89,6 +220,106 @@ input:checked + .slider {
 
 input:checked + .slider:before {
   transform: translateX(26px);
+}
+
+/* ==========================================================================
+   🎛 КАСТОМНЫЕ КНОПКИ
+   ========================================================================== */
+.custom-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  width: 180px;
+  height: 40px;
+  border: none;
+  border-radius: 50px !important;
+  font-weight: 600;
+  font-family: 'Segoe UI', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  color: white;
+}
+
+/* Иконка внутри кнопки */
+.custom-btn img {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  object-fit: contain;
+}
+
+/* Стили по типам кнопок */
+.btn-analyze {
+  background: linear-gradient(135deg, #7386d5 0%, #a0b1f5 100%);
+  margin-left: auto;
+}
+
+.btn-clear {
+  background: linear-gradient(135deg, #f68084 0%, #fda085 100%);
+  margin-right: auto;
+}
+
+/* Ripple эффект */
+.custom-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 5px; height: 5px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 100%;
+  opacity: 0;
+  transform: scale(1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.custom-btn:focus:not(:active)::after {
+  animation: ripple 0.6s ease-out;
+}
+
+/* Наведение и активное состояние */
+.custom-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.custom-btn:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   🌀 АНИМАЦИИ
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ripple {
+  0%   { transform: scale(0); opacity: 0.7; }
+  100% { transform: scale(20); opacity: 0; }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 20% 50%, 80% 70%; }
+  100% { background-position: 30% 60%, 70% 80%; }
+}
+
+/* ==========================================================================
+   🧹 ДРУГОЕ
+   ========================================================================== */
+footer {
+  display: none !important;
+}
+
+#analyze-row, #button-row, #button-row, #example-row {
+    margin-top: -10px; /* расстояние между строками */
+}
+#button-row {
+  display: flex;
+  gap: 0px; /* расстояние между колонками */
 }
 """
 

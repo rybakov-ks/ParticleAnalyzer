@@ -194,29 +194,31 @@ class ParticleAnalyzer:
             if not scale and scale_selector["scale"]:
                 return self._create_error_return()
 
+            config = {
+                "image": image,
+                "scale_input": scale_input,
+                "confidence_threshold": confidence_threshold,
+                "scale_selector": scale_selector,
+                "confidence_iou": confidence_iou,
+                "number_detections": number_detections,
+                "model_change": model_change,
+                "round_value": round_value,
+                "slice_height": slice_height,
+                "slice_width": slice_width,
+                "overlap_height_ratio": overlap_height_ratio,
+                "overlap_width_ratio": overlap_width_ratio,
+                "pbar": pbar,
+                "pr": pr,
+                "orig_image": orig_image,
+                "gray_image": gray_image,
+                "scale": scale,
+                "scale_factor_glob": scale_factor_glob,
+                "show_Feret_diametr": show_Feret_diametr,
+            }
+
             # Выбор стратегии обработки
             processor = self._select_processor(model_change, sahi_mode)
-            output_image, particle_data, annotations = processor(
-                image,
-                scale_input,
-                confidence_threshold,
-                scale_selector,
-                confidence_iou,
-                number_detections,
-                model_change,
-                round_value,
-                slice_height,
-                slice_width,
-                overlap_height_ratio,
-                overlap_width_ratio,
-                pbar,
-                pr,
-                orig_image,
-                gray_image,
-                scale,
-                scale_factor_glob,
-                show_Feret_diametr,
-            )
+            output_image, particle_data, annotations = processor(**config)
             if output_image is None:
                 return self._create_error_return()
 
@@ -268,42 +270,25 @@ class ParticleAnalyzer:
             return self._process_with_detectron
         raise ValueError(f"Неизвестная модель или неподдерживаемый тип: {model_name}")
 
-    def _process_with_yolo(
-        self,
-        image,
-        scale_input,
-        confidence_threshold,
-        scale_selector,
-        confidence_iou,
-        number_detections,
-        model_change,
-        round_value,
-        slice_height,
-        slice_width,
-        overlap_height_ratio,
-        overlap_width_ratio,
-        pbar,
-        pr,
-        orig_image,
-        gray_image,
-        scale,
-        scale_factor_glob,
-        show_Feret_diametr,
-    ):
+    def _process_with_yolo(self, **config):
         """Обработка с использованием YOLO"""
-        model = self.model_manager.get_model(model_change)
-        pbar.set_description(self._get_translation("YOLO обрабатывает изображение..."))
-        pr(0.5, desc=self._get_translation("YOLO обрабатывает изображение..."))
+        model = self.model_manager.get_model(config["model_change"])
+        config["pbar"].set_description(
+            self._get_translation("YOLO обрабатывает изображение...")
+        )
+        config["pr"](
+            0.5, desc=self._get_translation("YOLO обрабатывает изображение...")
+        )
 
         try:
             with torch.no_grad():
                 results = model(
-                    image,
+                    config["image"],
                     verbose=False,
-                    conf=confidence_threshold,
+                    conf=config["confidence_threshold"],
                     retina_masks=True,
-                    iou=confidence_iou,
-                    max_det=number_detections,
+                    iou=config["confidence_iou"],
+                    max_det=config["number_detections"],
                     device=self.device,
                 )
         except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
@@ -319,17 +304,17 @@ class ParticleAnalyzer:
         if len(results[0].boxes) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
             return None, None, None
-        elif len(results[0].boxes) == number_detections:
+        elif len(results[0].boxes) == config["number_detections"]:
             gr.Info(
                 self._get_translation(
                     "Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."
                 )
             )
-        pbar.update(1)
+        config["pbar"].update(1)
 
-        pbar.set_description(self._get_translation("Обработка частиц..."))
-        pr(0.62, desc=self._get_translation("Обработка частиц..."))
-        output_image = orig_image.copy()
+        config["pbar"].set_description(self._get_translation("Обработка частиц..."))
+        config["pr"](0.62, desc=self._get_translation("Обработка частиц..."))
+        output_image = config["orig_image"].copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
         )
@@ -339,58 +324,33 @@ class ParticleAnalyzer:
                 for mask, mask2 in zip(r.masks.xy, r.masks.data.cpu().numpy()):
                     particle_counter = self._analyze_particle(
                         points=mask,
-                        gray_image=gray_image,
                         output_image=output_image,
-                        scale_selector=scale_selector,
-                        scale_input=scale_input,
-                        scale=scale,
-                        particle_counter=particle_counter,
-                        round_value=round_value,
                         thickness=thickness,
                         particle_data=particle_data,
                         annotations=annotations,
                         raw_mask=mask2,
-                        scale_factor_glob=scale_factor_glob,
-                        show_Feret_diametr=show_Feret_diametr,
+                        particle_counter=particle_counter,
+                        **config,
                     )
-        pbar.update(1)
+        config["pbar"].update(1)
         return output_image, particle_data, annotations
 
-    def _process_with_detectron(
-        self,
-        image,
-        scale_input,
-        confidence_threshold,
-        scale_selector,
-        confidence_iou,
-        number_detections,
-        model_change,
-        round_value,
-        slice_height,
-        slice_width,
-        overlap_height_ratio,
-        overlap_width_ratio,
-        pbar,
-        pr,
-        orig_image,
-        gray_image,
-        scale,
-        scale_factor_glob,
-        show_Feret_diametr,
-    ):
+    def _process_with_detectron(self, **config):
         """Обработка с использованием Detectron2"""
-        cfg = self.model_manager.get_model(model_change)
-        cfg.TEST.DETECTIONS_PER_IMAGE = number_detections
-        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = confidence_threshold
-        cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = confidence_iou
+        cfg = self.model_manager.get_model(config["model_change"])
+        cfg.TEST.DETECTIONS_PER_IMAGE = config["number_detections"]
+        cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = config["confidence_threshold"]
+        cfg.MODEL.ROI_HEADS.NMS_THRESH_TEST = config["confidence_iou"]
 
-        pbar.set_description(
+        config["pbar"].set_description(
             self._get_translation("Detectron2 обрабатывает изображение...")
         )
-        pr(0.5, desc=self._get_translation("Detectron2 обрабатывает изображение..."))
+        config["pr"](
+            0.5, desc=self._get_translation("Detectron2 обрабатывает изображение...")
+        )
         try:
             predictor = DefaultPredictor(cfg)
-            results = predictor(image)
+            results = predictor(config["image"])
             masks = results["instances"].pred_masks.to("cpu").numpy()
         except Exception as e:
             self._handle_error(e)
@@ -398,17 +358,17 @@ class ParticleAnalyzer:
         if len(masks) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
             return None, None, None
-        elif len(masks) == number_detections:
+        elif len(masks) == config["number_detections"]:
             gr.Info(
                 self._get_translation(
                     "Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."
                 )
             )
-        pbar.update(1)
+        config["pbar"].update(1)
 
-        pbar.set_description(self._get_translation("Обработка частиц..."))
-        pr(0.62, desc=self._get_translation("Обработка частиц..."))
-        output_image = orig_image.copy()
+        config["pbar"].set_description(self._get_translation("Обработка частиц..."))
+        config["pr"](0.62, desc=self._get_translation("Обработка частиц..."))
+        output_image = config["orig_image"].copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
         )
@@ -423,72 +383,51 @@ class ParticleAnalyzer:
             points = contour.squeeze()
             particle_counter = self._analyze_particle(
                 points=points,
-                gray_image=gray_image,
                 output_image=output_image,
-                scale_selector=scale_selector,
-                scale_input=scale_input,
-                scale=scale,
-                particle_counter=particle_counter,
-                round_value=round_value,
                 thickness=thickness,
                 particle_data=particle_data,
                 annotations=annotations,
                 raw_mask=mask,
-                scale_factor_glob=scale_factor_glob,
-                show_Feret_diametr=show_Feret_diametr,
+                particle_counter=particle_counter,
+                **config,
             )
-        pbar.update(1)
+        config["pbar"].update(1)
         return output_image, particle_data, annotations
 
-    def _process_with_sahi(
-        self,
-        image,
-        scale_input,
-        confidence_threshold,
-        scale_selector,
-        confidence_iou,
-        number_detections,
-        model_change,
-        round_value,
-        slice_height,
-        slice_width,
-        overlap_height_ratio,
-        overlap_width_ratio,
-        pbar,
-        pr,
-        orig_image,
-        gray_image,
-        scale,
-        scale_factor_glob,
-        show_Feret_diametr,
-    ):
+    def _process_with_sahi(self, **config):
         """Обработка с использованием SAHI"""
-        if model_change in self.model_manager.yolo_loader.MODEL_MAPPING:
+        if config["model_change"] in self.model_manager.yolo_loader.MODEL_MAPPING:
             detection_model = AutoDetectionModel.from_pretrained(
                 model_type="ultralytics",
-                model_path=self.model_manager.get_model_path(model_change),
-                confidence_threshold=confidence_threshold,
+                model_path=self.model_manager.get_model_path(config["model_change"]),
+                confidence_threshold=config["confidence_threshold"],
                 device="cuda",
             )
-        elif model_change in self.model_manager.detectron_loader.MODEL_MAPPING:
+        elif (
+            config["model_change"] in self.model_manager.detectron_loader.MODEL_MAPPING
+        ):
             detection_model = CustomDetectron2Model(
-                model_path=self.model_manager.get_model_path(model_change),
-                config_path=self.model_manager.get_config_path(model_change),
-                confidence_threshold=confidence_threshold,
+                model_path=self.model_manager.get_model_path(config["model_change"]),
+                config_path=self.model_manager.get_config_path(config["model_change"]),
+                confidence_threshold=config["confidence_threshold"],
                 device="cuda",
             )
 
-        pbar.set_description(self._get_translation("SAHI обрабатывает изображение..."))
-        pr(0.5, desc=self._get_translation("SAHI обрабатывает изображение..."))
+        config["pbar"].set_description(
+            self._get_translation("SAHI обрабатывает изображение...")
+        )
+        config["pr"](
+            0.5, desc=self._get_translation("SAHI обрабатывает изображение...")
+        )
         try:
             results = get_sliced_prediction(
-                image,
+                config["image"],
                 detection_model,
-                slice_height=slice_height,
-                slice_width=slice_width,
-                overlap_height_ratio=overlap_height_ratio,
-                overlap_width_ratio=overlap_width_ratio,
-                postprocess_match_threshold=confidence_iou,
+                slice_height=config["slice_height"],
+                slice_width=config["slice_width"],
+                overlap_height_ratio=config["overlap_height_ratio"],
+                overlap_width_ratio=config["overlap_width_ratio"],
+                postprocess_match_threshold=config["confidence_iou"],
                 verbose=0,
             )
         except torch.cuda.OutOfMemoryError as e:
@@ -497,11 +436,11 @@ class ParticleAnalyzer:
         if len(results.object_prediction_list) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
             return None, None, None
-        pbar.update(1)
+        config["pbar"].update(1)
 
-        pbar.set_description(self._get_translation("Обработка частиц..."))
-        pr(0.62, desc=self._get_translation("Обработка частиц..."))
-        output_image = orig_image.copy()
+        config["pbar"].set_description(self._get_translation("Обработка частиц..."))
+        config["pr"](0.62, desc=self._get_translation("Обработка частиц..."))
+        output_image = config["orig_image"].copy()
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
         )
@@ -519,45 +458,23 @@ class ParticleAnalyzer:
                 points = flat_coords.reshape(-1, 1, 2)
                 particle_counter = self._analyze_particle(
                     points=points,
-                    gray_image=gray_image,
                     output_image=output_image,
-                    scale_selector=scale_selector,
-                    scale_input=scale_input,
-                    scale=scale,
-                    particle_counter=particle_counter,
-                    round_value=round_value,
                     thickness=thickness,
                     particle_data=particle_data,
                     annotations=None,
                     raw_mask=None,
-                    scale_factor_glob=scale_factor_glob,
-                    show_Feret_diametr=show_Feret_diametr,
+                    particle_counter=particle_counter,
+                    **config,
                 )
-        pbar.update(1)
+        config["pbar"].update(1)
         return output_image, particle_data, annotations
 
-    def _analyze_particle(
-        self,
-        points,
-        gray_image,
-        output_image,
-        scale_selector,
-        scale_input,
-        scale,
-        particle_counter,
-        round_value,
-        thickness,
-        particle_data,
-        annotations,
-        raw_mask,
-        scale_factor_glob,
-        show_Feret_diametr,
-    ) -> int:
+    def _analyze_particle(self, **config) -> int:
         """Анализ отдельной частицы с расчетом Feret-диаметров"""
-        if len(points) < 3:
-            return particle_counter
+        if len(config["points"]) < 3:
+            return config["particle_counter"]
 
-        points = np.array(points, dtype=np.int32).reshape((-1, 1, 2))
+        points = np.array(config["points"], dtype=np.int32).reshape((-1, 1, 2))
 
         # Вычисление центроида (геометрического центра)
         moments = cv2.moments(points)
@@ -605,70 +522,79 @@ class ParticleAnalyzer:
         feret_max, feret_min, feret_mean, angle_max, angle_min = get_feret(points)
 
         # Средняя интенсивность
-        mask_img = np.zeros_like(gray_image, dtype=np.uint8)
+        mask_img = np.zeros_like(config["gray_image"], dtype=np.uint8)
         cv2.fillPoly(mask_img, [points], 255)
-        mean_intensity = cv2.mean(gray_image, mask=mask_img)[0]
+        mean_intensity = cv2.mean(config["gray_image"], mask=mask_img)[0]
 
         # Отрисовка контура и Feret-линий (опционально)
         cv2.polylines(
-            output_image,
+            config["output_image"],
             [points],
             isClosed=True,
             color=(0, 255, 0),
-            thickness=thickness,
+            thickness=config["thickness"],
         )
-        if show_Feret_diametr:
+        if config["show_Feret_diametr"]:
             self._draw_feret_lines(
-                output_image, points, angle_max, (0, 255, 255)
+                config["output_image"], points, angle_max, (0, 255, 255)
             )  # Желтый - Feret max
             self._draw_feret_lines(
-                output_image, points, angle_min, (255, 0, 0)
+                config["output_image"], points, angle_min, (255, 0, 0)
             )  # Синий - Feret min
 
         # Сохранение аннотации
-        if annotations is not None and raw_mask is not None:
-            annotations.append((raw_mask, f"Particle {particle_counter}"))
+        if config["annotations"] is not None and config["raw_mask"] is not None:
+            config["annotations"].append(
+                (config["raw_mask"], f"Particle {config['particle_counter']}")
+            )
 
         # Масштабирование
-
         scale_factor = (
-            float(scale_input)
-            / float(scale)
-            * scale_factor_glob
-            / scale_selector["correction_factor"]
-            if scale_selector["scale"]
-            else 1 * scale_factor_glob
+            float(config["scale_input"])
+            / float(config["scale"])
+            * config["scale_factor_glob"]
+            / config["scale_selector"]["correction_factor"]
+            if config["scale_selector"]["scale"]
+            else 1 * config["scale_factor_glob"]
         )
         scale_area = scale_factor**2
 
         # Добавление данных частицы
         unit = self._get_translation(
-            scale_selector["unit"]
+            config["scale_selector"]["unit"]
         )  # Переводим единицу измерения
 
-        particle_data.append(
+        config["particle_data"].append(
             {
-                "№": round(particle_counter, round_value),
-                "centroid_x": round(centroid_x, round_value),
-                "centroid_y": round(centroid_y, round_value),
-                "D [{}]".format(unit): round(diameter * scale_factor, round_value),
-                "Dₘₐₓ [{}]".format(unit): round(feret_max * scale_factor, round_value),
-                "Dₘᵢₙ [{}]".format(unit): round(feret_min * scale_factor, round_value),
-                "Dₘₑₐₙ [{}]".format(unit): round(
-                    feret_mean * scale_factor, round_value
+                "№": round(config["particle_counter"], config["round_value"]),
+                "centroid_x": round(centroid_x, config["round_value"]),
+                "centroid_y": round(centroid_y, config["round_value"]),
+                "D [{}]".format(unit): round(
+                    diameter * scale_factor, config["round_value"]
                 ),
-                "θₘₐₓ [°]": round(angle_max, round_value),
-                "θₘᵢₙ [°]": round(angle_min, round_value),
-                "S [{}²]".format(unit): round(area * scale_area, round_value),
-                "P [{}]".format(unit): round(perimeter * scale_factor, round_value),
-                "e": round(eccentricity, round_value),
+                "Dₘₐₓ [{}]".format(unit): round(
+                    feret_max * scale_factor, config["round_value"]
+                ),
+                "Dₘᵢₙ [{}]".format(unit): round(
+                    feret_min * scale_factor, config["round_value"]
+                ),
+                "Dₘₑₐₙ [{}]".format(unit): round(
+                    feret_mean * scale_factor, config["round_value"]
+                ),
+                "θₘₐₓ [°]": round(angle_max, config["round_value"]),
+                "θₘᵢₙ [°]": round(angle_min, config["round_value"]),
+                "S [{}²]".format(unit): round(area * scale_area, config["round_value"]),
+                "P [{}]".format(unit): round(
+                    perimeter * scale_factor, config["round_value"]
+                ),
+                "e": round(eccentricity, config["round_value"]),
                 f'I [{self._get_translation("ед.")}]': round(
-                    mean_intensity, round_value
+                    mean_intensity, config["round_value"]
                 ),
             }
         )
 
-        return particle_counter + 1
+        return config["particle_counter"] + 1
 
     def _draw_feret_lines(self, image, contour, angle, color=(0, 255, 0), thickness=2):
         """Отрисовка Feret-линий"""
