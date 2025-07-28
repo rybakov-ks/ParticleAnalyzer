@@ -11,12 +11,14 @@
 9. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
+<div align="center">
+  <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
+</div>
+
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 [![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
-<div align="left">
-  <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
-</div>
+
   <p>A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.</p>
 <div align="center">
   <h3>Video demonstrations:</h3>
