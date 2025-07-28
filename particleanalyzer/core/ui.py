@@ -47,7 +47,9 @@ analyzer = ParticleAnalyzer()
 
 my_theme = gr.Theme.load(f"{assets_path('')}/themes/theme_schema@0.0.1.json").set(
     checkbox_label_background_fill='#2196f3',
-    input_background_fill_focus='white',
+    checkbox_label_background_fill_dark='#2196f3',
+    input_background_fill_focus='f1f5f9',
+    input_background_fill_focus_dark='334155',
 )
 
 
@@ -123,7 +125,7 @@ def create_interface(api_key):
                 demo.load(None, None, js=toggleTheme)
             with gr.Tabs(elem_id="tabs"):
                 with gr.Tab(i18n("Анализ")):
-                    with gr.Row(elem_id="analyze-row"):
+                    with gr.Row():
                         with gr.Column():
                             with gr.Row():
                                 scale_selector = gr.Dropdown(
@@ -143,7 +145,7 @@ def create_interface(api_key):
                                         <img src="https://rybakov-k.ru/images/instruction.gif" alt="Instructions for setting the scale">
                                     """
                                     )
-                            with gr.Row(equal_height=True):
+                            with gr.Row(equal_height=True, elem_id="analyze-row"):
                                 with gr.Column(visible=False) as Paint_row:
                                     im = gr.Paint(
                                         label=i18n("Изображение СЭМ"),
