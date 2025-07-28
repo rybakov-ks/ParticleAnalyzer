@@ -15,7 +15,9 @@
 [![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 <div align="left">
-  <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
+  <a href="https://sem.rybakov-k.ru/">
+    <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
+  </a>
 </div>
   <p>A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.</p>
 <div align="center">
