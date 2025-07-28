@@ -11,7 +11,7 @@
 9. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
-<div align="center">
+<div align="left">
   <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
 </div>
 
