@@ -16,7 +16,7 @@
 [![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 <div align="left">
   <a href="https://sem.rybakov-k.ru/">
-    <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="400"/>
+    <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
   </a>
 </div>
   <p>A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.</p>
