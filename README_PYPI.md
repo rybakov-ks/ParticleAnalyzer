@@ -25,6 +25,9 @@
   <img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/Images/example.gif" alt="Example" width="600">
 </p>
 
+---
+
+## ✅ Examples
 <table>
 <tr>
 <td width="50%">
