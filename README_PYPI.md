@@ -1,6 +1,13 @@
 # ParticleAnalyzer
 
-[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
+[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+
+
+<div align="left">
+  <a href="https://sem.rybakov-k.ru/">
+    <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
+  </a>
+</div>
 
 **ParticleAnalyzer** is a computer vision tool for automatic particle segmentation and size analysis in Scanning Electron Microscope (SEM) images.
 
@@ -17,6 +24,32 @@
 <p align="center">
   <img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/Images/example.gif" alt="Example" width="600">
 </p>
+
+<table>
+<tr>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/41d3feb1-a7db-451f-a804-9f2fbf42ebf5" controls></video>
+</td>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/c762d7a0-3bd7-42e7-aa77-92759066fbb6" controls></video>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/5c38cf15-c721-4929-adfb-4ce6a6912eed" controls></video>
+</td>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/345695f4-f00c-4410-87d9-edcee64c6df3" controls></video>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<video width="100%" src="https://github.com/user-attachments/assets/ff6f07ce-e778-4451-b044-718e604f73a1" controls></video>
+</td>
+<td width="50%">
+</td>
+</tr>
+</table>
 
 ---
 
@@ -42,7 +75,7 @@ pip install 'git+https://github.com/facebookresearch/detectron2.git'
 ### 📦 3. Install ParticleAnalyzer
 Finally, install ParticleAnalyzer from PyPI:
 ```python
-pip install ParticleAnalyzer
+pip install --upgrade ParticleAnalyzer
 ```
 ✅ Now you're ready to run the application:
 ```python
