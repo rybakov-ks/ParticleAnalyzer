@@ -12,6 +12,7 @@
 
 ## ParticleAnalyzer
 [![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 [![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 <div align="left">
@@ -72,7 +73,7 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 - Advanced configuration options for fine-tuning detection accuracy
 - AI Interpretation of SEM Data
 - Multi-language interface: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en)
-- Try it online: [particleanalyzer.ru](https://particleanalyzer.ru)
+- Try it online: [particleanalyzer.ru](https://particleanalyzer.ru) (Amsterdam) or [sem.rybakov-k.ru](https://sem.rybakov-k.ru/) (Russian Federation)
 
 ## 🛠 Installation Guide
 
