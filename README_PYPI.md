@@ -1,6 +1,7 @@
 # ParticleAnalyzer
 
-[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+[![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+[![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
 
 
 <div align="left">
