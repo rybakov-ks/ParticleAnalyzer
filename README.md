@@ -11,10 +11,10 @@
 9. 📧 [Contributors](#-contributors)
 
 ## ParticleAnalyzer
-[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
-[![Try Online](https://img.shields.io/badge/TRY%20ONLINE-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
-[![Download from PyPI](https://img.shields.io/pypi/v/particleanalyzer?label=Download%20from%20PyPI)](https://pypi.org/project/particleanalyzer/)
-[![Downloads per month](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
+[![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+[![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20sem.rybakov--k.ru-brightgreen)](https://sem.rybakov-k.ru/)
+[![PyPI Version](https://img.shields.io/pypi/v/particleanalyzer?label=PyPI)](https://pypi.org/project/particleanalyzer/)
+[![Monthly Downloads](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 <div align="left">
   <a href="https://sem.rybakov-k.ru/">
     <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
