@@ -13,7 +13,7 @@ def main(port=8000, api_key=""):
         server_name="127.0.0.1",
         server_port=port,
         pwa=True,
-        favicon_path=f'{assets_path("")}/icon/search-solid.png',
+        favicon_path=f'{assets_path("")}/icon/favicon.png',
         i18n=i18n,
         ssr_mode=True,
         show_api=False,
