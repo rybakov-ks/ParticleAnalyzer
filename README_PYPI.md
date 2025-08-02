@@ -5,7 +5,7 @@
 
 <div align="left">
   <a href="https://sem.rybakov-k.ru/">
-    <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
+    <img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
   </a>
 </div>
 
