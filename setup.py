@@ -40,7 +40,7 @@ setup(
         "numpy",
         "pandas",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     author="Kirill Rybakov",
     author_email="rybakov-ks@ya.ru",
     description="SEM Image Analysis Tool",
