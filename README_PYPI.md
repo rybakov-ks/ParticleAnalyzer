@@ -27,35 +27,6 @@
 
 ---
 
-## ✅ Examples
-<table>
-<tr>
-<td width="50%">
-<video width="100%" src="https://github.com/user-attachments/assets/41d3feb1-a7db-451f-a804-9f2fbf42ebf5" controls></video>
-</td>
-<td width="50%">
-<video width="100%" src="https://github.com/user-attachments/assets/c762d7a0-3bd7-42e7-aa77-92759066fbb6" controls></video>
-</td>
-</tr>
-<tr>
-<td width="50%">
-<video width="100%" src="https://github.com/user-attachments/assets/5c38cf15-c721-4929-adfb-4ce6a6912eed" controls></video>
-</td>
-<td width="50%">
-<video width="100%" src="https://github.com/user-attachments/assets/345695f4-f00c-4410-87d9-edcee64c6df3" controls></video>
-</td>
-</tr>
-<tr>
-<td width="50%">
-<video width="100%" src="https://github.com/user-attachments/assets/ff6f07ce-e778-4451-b044-718e604f73a1" controls></video>
-</td>
-<td width="50%">
-</td>
-</tr>
-</table>
-
----
-
 ## 🛠 Installation Guide
 
  ### 1. 📥 Install PyTorch with CUDA support
