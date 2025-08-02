@@ -262,6 +262,28 @@ input:checked + .slider:before {
   margin-right: auto;
 }
 
+.btn-ai-run {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  margin-left: auto;
+  width: 200px;
+}
+
+.btn-ai-cancel {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ffa3a3 100%);
+  margin-right: auto;
+  width: 200px;
+}
+
+.btn-yes {
+  background: linear-gradient(135deg, #4CAF50 0%, #8BC34A 100%);
+  margin-left: auto;
+}
+
+.btn-no {
+  background: linear-gradient(135deg, #F44336 0%, #FF5252 100%); 
+  margin-right: auto;
+}
+
 /* Ripple эффект */
 .custom-btn::after {
   content: '';
@@ -287,6 +309,44 @@ input:checked + .slider:before {
 
 .custom-btn:active {
   transform: translateY(1px);
+}
+
+/* ==========================================================================
+   АДАПТИВНЫЕ СТИЛИ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ
+   ========================================================================== */
+@media (max-width: 400px) {
+  .custom-btn {
+    width: 100%; /* Занимает всю доступную ширину */
+    max-width: 280px; /* Но не более 280px */
+    height: 48px; /* Увеличиваем высоту */
+    font-size: 15px; /* Увеличиваем размер текста */
+    padding: 0 20px; /* Больше внутренних отступов */
+  }
+
+  .custom-btn img {
+    width: 26px; /* Увеличиваем иконки */
+    height: 26px;
+    margin-right: 10px;
+  }
+
+  /* Контейнер для кнопок */
+  #button-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px; /* Увеличиваем расстояние между кнопками */
+  }
+}
+
+/* Анимация ripple-эффекта */
+@keyframes ripple {
+  0% {
+    transform: scale(0) translate(-50%);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(20) translate(-50%);
+    opacity: 0;
+  }
 }
 
 /* ==========================================================================
@@ -321,31 +381,57 @@ footer {
   display: flex;
   gap: 0px; /* расстояние между колонками */
 }
+
+/* Для мобильных устройств */
+@media (max-width: 400px) {
+    .logo-image {
+        width: 30px !important; /* Фиксированная ширина для иконки */
+        height: 40px !important;
+        object-fit: cover;
+        object-position: left center; /* Обрезаем справа, оставляя иконку слева */
+    }
+    
+    /* Дополнительно можно скрыть текст в кнопке Помощь */
+    @media (max-width: 480px) {
+        button[onclick="startIntro()"] span {
+            display: none;
+        }
+        button[onclick="startIntro()"] {
+            padding: 7px !important;
+            width: 40px !important;
+            justify-content: center !important;
+        }
+    }
+}
 """
 
 custom_head = (
     """
 <!-- HTML Meta Tags -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <title>ParticleAnalyzer — SEM Image Analysis Tool</title>
-<meta name="description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.">
+<meta name="description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
 
 <!-- Facebook Meta Tags -->
-<meta property="og:url" content="https://sem.rybakov-k.ru/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="ParticleAnalyzer">
-<meta property="og:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.">
-<meta property="og:image" content="https://rybakov-k.ru/images/ex.png">
+<meta property="og:url" content="https://sem.rybakov-k.ru/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="ParticleAnalyzer" />
+<meta property="og:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
+<meta property="og:image" content="https://rybakov-k.ru/assets/icon/logo_og.png" />
 
 <!-- Twitter Meta Tags -->
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:creator" content="@rybakov_ks">
-<meta name="twitter:title" content="ParticleAnalyzer">
-<meta name="twitter:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.">
-<meta name="twitter:image" content="https://rybakov-k.ru/images/ex.png">
-<meta property="twitter:domain" content="sem.rybakov-k.ru">
-<meta property="twitter:url" content="https://sem.rybakov-k.ru/">
-
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:creator" content="@rybakov_ks" />
+<meta name="twitter:title" content="ParticleAnalyzer" />
+<meta name="twitter:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
+<meta name="twitter:image" content="https://rybakov-k.ru/assets/icon/logo_og.png" />
+<meta property="twitter:domain" content="sem.rybakov-k.ru" />
+<meta property="twitter:url" content="https://sem.rybakov-k.ru/" />
 <!-- Meta Tags Generated via https://www.opengraph.xyz/ -->
+
+<!-- Favicon -->
+<link rel="icon" href="https://rybakov-k.ru/assets/icon/favicon.svg" type="image/x-icon" />
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/introjs.min.css" rel="stylesheet">
@@ -386,5 +472,6 @@ custom_head = (
   color: #000000 !important;
 }
 </style>
+
 """
 )

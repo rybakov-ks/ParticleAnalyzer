@@ -46,10 +46,10 @@ def assets_path(name: str):
 analyzer = ParticleAnalyzer()
 
 my_theme = gr.Theme.load(f"{assets_path('')}/themes/theme_schema@0.0.1.json").set(
-    checkbox_label_background_fill='#2196f3',
-    checkbox_label_background_fill_dark='#2196f3',
-    input_background_fill_focus='f1f5f9',
-    input_background_fill_focus_dark='334155',
+    checkbox_label_background_fill="#2196f3",
+    checkbox_label_background_fill_dark="#2196f3",
+    input_background_fill_focus="f1f5f9",
+    input_background_fill_focus_dark="334155",
 )
 
 
@@ -71,21 +71,15 @@ def create_interface(api_key):
                 gr.HTML(
                     f"""
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: inline-block; margin-right: 20px;">
-                            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <image x="2" y="4" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                                       xlink:href="https://rybakov-k.ru/assets/icon/305079-2196f3.svg"/>
-                                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                                    <text x="55" y="29" font-size="22" font-weight="600" letter-spacing="-0.3">
-                                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                                    </text>
-                                    <text x="56" y="44" font-size="11" fill="#64748b" font-weight="500">
-                                        SEM Image Analysis Tool
-                                    </text>
-                                </g>
-                                <line x1="49" y1="4" x2="49" y2="54" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-                            </svg>
+                        <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
+                          <img 
+                            src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                            alt="ParticleAnalyzer" 
+                            style="max-height: 50px; width: auto; height: auto;"
+                            class="logo-image"
+                          >
                         </div>
+
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <button onclick="startIntro()" style="
                                 background: #4285f4;
@@ -125,7 +119,7 @@ def create_interface(api_key):
                 demo.load(None, None, js=toggleTheme)
             with gr.Tabs(elem_id="tabs"):
                 with gr.Tab(i18n("Анализ")):
-                    with gr.Row():
+                    with gr.Row(elem_id="analyze-row"):
                         with gr.Column():
                             with gr.Row():
                                 scale_selector = gr.Dropdown(
@@ -140,12 +134,11 @@ def create_interface(api_key):
                                 with gr.Accordion(
                                     i18n("Как задать масштаб?"), open=False
                                 ):
-                                    gr.HTML(
-                                        """
-                                        <img src="https://rybakov-k.ru/images/instruction.gif" alt="Instructions for setting the scale">
-                                    """
+                                    gr.Video(
+                                        f'{assets_path("")}/instruction.mp4',
+                                        label=i18n("Видео инструкция"),
                                     )
-                            with gr.Row(equal_height=True, elem_id="analyze-row"):
+                            with gr.Row(equal_height=True):
                                 with gr.Column(visible=False) as Paint_row:
                                     im = gr.Paint(
                                         label=i18n("Изображение СЭМ"),
@@ -193,37 +186,39 @@ def create_interface(api_key):
                                         elem_id="scale-input",
                                     )
 
-                    with gr.Row(elem_id="button-row"):
-                        with gr.Column():
-                            process_button = gr.HTML(
-                                f"""
-                            <button class="custom-btn btn-analyze" id="process-button" onclick="analyze()">
-                                <img src='https://rybakov-k.ru/assets/icon/icons8-химия-50.png' 
-                                     alt='Chemistry icon'/> 
-                                {i18n('Анализировать')}
-                            </button>
-                            """
-                            )
-                        with gr.Column():
-                            clear_button = gr.HTML(
-                                f"""
-                            <button class="custom-btn btn-clear" id="clear-btn" onclick="clear()">
-                                <img src='https://rybakov-k.ru/assets/icon/icons8-метла-50.png' 
-                                     alt='Chemistry icon'/> 
-                                {i18n('Очистить')}
-                            </button>
-                            """
-                            )
+                            with gr.Row(elem_id="button-row"):
+                                with gr.Column(
+                                    min_width=140
+                                ):
+                                    process_button = gr.HTML(
+                                        f"""
+                                        <button class="custom-btn btn-analyze" id="process-button">
+                                            <img src='https://rybakov-k.ru/assets/icon/icons8-химия-50.png' 
+                                                 alt='Analyze icon'/> 
+                                            {i18n('Анализировать')}
+                                        </button>
+                                        """
+                                    )
+                                with gr.Column(min_width=140):
+                                    clear_button = gr.HTML(
+                                        f"""
+                                        <button class="custom-btn btn-clear" id="clear-btn">
+                                            <img src='https://rybakov-k.ru/assets/icon/icons8-метла-50.png' 
+                                                 alt='Clear icon'/> 
+                                            {i18n('Очистить')}
+                                        </button>
+                                        """
+                                    )
 
                     with gr.Row(elem_id="example-row") as in_image_example_row:
                         gr.Examples(
                             examples=[
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.png",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.bmp",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.webp",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.webp",
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Rec-Cu-Ni-Powder_250x_5_SE_V1_png.jpg",
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/left_half.jpg",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/image_c_01.webp",
                             ],
                             inputs=in_image,
                             label=i18n("Примеры"),
@@ -290,20 +285,30 @@ def create_interface(api_key):
                                                     ),
                                                     autoscroll=False,
                                                 )
-                                    with gr.Row(elem_classes="btn-group"):
-                                        llm_run = gr.Button(
-                                            value=i18n("Запустить ИИ-анализ"),
-                                            variant="primary",
-                                            size="md",
-                                            icon=f'{assets_path("")}/icon/ai.png',
-                                        )
-                                        cancel_llm_button = gr.Button(
-                                            value=i18n("Отменить"),
-                                            size="md",
-                                            variant="stop",
-                                            icon=f'{assets_path("")}/icon/incorrect.png',
-                                            elem_classes="custom-cancel-btn",
-                                        )
+                                    with gr.Row(elem_id="button-row"):
+                                        with gr.Column(
+                                            min_width=140
+                                        ):
+                                            llm_run = gr.HTML(
+                                                f"""
+                                                <button class="custom-btn btn-ai-run" id="ai-run-btn"">
+                                                    <img src='https://rybakov-k.ru/assets/icon/ai.png' 
+                                                         alt='Analyze icon'/> 
+                                                    {i18n('Запустить ИИ-анализ')}
+                                                </button>
+                                                """
+                                            )
+                                        with gr.Column(min_width=140):
+                                            cancel_llm_button = gr.HTML(
+                                                f"""
+                                                <button class="custom-btn btn-ai-cancel" id="ai-cancel-btn"">
+                                                    <img src='https://rybakov-k.ru/assets/icon/incorrect.png' 
+                                                         alt='Clear icon'/> 
+                                                    {i18n('Отменить')}
+                                                </button>
+                                                """
+                                            )
+
                                 with gr.Tab(i18n("Файлы"), id=4):
                                     with gr.Row():
                                         download_output = gr.Files(
@@ -318,21 +323,30 @@ def create_interface(api_key):
                                                 "Вы удовлетворены качеством сегментации?"
                                             )
                                         )
-                                    with gr.Row():
-                                        with gr.Column(scale=1):
-                                            yes_button = gr.Button(
-                                                value=i18n("Да"),
-                                                variant="secondary",
-                                                size="sm",
-                                                icon=f'{assets_path("")}/icon/like.png',
+                                    with gr.Row(elem_id="button-row"):
+                                        with gr.Column(
+                                            min_width=140
+                                        ):
+                                            yes_button = gr.HTML(
+                                                f"""
+                                                <button class="custom-btn btn-yes" id="yes-btn"">
+                                                    <img src='https://rybakov-k.ru/assets/icon/like.png' 
+                                                         alt='Analyze icon'/> 
+                                                    {i18n('Да')}
+                                                </button>
+                                                """
                                             )
-                                        with gr.Column(scale=1):
-                                            no_button = gr.Button(
-                                                value=i18n("Нет"),
-                                                variant="stop",
-                                                size="sm",
-                                                icon=f'{assets_path("")}/icon/dislike.png',
+                                        with gr.Column(min_width=140):
+                                            no_button = gr.HTML(
+                                                f"""
+                                                <button class="custom-btn btn-no" id="no-btn"">
+                                                    <img src='https://rybakov-k.ru/assets/icon/dislike.png' 
+                                                         alt='Clear icon'/> 
+                                                    {i18n('Нет')}
+                                                </button>
+                                                """
                                             )
+
                 with gr.Tab(i18n("Настройки"), elem_id="setting"):
                     with gr.Group(elem_id="model-setting"):
                         with gr.Row():
