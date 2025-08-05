@@ -277,7 +277,7 @@ class ParticleAnalyzer:
                 gr.update(visible=api_key),
                 gr.update(visible=True),
                 gr.update(minimum=d_max_min, maximum=d_max_max, value=(d_max_min, d_max_max), label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]"),
-                gr.update(minimum=d_min_min, maximum=d_min_max, value=(d_min_min, d_min_max), label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]"),
+                gr.update(minimum=d_min_min, maximum=d_min_max, value=(d_min_min, d_min_max), label=f"Dₘᵢₙ [{self._get_translation(scale_selector['unit'])}]"),
                 gr.update(
                     minimum=theta_max_min, maximum=theta_max_max, value=(theta_max_min, theta_max_max)
                 ),
