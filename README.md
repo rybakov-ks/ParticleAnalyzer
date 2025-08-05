@@ -168,6 +168,10 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 
 *Normal distribution fitting for all measured parameters showing particle population characteristics*
 
+### Data filtering
+
+https://github.com/user-attachments/assets/6548071a-3c83-4539-897a-6ebf175bec17
+
 **AI Interpretation of SEM Data**
 <div align="center">
   <img src="Images/9.png" alt="Statistics Table">
