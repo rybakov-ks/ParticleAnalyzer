@@ -123,6 +123,15 @@ class ParticleAnalyzer:
             gr.update(visible=False),
             gr.update(visible=False),
             gr.update(visible=False),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            gr.update(visible=False),
         )
 
     def analyze_image(
@@ -236,6 +245,21 @@ class ParticleAnalyzer:
                 lang=self.lang,
             )
             stats_df = builder.build_stats_table()
+            d_max_max = stats_df.data.iloc[1, 3] + stats_df.data.iloc[0, 3] * 0.01
+            d_max_min = stats_df.data.iloc[1, 4]
+            d_min_max = stats_df.data.iloc[2, 3] + stats_df.data.iloc[1, 3] * 0.01
+            d_min_min = stats_df.data.iloc[2, 4]
+            theta_max_max = stats_df.data.iloc[4, 3] + stats_df.data.iloc[4, 3] * 0.01
+            theta_max_min = stats_df.data.iloc[4, 4]
+            theta_min_max = stats_df.data.iloc[5, 3] + stats_df.data.iloc[5, 3] * 0.01
+            theta_min_min = stats_df.data.iloc[5, 4]
+            S_max = stats_df.data.iloc[6, 3] + stats_df.data.iloc[6, 3] * 0.01
+            S_min = stats_df.data.iloc[6, 4]
+            P_max = stats_df.data.iloc[7, 3] + stats_df.data.iloc[7, 3] * 0.01
+            P_min = stats_df.data.iloc[7, 4]
+            I_max = stats_df.data.iloc[9, 3] + stats_df.data.iloc[9, 3] * 0.01
+            I_min = stats_df.data.iloc[9, 4]
+
             pbar.update(1)
 
             pbar.set_description(self._get_translation("Построение графиков..."))
@@ -251,6 +275,25 @@ class ParticleAnalyzer:
                 (orig_image, annotations) if segment_mode else None,
                 gr.update(visible=segment_mode),
                 gr.update(visible=api_key),
+                gr.update(visible=True),
+                gr.update(minimum=d_max_min, maximum=d_max_max, value=(d_max_min, d_max_max), label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]"),
+                gr.update(minimum=d_min_min, maximum=d_min_max, value=(d_min_min, d_min_max), label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]"),
+                gr.update(
+                    minimum=theta_max_min, maximum=theta_max_max, value=(theta_max_min, theta_max_max)
+                ),
+                gr.update(
+                    minimum=theta_min_min, maximum=theta_min_max, value=(theta_min_min, theta_min_max)
+                ),
+                gr.update(minimum=0, maximum=1, value=(0, 1)),
+                gr.update(
+                    minimum=S_min, maximum=S_max, value=(S_min, S_max), label=f"S [{self._get_translation(scale_selector['unit'])}²]"
+                ),
+                gr.update(
+                    minimum=P_min, maximum=P_max, value=(P_min, P_max), label=f"P [{self._get_translation(scale_selector['unit'])}]"
+                ),
+                gr.update(
+                    minimum=I_min, maximum=I_max, value=(I_min, I_max)
+                ),
                 gr.update(visible=True),
             )
         except Exception as e:
@@ -591,6 +634,7 @@ class ParticleAnalyzer:
                 f'I [{self._get_translation("ед.")}]': round(
                     mean_intensity, config["round_value"]
                 ),
+                "points": points.tolist(),
             }
         )
 
@@ -627,14 +671,13 @@ class ParticleAnalyzer:
             image, tuple(pt1.astype(int)), tuple(pt2.astype(int)), color, thickness
         )
 
+    @staticmethod
     def _get_scaled_thickness(
-        self,
         image_width: int,
         image_height: int,
         base_width: int = 300,
         base_thickness: int = 1,
     ) -> int:
-        """Вычисление толщины линии в зависимости от разрешения"""
         if image_width < base_width or image_height < base_width:
             return 1
         return max(1, int(base_thickness * (image_width / base_width)))

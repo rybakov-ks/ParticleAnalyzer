@@ -1,11 +1,15 @@
 import gradio as gr
 import pandas as pd
+import numpy as np
+import cv2
 import csv
 import os
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
+from particleanalyzer.core.StatisticsBuilder import StatisticsBuilder
+from particleanalyzer.core.ImagePreprocessor import ImagePreprocessor
 
 
 def assets_path(name: str):
@@ -129,6 +133,7 @@ def reset_interface(scale_value):
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
+        gr.update(visible=False),  # Скрываем sidebar
     )
 
 
@@ -143,6 +148,7 @@ def reset_interface2(scale_value):
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
+        gr.update(visible=False),  # Скрываем sidebar
     )
 
 
@@ -218,6 +224,93 @@ def log_analytics(
 
 def chatbot_visibility():
     return gr.update(visible=True)
+
+
+def statistic_an(
+    df: pd.DataFrame,
+    scale_selector: int,
+    round_value: int,
+    number_of_bins: int,
+    d_max_slider,
+    d_min_slider,
+    theta_max_slider,
+    theta_min_slider,
+    e_slider,
+    S_slider,
+    P_slider,
+    I_slider,
+    image: np.ndarray,
+    image2: np.ndarray,
+    solution,
+    sahi_mode,
+):
+
+    lang = LanguageContext.get_language()
+    scale_config = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
+    selected_image = image["background"] if scale_config["scale"] else image2
+
+    selected_image, scale_factor_glob = ImagePreprocessor.resize_image(
+        selected_image, solution, sahi_mode
+    )
+
+    d_max_min, d_max_max = d_max_slider
+    d_min_min, d_min_max = d_min_slider
+    theta_max_min, theta_max_max = theta_max_slider
+    theta_min_min, theta_min_max = theta_min_slider
+    e_min, e_max = e_slider
+    S_min, S_max = S_slider
+    P_min, P_max = P_slider
+    I_min, I_max = I_slider
+    
+    filtered_df = df[
+        (df.iloc[:, 4] >= d_max_min)
+        & (df.iloc[:, 4] <= d_max_max)
+        & (df.iloc[:, 5] >= d_min_min)
+        & (df.iloc[:, 5] <= d_min_max)
+        & (df.iloc[:, 7] >= theta_max_min)
+        & (df.iloc[:, 7] <= theta_max_max)
+        & (df.iloc[:, 8] >= theta_min_min)
+        & (df.iloc[:, 8] <= theta_min_max)
+        & (df.iloc[:, 11] >= e_min)
+        & (df.iloc[:, 11] <= e_max)
+        & (df.iloc[:, 9] >= S_min)
+        & (df.iloc[:, 9] <= S_max)
+        & (df.iloc[:, 10] >= P_min)
+        & (df.iloc[:, 10] <= P_max)
+        & (df.iloc[:, 12] >= I_min)
+        & (df.iloc[:, 12] <= I_max)
+    ].copy()
+
+    builder = StatisticsBuilder(
+        filtered_df,
+        scale_config,
+        round_value=round_value,
+        number_of_bins=number_of_bins,
+        lang=lang,
+    )
+    stats_df = builder.build_stats_table()
+    fig = builder.build_distribution_fig(selected_image)
+
+    thickness = ParticleAnalyzer._get_scaled_thickness(
+        selected_image.shape[1], selected_image.shape[0]
+    )
+
+    points_arrays = [
+        np.array(p, dtype=np.int32).reshape((-1, 1, 2))
+        for p in filtered_df.iloc[:, -1]
+        if p and len(p) > 0
+    ]
+
+    if points_arrays:
+        cv2.polylines(
+            selected_image,
+            points_arrays,
+            isClosed=True,
+            color=(0, 255, 0),
+            thickness=thickness,
+        )
+
+    return stats_df, fig, selected_image
 
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")

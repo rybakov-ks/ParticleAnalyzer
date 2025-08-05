@@ -12,15 +12,16 @@ from particleanalyzer.core.languages import translations
 
 
 class ImagePreprocessor:
+    processing_profiles = {
+        "640x640": (640, 640),
+        "1024x1024": (1024, 1024),
+        "1280x1280": (1280, 1280),
+        "1600x1600": (1600, 1600),
+        "2048x2048": (2048, 2048),
+        "Оригинал": None,
+    }
+
     def __init__(self, output_dir: str = "output", lang="ru"):
-        self._processing_profiles = {
-            "640x640": (640, 640),
-            "1024x1024": (1024, 1024),
-            "1280x1280": (1280, 1280),
-            "1600x1600": (1600, 1600),
-            "2048x2048": (2048, 2048),
-            "Оригинал": None,
-        }
         self.output_dir = output_dir
         self.lang = lang
         os.makedirs(self.output_dir, exist_ok=True)
@@ -59,7 +60,7 @@ class ImagePreprocessor:
             self._save_image_metadata(image, request)
 
             # Изменение размера
-            image, scale_factor_glob = self._resize_image(image, solution, sahi_mode)
+            image, scale_factor_glob = self.resize_image(image, solution, sahi_mode)
 
             # Конвертация цветовых пространств
             orig_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -79,15 +80,18 @@ class ImagePreprocessor:
             return cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
         return image
 
-    def _resize_image(
-        self, image: np.ndarray, solution: str, sahi_mode: bool
+    @staticmethod
+    def resize_image(
+        image: np.ndarray,
+        solution: str,
+        sahi_mode: bool,
     ) -> np.ndarray:
         """Изменяет размер изображения согласно выбранному профилю."""
         if solution == "Оригинал" or sahi_mode:
             return image, 1
 
-        if solution in self._processing_profiles:
-            max_w, max_h = self._processing_profiles[solution]
+        if solution in ImagePreprocessor.processing_profiles:
+            max_w, max_h = ImagePreprocessor.processing_profiles[solution]
             h, w = image.shape[:2]
 
             if h > max_h or w > max_w:
@@ -107,8 +111,6 @@ class ImagePreprocessor:
                     cv2.resize(image, new_size, interpolation=cv2.INTER_AREA),
                     scale_factor_glob,
                 )
-        if image is None or (isinstance(image, np.ndarray) and image.size == 0):
-            gr.Info(self._get_translation("Ошибка: изображение отсутствует..."))
         return image, 1
 
     def _save_image_metadata(self, image: np.ndarray, request: gr.Request) -> None:
