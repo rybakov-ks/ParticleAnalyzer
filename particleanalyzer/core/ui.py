@@ -1,5 +1,6 @@
 import os
 import gradio as gr
+from gradio_rangeslider import RangeSlider
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
 from particleanalyzer.core.utils import (
     scale_input_visibility,
@@ -15,6 +16,7 @@ from particleanalyzer.core.utils import (
     scale_input_unit_measurement,
     toggleTheme,
     translate_chatbot,
+    statistic_an,
 )
 from particleanalyzer.core.about import about_ru
 from particleanalyzer.core.parameter_information import reference_ru
@@ -117,6 +119,7 @@ def create_interface(api_key):
                     """
                 )
                 demo.load(None, None, js=toggleTheme)
+  
             with gr.Tabs(elem_id="tabs"):
                 with gr.Tab(i18n("Анализ")):
                     with gr.Row(elem_id="analyze-row"):
@@ -187,9 +190,7 @@ def create_interface(api_key):
                                     )
 
                             with gr.Row(elem_id="button-row"):
-                                with gr.Column(
-                                    min_width=140
-                                ):
+                                with gr.Column(min_width=140):
                                     process_button = gr.HTML(
                                         f"""
                                         <button class="custom-btn btn-analyze" id="process-button">
@@ -224,7 +225,9 @@ def create_interface(api_key):
                             label=i18n("Примеры"),
                             elem_id="examples_images",
                         )
+
                     with gr.Row(visible=False, min_height=650) as results_row:
+
                         with gr.Column():
                             gr.HTML(
                                 f"""
@@ -286,9 +289,7 @@ def create_interface(api_key):
                                                     autoscroll=False,
                                                 )
                                     with gr.Row(elem_id="button-row"):
-                                        with gr.Column(
-                                            min_width=140
-                                        ):
+                                        with gr.Column(min_width=140):
                                             llm_run = gr.HTML(
                                                 f"""
                                                 <button class="custom-btn btn-ai-run" id="ai-run-btn"">
@@ -324,9 +325,7 @@ def create_interface(api_key):
                                             )
                                         )
                                     with gr.Row(elem_id="button-row"):
-                                        with gr.Column(
-                                            min_width=140
-                                        ):
+                                        with gr.Column(min_width=140):
                                             yes_button = gr.HTML(
                                                 f"""
                                                 <button class="custom-btn btn-yes" id="yes-btn"">
@@ -445,202 +444,263 @@ def create_interface(api_key):
                             )
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
+        with gr.Row(visible=False) as slider:
+            with gr.Sidebar(width=400):
+                with gr.Row():
+                    gr.HTML(
+                        f"""<h2 style="display: flex; align-items: center; gap: 8px;">
+                            <i class='fa fa-filter' style='color: #2563eb;'></i>
+                            {i18n('Параметры фильтрации')}
+                           </h2>"""
+                    )
+                with gr.Row():
+                    d_max_slider = RangeSlider(
+                        label="Dₘₐₓ"
+                    )
+                with gr.Row():
+                    d_min_slider = RangeSlider(
+                        label="Dₘᵢₙ"
+                    )
+                with gr.Row():
+                    theta_max_slider = RangeSlider(
+                        label="θₘₐₓ [°]",
+                        minimum=0.00,
+                        maximum=180.00,
+                        value=(0.00, 180.00),
+                        step=0.01,
+                    )
+                with gr.Row():
+                    theta_min_slider = RangeSlider(
+                        label="θₘᵢₙ [°]",
+                        minimum=0.00,
+                        maximum=180.00,
+                        value=(0.00, 180.00),
+                        step=0.01,
+                    )
+                with gr.Row():
+                    e_slider = RangeSlider(
+                        label="e",
+                        minimum=0.00,
+                        maximum=1.00,
+                        value=(0.00, 1.00),
+                        step=0.01,
+                    )
+                with gr.Row():
+                    S_slider = RangeSlider(
+                        label="S",
+                    )
+                with gr.Row():
+                    P_slider = RangeSlider(
+                        label="P",
+                    ) 
+                with gr.Row():
+                    I_slider = RangeSlider(
+                        label=f"I [{i18n('ед.')}]",
+                    ) 
+                # with gr.Row():
+                    # apply_filter = gr.HTML(
+                        # f"""
+                        # <button class="custom-btn btn-f" id="filter-btn" style="display: flex; align-items: center; gap: 8px;">
+                            # <i class="fas fa-filter" style="color: #000000; font-size: 1.1em;"></i>
+                            # {i18n('Применить фильтр')}
+                        # </button>
+                        # """
+                    # )
+        analyze = process_button.click(
+            fn=analyzer.analyze_image,
+            inputs=[
+                im,
+                in_image,
+                scale_input,
+                confidence_threshold,
+                scale_selector,
+                confidence_iou,
+                number_detections,
+                solution,
+                model_change,
+                round_value,
+                slice_height,
+                slice_width,
+                overlap_height_ratio,
+                overlap_width_ratio,
+                sahi_mode,
+                number_of_bins,
+                segment_mode,
+                show_Feret_diametr,
+                api_key,
+            ],
+            outputs=[
+                output_image,
+                output_table,
+                output_plot,
+                output_table2,
+                output_image2,
+                AnnotatedImage_row,
+                chatbot_row,
+                results_row,
+                d_max_slider,
+                d_min_slider,
+                theta_max_slider,
+                theta_min_slider,
+                e_slider,
+                S_slider,
+                P_slider,
+                I_slider,
+                slider,
+            ],
+            show_progress_on=output_image,
+        )
 
-            analyze = process_button.click(
-                fn=analyzer.analyze_image,
-                inputs=[
-                    im,
-                    in_image,
-                    scale_input,
-                    confidence_threshold,
-                    scale_selector,
-                    confidence_iou,
-                    number_detections,
-                    solution,
-                    model_change,
-                    round_value,
-                    slice_height,
-                    slice_width,
-                    overlap_height_ratio,
-                    overlap_width_ratio,
-                    sahi_mode,
-                    number_of_bins,
-                    segment_mode,
-                    show_Feret_diametr,
-                    api_key,
-                ],
-                outputs=[
-                    output_image,
-                    output_table,
-                    output_plot,
-                    output_table2,
-                    output_image2,
-                    AnnotatedImage_row,
-                    chatbot_row,
-                    results_row,
-                ],
-                show_progress_on=output_image,
-            )
+        process_button.click(translate_chatbot, None, chatbot)
+        
+        gr.on(
+            triggers=[d_max_slider.release, d_min_slider.release, theta_max_slider.release, 
+            theta_min_slider.release, e_slider.release, S_slider.release, P_slider.release,
+            I_slider.release],
+            fn=statistic_an,
+            inputs=[
+                output_table,
+                scale_selector,
+                round_value,
+                number_of_bins,
+                d_max_slider,
+                d_min_slider,
+                theta_max_slider,
+                theta_min_slider,
+                e_slider,
+                S_slider,
+                P_slider,
+                I_slider,
+                im,
+                in_image,
+                solution,
+                sahi_mode,
+            ],
+            outputs=[output_table2, output_plot, output_image],
+        )
 
-            process_button.click(translate_chatbot, None, chatbot)
 
-            llm_start = llm_run.click(
-                fn=llm_amalysis.analyze,
-                inputs=[output_table, model_llm],
-                outputs=[chatbot],
-            )
-            cancel_llm_button.click(None, None, None, cancels=[llm_start])
+        llm_start = llm_run.click(
+            fn=llm_amalysis.analyze,
+            inputs=[output_table, model_llm],
+            outputs=[chatbot],
+        )
+        cancel_llm_button.click(None, None, None, cancels=[llm_start])
 
-            scale_selector.change(
-                scale_input_visibility,
-                inputs=scale_selector,
-                outputs=[
-                    scale_input_row,
-                    Paint_row,
-                    Image_row,
-                    output_table,
-                    in_image_example_row,
-                    output_table_image2,
-                    row_instruction,
-                ],
-                show_progress="hide",
-                show_progress_on=scale_input_row,
-            )
+        scale_selector.change(
+            scale_input_visibility,
+            inputs=scale_selector,
+            outputs=[
+                scale_input_row,
+                Paint_row,
+                Image_row,
+                output_table,
+                in_image_example_row,
+                output_table_image2,
+                row_instruction,
+            ],
+            show_progress="hide",
+            show_progress_on=scale_input_row,
+        )
 
-            segment_mode.change(
-                segment_mode_visibility,
-                inputs=segment_mode,
-                outputs=[AnnotatedImage_row, output_table_image2_row],
-            )
+        segment_mode.change(
+            segment_mode_visibility,
+            inputs=segment_mode,
+            outputs=[AnnotatedImage_row, output_table_image2_row],
+        )
 
-            sahi_mode.change(
-                sahi_mode_visibility,
-                inputs=sahi_mode,
-                outputs=[
-                    slice_row,
-                    slice_row2,
-                    number_detections_row,
-                    solution_and_segment_mode_row,
-                    segment_mode,
-                ],
-                show_progress="hide",
-                show_progress_on=slice_row,
-            )
+        sahi_mode.change(
+            sahi_mode_visibility,
+            inputs=sahi_mode,
+            outputs=[
+                slice_row,
+                slice_row2,
+                number_detections_row,
+                solution_and_segment_mode_row,
+                segment_mode,
+            ],
+            show_progress="hide",
+            show_progress_on=slice_row,
+        )
 
-            output_image2.select(
-                select_section,
-                inputs=output_table,
-                outputs=[output_table_image2, output_table_image2_row],
-            )
+        output_image2.select(
+            select_section,
+            inputs=output_table,
+            outputs=[output_table_image2, output_table_image2_row],
+        )
+        
+        gr.on(
+            triggers=[clear_button.click, in_image.clear, im.clear],
+            fn=reset_interface,
+            inputs=[scale_selector],
+            outputs=[
+                im,
+                output_image,
+                output_plot,
+                in_image,
+                output_image2,
+                AnnotatedImage_row,
+                output_table_image2_row,
+                chatbot,
+                results_row,
+                slider,
+            ],
+            cancels=[analyze],
+            show_progress="hide",
+            show_progress_on=question_row,
+        )
 
-            clear_button.click(
-                fn=reset_interface,
-                inputs=[scale_selector],
-                outputs=[
-                    im,
-                    output_image,
-                    output_plot,
-                    in_image,
-                    output_image2,
-                    AnnotatedImage_row,
-                    output_table_image2_row,
-                    chatbot,
-                    results_row,
-                ],
-                cancels=[analyze],
-                show_progress="hide",
-                show_progress_on=question_row,
-            )
+        scale_selector.change(
+            fn=reset_interface2,
+            inputs=[scale_selector],
+            outputs=[
+                output_image,
+                output_plot,
+                in_image,
+                output_image2,
+                AnnotatedImage_row,
+                output_table_image2_row,
+                chatbot,
+                results_row,
+            ],
+            show_progress="hide",
+            show_progress_on=question_row,
+        )
 
-            in_image.clear(
-                fn=reset_interface,
-                inputs=[scale_selector],
-                outputs=[
-                    im,
-                    output_image,
-                    output_plot,
-                    in_image,
-                    output_image2,
-                    AnnotatedImage_row,
-                    output_table_image2_row,
-                    chatbot,
-                    results_row,
-                ],
-                cancels=[analyze],
-                show_progress="hide",
-                show_progress_on=question_row,
-            )
+        scale_selector.change(
+            fn=scale_input_unit_measurement,
+            inputs=[scale_selector],
+            outputs=[scale_input],
+            show_progress="hide",
+            show_progress_on=question_row,
+        )
 
-            im.clear(
-                fn=reset_interface,
-                inputs=[scale_selector],
-                outputs=[
-                    im,
-                    output_image,
-                    output_plot,
-                    in_image,
-                    output_image2,
-                    AnnotatedImage_row,
-                    output_table_image2_row,
-                    chatbot,
-                    results_row,
-                ],
-                cancels=[analyze],
-                show_progress="hide",
-                show_progress_on=question_row,
-            )
+        yes_button.click(
+            fn=log_analytics,
+            inputs=[
+                confidence_threshold,
+                confidence_iou,
+                model_change,
+                gr.State("yes"),
+            ],
+            outputs=[question_row, tabs_row],
+        )
 
-            scale_selector.change(
-                fn=reset_interface2,
-                inputs=[scale_selector],
-                outputs=[
-                    output_image,
-                    output_plot,
-                    in_image,
-                    output_image2,
-                    AnnotatedImage_row,
-                    output_table_image2_row,
-                    chatbot,
-                    results_row,
-                ],
-                show_progress="hide",
-                show_progress_on=question_row,
-            )
+        no_button.click(
+            fn=log_analytics,
+            inputs=[
+                confidence_threshold,
+                confidence_iou,
+                model_change,
+                gr.State("no"),
+            ],
+            outputs=[question_row, tabs_row],
+        )
 
-            scale_selector.change(
-                fn=scale_input_unit_measurement,
-                inputs=[scale_selector],
-                outputs=[scale_input],
-                show_progress="hide",
-                show_progress_on=question_row,
-            )
-
-            yes_button.click(
-                fn=log_analytics,
-                inputs=[
-                    confidence_threshold,
-                    confidence_iou,
-                    model_change,
-                    gr.State("yes"),
-                ],
-                outputs=[question_row, tabs_row],
-            )
-
-            no_button.click(
-                fn=log_analytics,
-                inputs=[
-                    confidence_threshold,
-                    confidence_iou,
-                    model_change,
-                    gr.State("no"),
-                ],
-                outputs=[question_row, tabs_row],
-            )
-
-            output_table.change(
-                fn=save_data_to_csv,
-                inputs=[output_table, output_table2],
-                outputs=download_output,
-            )
+        output_table.change(
+            fn=save_data_to_csv,
+            inputs=[output_table, output_table2],
+            outputs=download_output,
+        )
 
     return demo

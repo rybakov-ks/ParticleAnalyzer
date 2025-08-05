@@ -284,6 +284,11 @@ input:checked + .slider:before {
   margin-right: auto;
 }
 
+.btn-f {
+  background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
+  width: 300px;
+}
+
 /* Ripple эффект */
 .custom-btn::after {
   content: '';
