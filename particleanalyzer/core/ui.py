@@ -4,9 +4,7 @@ from gradio_rangeslider import RangeSlider
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
 from particleanalyzer.core.utils import (
     scale_input_visibility,
-    segment_mode_visibility,
     sahi_mode_visibility,
-    select_section,
     reset_interface,
     reset_interface2,
     log_analytics,
@@ -17,6 +15,7 @@ from particleanalyzer.core.utils import (
     toggleTheme,
     translate_chatbot,
     statistic_an,
+    select_particle_from_image,
 )
 from particleanalyzer.core.about import about_ru
 from particleanalyzer.core.parameter_information import reference_ru
@@ -68,6 +67,7 @@ def create_interface(api_key):
 
     with demo:
         api_key = gr.State(True if api_key else False)
+        points_df = gr.State()
         with gr.Column(elem_id="app-container"):
             with gr.Row(equal_height=True, elem_id="gr-head"):
                 gr.HTML(
@@ -119,7 +119,7 @@ def create_interface(api_key):
                     """
                 )
                 demo.load(None, None, js=toggleTheme)
-  
+
             with gr.Tabs(elem_id="tabs"):
                 with gr.Tab(i18n("Анализ")):
                     with gr.Row(elem_id="analyze-row"):
@@ -157,6 +157,7 @@ def create_interface(api_key):
                                         layers=False,
                                         eraser=gr.Eraser(default_size=200),
                                         elem_id="in-image-paint",
+                                        image_mode="RGB",
                                     )
                                 with gr.Column() as Image_row:
                                     in_image = gr.Image(
@@ -170,24 +171,21 @@ def create_interface(api_key):
                                         label=i18n("Результат сегментации"),
                                         elem_id="output-image",
                                     )
-                                with gr.Row(visible=False) as AnnotatedImage_row:
-                                    output_image2 = gr.AnnotatedImage(
-                                        label=i18n("Результат сегментации")
-                                    )
-                                with gr.Row(visible=False) as output_table_image2_row:
-                                    output_table_image2 = gr.Dataframe(
-                                        value=empty_df_ParticleCharacteristics,
-                                        label=i18n("Характеристики частицы"),
-                                        interactive=False,
-                                        elem_id="dataframe-table",
-                                    )
+                            with gr.Row(visible=False) as output_table_image2_row:
+                                output_table_image2 = gr.Dataframe(
+                                    value=empty_df_ParticleCharacteristics,
+                                    label=i18n("Характеристики частицы"),
+                                    interactive=True,
+                                    elem_id="dataframe-table",
+                                    show_copy_button=True,
+                                )
 
-                                with gr.Row(visible=False) as scale_input_row:
-                                    scale_input = gr.Number(
-                                        label="Длина шкалы в мкм",
-                                        value=1.0,
-                                        elem_id="scale-input",
-                                    )
+                            with gr.Row(visible=False) as scale_input_row:
+                                scale_input = gr.Number(
+                                    label="Длина шкалы в мкм",
+                                    value=1.0,
+                                    elem_id="scale-input",
+                                )
 
                             with gr.Row(elem_id="button-row"):
                                 with gr.Column(min_width=140):
@@ -408,11 +406,6 @@ def create_interface(api_key):
                                 value="1024x1024",
                                 label=i18n("Разрешение изображения"),
                             )
-                        with gr.Column():
-                            segment_mode = gr.Checkbox(
-                                label=i18n("Включить"),
-                                info=i18n("Включить режим анализа отдельных частиц?"),
-                            )
                     with gr.Row() as number_detections_row:
                         number_detections = gr.Slider(
                             minimum=1,
@@ -442,6 +435,22 @@ def create_interface(api_key):
                                 label=i18n("Включить"),
                                 info=i18n("Включить отображение диаметров Ферета?"),
                             )
+                        with gr.Column(min_width=150):
+                            show_polylines = gr.Checkbox(
+                                value=True,
+                                label=i18n("Включить"),
+                                info=i18n("Включить контур?"),
+                            )
+                        with gr.Column(min_width=300):
+                            outline_color = gr.ColorPicker(
+                                value="rgb(0, 255, 0, 1)", label=i18n("Цвет контура")
+                            )
+                        with gr.Column(min_width=150):
+                            show_fillPoly = gr.Checkbox(
+                                label=i18n("Включить"),
+                                info=i18n("Включить заливку?"),
+                            )
+
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as slider:
@@ -454,13 +463,9 @@ def create_interface(api_key):
                            </h2>"""
                     )
                 with gr.Row():
-                    d_max_slider = RangeSlider(
-                        label="Dₘₐₓ"
-                    )
+                    d_max_slider = RangeSlider(label="Dₘₐₓ")
                 with gr.Row():
-                    d_min_slider = RangeSlider(
-                        label="Dₘᵢₙ"
-                    )
+                    d_min_slider = RangeSlider(label="Dₘᵢₙ")
                 with gr.Row():
                     theta_max_slider = RangeSlider(
                         label="θₘₐₓ [°]",
@@ -492,20 +497,20 @@ def create_interface(api_key):
                 with gr.Row():
                     P_slider = RangeSlider(
                         label="P",
-                    ) 
+                    )
                 with gr.Row():
                     I_slider = RangeSlider(
                         label=f"I [{i18n('ед.')}]",
-                    ) 
+                    )
                 # with gr.Row():
-                    # apply_filter = gr.HTML(
-                        # f"""
-                        # <button class="custom-btn btn-f" id="filter-btn" style="display: flex; align-items: center; gap: 8px;">
-                            # <i class="fas fa-filter" style="color: #000000; font-size: 1.1em;"></i>
-                            # {i18n('Применить фильтр')}
-                        # </button>
-                        # """
-                    # )
+                # apply_filter = gr.HTML(
+                # f"""
+                # <button class="custom-btn btn-f" id="filter-btn" style="display: flex; align-items: center; gap: 8px;">
+                # <i class="fas fa-filter" style="color: #000000; font-size: 1.1em;"></i>
+                # {i18n('Применить фильтр')}
+                # </button>
+                # """
+                # )
         analyze = process_button.click(
             fn=analyzer.analyze_image,
             inputs=[
@@ -525,17 +530,18 @@ def create_interface(api_key):
                 overlap_width_ratio,
                 sahi_mode,
                 number_of_bins,
-                segment_mode,
                 show_Feret_diametr,
+                outline_color,
+                show_fillPoly,
+                show_polylines,
                 api_key,
             ],
             outputs=[
                 output_image,
                 output_table,
+                points_df,
                 output_plot,
                 output_table2,
-                output_image2,
-                AnnotatedImage_row,
                 chatbot_row,
                 results_row,
                 d_max_slider,
@@ -551,15 +557,29 @@ def create_interface(api_key):
             show_progress_on=output_image,
         )
 
+        output_image.select(
+            select_particle_from_image,
+            inputs=[points_df, output_table],
+            outputs=[output_table_image2, output_table_image2_row],
+        )
+
         process_button.click(translate_chatbot, None, chatbot)
-        
+
         gr.on(
-            triggers=[d_max_slider.release, d_min_slider.release, theta_max_slider.release, 
-            theta_min_slider.release, e_slider.release, S_slider.release, P_slider.release,
-            I_slider.release],
+            triggers=[
+                d_max_slider.release,
+                d_min_slider.release,
+                theta_max_slider.release,
+                theta_min_slider.release,
+                e_slider.release,
+                S_slider.release,
+                P_slider.release,
+                I_slider.release,
+            ],
             fn=statistic_an,
             inputs=[
                 output_table,
+                points_df,
                 scale_selector,
                 round_value,
                 number_of_bins,
@@ -575,10 +595,12 @@ def create_interface(api_key):
                 in_image,
                 solution,
                 sahi_mode,
+                outline_color,
+                show_fillPoly,
+                show_polylines,
             ],
             outputs=[output_table2, output_plot, output_image],
         )
-
 
         llm_start = llm_run.click(
             fn=llm_amalysis.analyze,
@@ -603,12 +625,6 @@ def create_interface(api_key):
             show_progress_on=scale_input_row,
         )
 
-        segment_mode.change(
-            segment_mode_visibility,
-            inputs=segment_mode,
-            outputs=[AnnotatedImage_row, output_table_image2_row],
-        )
-
         sahi_mode.change(
             sahi_mode_visibility,
             inputs=sahi_mode,
@@ -617,18 +633,11 @@ def create_interface(api_key):
                 slice_row2,
                 number_detections_row,
                 solution_and_segment_mode_row,
-                segment_mode,
             ],
             show_progress="hide",
             show_progress_on=slice_row,
         )
 
-        output_image2.select(
-            select_section,
-            inputs=output_table,
-            outputs=[output_table_image2, output_table_image2_row],
-        )
-        
         gr.on(
             triggers=[clear_button.click, in_image.clear, im.clear],
             fn=reset_interface,
@@ -638,8 +647,6 @@ def create_interface(api_key):
                 output_image,
                 output_plot,
                 in_image,
-                output_image2,
-                AnnotatedImage_row,
                 output_table_image2_row,
                 chatbot,
                 results_row,
@@ -657,8 +664,6 @@ def create_interface(api_key):
                 output_image,
                 output_plot,
                 in_image,
-                output_image2,
-                AnnotatedImage_row,
                 output_table_image2_row,
                 chatbot,
                 results_row,
