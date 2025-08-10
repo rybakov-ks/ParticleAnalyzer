@@ -9,6 +9,8 @@ import gc
 from tqdm import tqdm
 from typing import Optional, Tuple
 from scipy.spatial.distance import pdist
+import random
+import re
 
 try:
     from detectron2.engine import DefaultPredictor
@@ -122,7 +124,6 @@ class ParticleAnalyzer:
             None,
             gr.update(visible=False),
             gr.update(visible=False),
-            gr.update(visible=False),
             None,
             None,
             None,
@@ -152,8 +153,10 @@ class ParticleAnalyzer:
         overlap_width_ratio: float,
         sahi_mode: bool,
         number_of_bins: int,
-        segment_mode: bool,
         show_Feret_diametr: bool,
+        outline_color,
+        show_fillPoly,
+        show_polylines,
         api_key: bool,
         request: gr.Request,
         pr=gr.Progress(),
@@ -223,6 +226,9 @@ class ParticleAnalyzer:
                 "scale": scale,
                 "scale_factor_glob": scale_factor_glob,
                 "show_Feret_diametr": show_Feret_diametr,
+                "outline_color": outline_color,
+                "show_fillPoly": show_fillPoly,
+                "show_polylines": show_polylines,
             }
 
             # Выбор стратегии обработки
@@ -233,6 +239,8 @@ class ParticleAnalyzer:
 
             output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
             df = pd.DataFrame(particle_data)
+            points_df = pd.DataFrame(df["points"])
+            df = df.drop(columns=["points"])
 
             pbar.set_description(self._get_translation("Построение таблицы..."))
             pr(0.75, desc=self._get_translation("Построение таблицы..."))
@@ -245,20 +253,42 @@ class ParticleAnalyzer:
                 lang=self.lang,
             )
             stats_df = builder.build_stats_table()
-            d_max_max = stats_df.data.iloc[1, 3] + stats_df.data.iloc[0, 3] * 0.01
-            d_max_min = stats_df.data.iloc[1, 4]
-            d_min_max = stats_df.data.iloc[2, 3] + stats_df.data.iloc[1, 3] * 0.01
-            d_min_min = stats_df.data.iloc[2, 4]
-            theta_max_max = stats_df.data.iloc[4, 3] + stats_df.data.iloc[4, 3] * 0.01
-            theta_max_min = stats_df.data.iloc[4, 4]
-            theta_min_max = stats_df.data.iloc[5, 3] + stats_df.data.iloc[5, 3] * 0.01
-            theta_min_min = stats_df.data.iloc[5, 4]
-            S_max = stats_df.data.iloc[6, 3] + stats_df.data.iloc[6, 3] * 0.01
-            S_min = stats_df.data.iloc[6, 4]
-            P_max = stats_df.data.iloc[7, 3] + stats_df.data.iloc[7, 3] * 0.01
-            P_min = stats_df.data.iloc[7, 4]
-            I_max = stats_df.data.iloc[9, 3] + stats_df.data.iloc[9, 3] * 0.01
-            I_min = stats_df.data.iloc[9, 4]
+
+            d_max_max = round(
+                stats_df.data.iloc[1, 3] + stats_df.data.iloc[0, 3] * 0.01,
+                config["round_value"],
+            )
+            d_max_min = round(stats_df.data.iloc[1, 4], config["round_value"])
+            d_min_max = round(
+                stats_df.data.iloc[2, 3] + stats_df.data.iloc[1, 3] * 0.01,
+                config["round_value"],
+            )
+            d_min_min = round(stats_df.data.iloc[2, 4], config["round_value"])
+            theta_max_max = round(
+                stats_df.data.iloc[4, 3] + stats_df.data.iloc[4, 3] * 0.01,
+                config["round_value"],
+            )
+            theta_max_min = round(stats_df.data.iloc[4, 4], config["round_value"])
+            theta_min_max = round(
+                stats_df.data.iloc[5, 3] + stats_df.data.iloc[5, 3] * 0.01,
+                config["round_value"],
+            )
+            theta_min_min = round(stats_df.data.iloc[5, 4], config["round_value"])
+            S_max = round(
+                stats_df.data.iloc[6, 3] + stats_df.data.iloc[6, 3] * 0.01,
+                config["round_value"],
+            )
+            S_min = round(stats_df.data.iloc[6, 4], config["round_value"])
+            P_max = round(
+                stats_df.data.iloc[7, 3] + stats_df.data.iloc[7, 3] * 0.01,
+                config["round_value"],
+            )
+            P_min = round(stats_df.data.iloc[7, 4], config["round_value"])
+            I_max = round(
+                stats_df.data.iloc[9, 3] + stats_df.data.iloc[9, 3] * 0.01,
+                config["round_value"],
+            )
+            I_min = round(stats_df.data.iloc[9, 4], config["round_value"])
 
             pbar.update(1)
 
@@ -270,30 +300,51 @@ class ParticleAnalyzer:
             return (
                 output_image,
                 df,
+                points_df,
                 fig,
                 stats_df,
-                (orig_image, annotations) if segment_mode else None,
-                gr.update(visible=segment_mode),
                 gr.update(visible=api_key),
                 gr.update(visible=True),
-                gr.update(minimum=d_max_min, maximum=d_max_max, value=(d_max_min, d_max_max), label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]"),
-                gr.update(minimum=d_min_min, maximum=d_min_max, value=(d_min_min, d_min_max), label=f"Dₘᵢₙ [{self._get_translation(scale_selector['unit'])}]"),
                 gr.update(
-                    minimum=theta_max_min, maximum=theta_max_max, value=(theta_max_min, theta_max_max)
+                    minimum=d_max_min,
+                    maximum=d_max_max,
+                    value=(d_max_min, d_max_max),
+                    step=d_max_max * 0.01,
+                    label=f"Dₘₐₓ [{self._get_translation(scale_selector['unit'])}]",
                 ),
                 gr.update(
-                    minimum=theta_min_min, maximum=theta_min_max, value=(theta_min_min, theta_min_max)
+                    minimum=d_min_min,
+                    maximum=d_min_max,
+                    value=(d_min_min, d_min_max),
+                    step=d_min_max * 0.01,
+                    label=f"Dₘᵢₙ [{self._get_translation(scale_selector['unit'])}]",
+                ),
+                gr.update(
+                    minimum=theta_max_min,
+                    maximum=theta_max_max,
+                    value=(theta_max_min, theta_max_max),
+                ),
+                gr.update(
+                    minimum=theta_min_min,
+                    maximum=theta_min_max,
+                    value=(theta_min_min, theta_min_max),
                 ),
                 gr.update(minimum=0, maximum=1, value=(0, 1)),
                 gr.update(
-                    minimum=S_min, maximum=S_max, value=(S_min, S_max), label=f"S [{self._get_translation(scale_selector['unit'])}²]"
+                    minimum=S_min,
+                    maximum=S_max,
+                    value=(S_min, S_max),
+                    step=S_max * 0.01,
+                    label=f"S [{self._get_translation(scale_selector['unit'])}²]",
                 ),
                 gr.update(
-                    minimum=P_min, maximum=P_max, value=(P_min, P_max), label=f"P [{self._get_translation(scale_selector['unit'])}]"
+                    minimum=P_min,
+                    maximum=P_max,
+                    value=(P_min, P_max),
+                    step=P_max * 0.01,
+                    label=f"P [{self._get_translation(scale_selector['unit'])}]",
                 ),
-                gr.update(
-                    minimum=I_min, maximum=I_max, value=(I_min, I_max)
-                ),
+                gr.update(minimum=I_min, maximum=I_max, value=(I_min, I_max)),
                 gr.update(visible=True),
             )
         except Exception as e:
@@ -570,13 +621,27 @@ class ParticleAnalyzer:
         mean_intensity = cv2.mean(config["gray_image"], mask=mask_img)[0]
 
         # Отрисовка контура и Feret-линий (опционально)
-        cv2.polylines(
-            config["output_image"],
-            [points],
-            isClosed=True,
-            color=(0, 255, 0),
-            thickness=config["thickness"],
-        )
+        if config["show_fillPoly"]:
+            overlay = config["output_image"].copy()
+            cv2.fillPoly(overlay, [points], self.get_random_color())
+            alpha = 0.3
+            cv2.addWeighted(
+                overlay,
+                alpha,
+                config["output_image"],
+                1 - alpha,
+                0,
+                config["output_image"],
+            )
+        if config["show_polylines"]:
+            cv2.polylines(
+                config["output_image"],
+                [points],
+                isClosed=True,
+                color=self.rgba_to_bgr(config["outline_color"]),
+                thickness=config["thickness"],
+            )
+
         if config["show_Feret_diametr"]:
             self._draw_feret_lines(
                 config["output_image"], points, angle_max, (0, 255, 255)
@@ -610,8 +675,6 @@ class ParticleAnalyzer:
         config["particle_data"].append(
             {
                 "№": round(config["particle_counter"], config["round_value"]),
-                "centroid_x": round(centroid_x, config["round_value"]),
-                "centroid_y": round(centroid_y, config["round_value"]),
                 "D [{}]".format(unit): round(
                     diameter * scale_factor, config["round_value"]
                 ),
@@ -634,6 +697,8 @@ class ParticleAnalyzer:
                 f'I [{self._get_translation("ед.")}]': round(
                     mean_intensity, config["round_value"]
                 ),
+                "centroid_x": round(centroid_x, config["round_value"]),
+                "centroid_y": round(centroid_y, config["round_value"]),
                 "points": points.tolist(),
             }
         )
@@ -699,6 +764,23 @@ class ParticleAnalyzer:
                 "Ошибка: недостаточно памяти CUDA. Освобождаем память. Попробуйте уменьшить разрешение изображения или включите режим SAHI..."
             )
         )
+
+    @staticmethod
+    def get_random_color():
+        """Генерирует случайный цвет в BGR формате"""
+        return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+    @staticmethod
+    def rgba_to_bgr(rgba_str):
+        numbers = re.findall(r"[\d.]+", rgba_str)
+        if len(numbers) < 3:
+            raise ValueError("Неправильный формат rgba")
+
+        r = int(float(numbers[0]))
+        g = int(float(numbers[1]))
+        b = int(float(numbers[2]))
+
+        return (b, g, r)
 
     def _cleanup(self, pbar: Optional[tqdm] = None):
         """Очистка ресурсов"""

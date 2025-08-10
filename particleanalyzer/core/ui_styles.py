@@ -436,7 +436,7 @@ custom_head = (
 <!-- Meta Tags Generated via https://www.opengraph.xyz/ -->
 
 <!-- Favicon -->
-<link rel="icon" href="https://rybakov-k.ru/assets/icon/favicon.svg" type="image/x-icon" />
+<link rel="icon" href="https://rybakov-k.ru/assets/icon/favicon.png" type="image/x-icon" />
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/introjs.min.css" rel="stylesheet">

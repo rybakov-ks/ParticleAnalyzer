@@ -95,13 +95,6 @@ def scale_input_visibility(scale_value):
     )
 
 
-def segment_mode_visibility(segment_mode):
-    """Режим анализа отдельных частиц"""
-    return gr.update(visible=None if segment_mode else False), gr.update(
-        visible=None if segment_mode else False
-    )
-
-
 def select_section(evt: gr.SelectData, output_table):
     """Режим анализа отдельных частиц. Возвращаем параметры частицы"""
     if 0 <= evt.index < len(output_table):
@@ -117,7 +110,6 @@ def sahi_mode_visibility(sahi_mode):
         gr.update(visible=sahi_mode),
         gr.update(visible=not sahi_mode),
         gr.update(visible=not sahi_mode),
-        gr.update(value=False if sahi_mode else None),
     )
 
 
@@ -128,8 +120,6 @@ def reset_interface(scale_value):
         None,  # Очищаем output_image
         None,  # Очищаем графики
         None,  # Очищаем input_image
-        None,  # Очищаем output_image2
-        gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
@@ -143,8 +133,6 @@ def reset_interface2(scale_value):
         None,  # Очищаем output_image
         None,  # Очищаем графики
         None,  # Очищаем input_image
-        None,  # Очищаем output_image2
-        gr.update(visible=False),  # Скрываем строку AnnotatedImage_row
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
@@ -228,6 +216,7 @@ def chatbot_visibility():
 
 def statistic_an(
     df: pd.DataFrame,
+    points_df: pd.DataFrame,
     scale_selector: int,
     round_value: int,
     number_of_bins: int,
@@ -243,6 +232,9 @@ def statistic_an(
     image2: np.ndarray,
     solution,
     sahi_mode,
+    outline_color,
+    show_fillPoly,
+    show_polylines,
 ):
 
     lang = LanguageContext.get_language()
@@ -261,25 +253,27 @@ def statistic_an(
     S_min, S_max = S_slider
     P_min, P_max = P_slider
     I_min, I_max = I_slider
-    
+
     filtered_df = df[
-        (df.iloc[:, 4] >= d_max_min)
-        & (df.iloc[:, 4] <= d_max_max)
-        & (df.iloc[:, 5] >= d_min_min)
-        & (df.iloc[:, 5] <= d_min_max)
-        & (df.iloc[:, 7] >= theta_max_min)
-        & (df.iloc[:, 7] <= theta_max_max)
-        & (df.iloc[:, 8] >= theta_min_min)
-        & (df.iloc[:, 8] <= theta_min_max)
-        & (df.iloc[:, 11] >= e_min)
-        & (df.iloc[:, 11] <= e_max)
-        & (df.iloc[:, 9] >= S_min)
-        & (df.iloc[:, 9] <= S_max)
-        & (df.iloc[:, 10] >= P_min)
-        & (df.iloc[:, 10] <= P_max)
-        & (df.iloc[:, 12] >= I_min)
-        & (df.iloc[:, 12] <= I_max)
+        (df.iloc[:, 2] >= d_max_min)
+        & (df.iloc[:, 2] <= d_max_max)
+        & (df.iloc[:, 3] >= d_min_min)
+        & (df.iloc[:, 3] <= d_min_max)
+        & (df.iloc[:, 5] >= theta_max_min)
+        & (df.iloc[:, 5] <= theta_max_max)
+        & (df.iloc[:, 6] >= theta_min_min)
+        & (df.iloc[:, 6] <= theta_min_max)
+        & (df.iloc[:, 9] >= e_min)
+        & (df.iloc[:, 9] <= e_max)
+        & (df.iloc[:, 7] >= S_min)
+        & (df.iloc[:, 7] <= S_max)
+        & (df.iloc[:, 8] >= P_min)
+        & (df.iloc[:, 8] <= P_max)
+        & (df.iloc[:, 10] >= I_min)
+        & (df.iloc[:, 10] <= I_max)
     ].copy()
+
+    filtered_points_df = points_df.loc[filtered_df.index].copy()
 
     builder = StatisticsBuilder(
         filtered_df,
@@ -297,20 +291,58 @@ def statistic_an(
 
     points_arrays = [
         np.array(p, dtype=np.int32).reshape((-1, 1, 2))
-        for p in filtered_df.iloc[:, -1]
+        for p in filtered_points_df.iloc[:, -1]
         if p and len(p) > 0
     ]
 
     if points_arrays:
-        cv2.polylines(
-            selected_image,
-            points_arrays,
-            isClosed=True,
-            color=(0, 255, 0),
-            thickness=thickness,
-        )
+        if show_fillPoly:
+            overlay = selected_image.copy()
+            for contour in points_arrays:
+                cv2.fillPoly(overlay, [contour], ParticleAnalyzer.get_random_color())
+            alpha = 0.3
+            cv2.addWeighted(
+                overlay, alpha, selected_image, 1 - alpha, 0, selected_image
+            )
+        if show_polylines:
+            cv2.polylines(
+                selected_image,
+                points_arrays,
+                isClosed=True,
+                color=ParticleAnalyzer.rgba_to_bgr(outline_color),
+                thickness=thickness,
+            )
 
     return stats_df, fig, selected_image
+
+
+def select_particle_from_image(points_df, output_table, evt: gr.SelectData):
+    target_point = (evt.index[0], evt.index[1])
+
+    matching_contours = []
+
+    for idx, contour_points in points_df["points"].items():
+        if not contour_points or len(contour_points) < 3:
+            continue
+
+        contour = np.array(contour_points, dtype=np.int32).reshape((-1, 1, 2))
+        distance = cv2.pointPolygonTest(contour, target_point, measureDist=False)
+
+        if distance >= 0:
+            matching_contours.append(idx)
+
+    if not matching_contours:
+        return output_table.iloc[[]], gr.update(visible=False)
+
+    if len(matching_contours) > 1:
+        matching_contours.sort(
+            key=lambda x: cv2.contourArea(
+                np.array(points_df.loc[x, "points"]).reshape((-1, 1, 2))
+            )
+        )
+
+    selected_idx = matching_contours[0]
+    return output_table.iloc[[selected_idx]], gr.update(visible=True)
 
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
