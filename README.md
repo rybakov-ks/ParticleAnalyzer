@@ -15,7 +15,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/particleanalyzer?label=PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Monthly Downloads](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 <div align="left">
-  <a href="https://sem.rybakov-k.ru/">
+  <a href="https://particleanalyzer.ru/">
     <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
   </a>
 </div>
