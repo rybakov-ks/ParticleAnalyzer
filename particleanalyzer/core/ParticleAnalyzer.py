@@ -157,6 +157,9 @@ class ParticleAnalyzer:
         outline_color,
         show_fillPoly,
         show_polylines,
+        fill_type_color,
+        fill_color,
+        fill_alpha,
         api_key: bool,
         request: gr.Request,
         pr=gr.Progress(),
@@ -229,6 +232,9 @@ class ParticleAnalyzer:
                 "outline_color": outline_color,
                 "show_fillPoly": show_fillPoly,
                 "show_polylines": show_polylines,
+                "fill_type_color": fill_type_color,
+                "fill_color": fill_color,
+                "fill_alpha": fill_alpha,
             }
 
             # Выбор стратегии обработки
@@ -619,12 +625,19 @@ class ParticleAnalyzer:
         mask_img = np.zeros_like(config["gray_image"], dtype=np.uint8)
         cv2.fillPoly(mask_img, [points], 255)
         mean_intensity = cv2.mean(config["gray_image"], mask=mask_img)[0]
-
         # Отрисовка контура и Feret-линий (опционально)
         if config["show_fillPoly"]:
             overlay = config["output_image"].copy()
-            cv2.fillPoly(overlay, [points], self.get_random_color())
-            alpha = 0.3
+            cv2.fillPoly(
+                overlay,
+                [points],
+                (
+                    self.get_random_color()
+                    if config["fill_type_color"] == "Random"
+                    else self.rgba_to_bgr(config["fill_color"])
+                ),
+            )
+            alpha = config["fill_alpha"]
             cv2.addWeighted(
                 overlay,
                 alpha,

@@ -16,6 +16,7 @@ from particleanalyzer.core.utils import (
     translate_chatbot,
     statistic_an,
     select_particle_from_image,
+    particle_removal,
 )
 from particleanalyzer.core.about import about_ru
 from particleanalyzer.core.parameter_information import reference_ru
@@ -172,13 +173,20 @@ def create_interface(api_key):
                                         elem_id="output-image",
                                     )
                             with gr.Row(visible=False) as output_table_image2_row:
-                                output_table_image2 = gr.Dataframe(
-                                    value=empty_df_ParticleCharacteristics,
-                                    label=i18n("Характеристики частицы"),
-                                    interactive=True,
-                                    elem_id="dataframe-table",
-                                    show_copy_button=True,
-                                )
+                                with gr.Column():
+                                    output_table_image2 = gr.Dataframe(
+                                        value=empty_df_ParticleCharacteristics,
+                                        label=i18n("Характеристики частицы"),
+                                        interactive=True,
+                                        elem_id="dataframe-table",
+                                        show_copy_button=True,
+                                    )
+                                    delete_row = gr.Button(
+                                        value=i18n("Удалить частицу"),
+                                        icon="https://rybakov-k.ru/assets/icon/incorrect.png",
+                                        elem_id="delete-row-btn",
+                                        elem_classes="custom-btn btn-delete-row",
+                                    )
 
                             with gr.Row(visible=False) as scale_input_row:
                                 scale_input = gr.Number(
@@ -189,24 +197,18 @@ def create_interface(api_key):
 
                             with gr.Row(elem_id="button-row"):
                                 with gr.Column(min_width=140):
-                                    process_button = gr.HTML(
-                                        f"""
-                                        <button class="custom-btn btn-analyze" id="process-button">
-                                            <img src='https://rybakov-k.ru/assets/icon/icons8-химия-50.png' 
-                                                 alt='Analyze icon'/> 
-                                            {i18n('Анализировать')}
-                                        </button>
-                                        """
+                                    process_button = gr.Button(
+                                        value=i18n("Анализировать"),
+                                        icon="https://rybakov-k.ru/assets/icon/icons8-химия-50.png",
+                                        elem_id="process-button",
+                                        elem_classes="custom-btn btn-analyze",
                                     )
                                 with gr.Column(min_width=140):
-                                    clear_button = gr.HTML(
-                                        f"""
-                                        <button class="custom-btn btn-clear" id="clear-btn">
-                                            <img src='https://rybakov-k.ru/assets/icon/icons8-метла-50.png' 
-                                                 alt='Clear icon'/> 
-                                            {i18n('Очистить')}
-                                        </button>
-                                        """
+                                    clear_button = gr.Button(
+                                        value=i18n("Очистить"),
+                                        icon="https://rybakov-k.ru/assets/icon/icons8-метла-50.png",
+                                        elem_id="clear-btn",
+                                        elem_classes="custom-btn btn-clear",
                                     )
 
                     with gr.Row(elem_id="example-row") as in_image_example_row:
@@ -288,24 +290,18 @@ def create_interface(api_key):
                                                 )
                                     with gr.Row(elem_id="button-row"):
                                         with gr.Column(min_width=140):
-                                            llm_run = gr.HTML(
-                                                f"""
-                                                <button class="custom-btn btn-ai-run" id="ai-run-btn"">
-                                                    <img src='https://rybakov-k.ru/assets/icon/ai.png' 
-                                                         alt='Analyze icon'/> 
-                                                    {i18n('Запустить ИИ-анализ')}
-                                                </button>
-                                                """
+                                            llm_run = gr.Button(
+                                                value=i18n("Запустить ИИ-анализ"),
+                                                icon="https://rybakov-k.ru/assets/icon/ai.png",
+                                                elem_id="ai-run-btn",
+                                                elem_classes="custom-btn btn-ai-run",
                                             )
                                         with gr.Column(min_width=140):
-                                            cancel_llm_button = gr.HTML(
-                                                f"""
-                                                <button class="custom-btn btn-ai-cancel" id="ai-cancel-btn"">
-                                                    <img src='https://rybakov-k.ru/assets/icon/incorrect.png' 
-                                                         alt='Clear icon'/> 
-                                                    {i18n('Отменить')}
-                                                </button>
-                                                """
+                                            cancel_llm_button = gr.Button(
+                                                value=i18n("Отменить"),
+                                                icon="https://rybakov-k.ru/assets/icon/incorrect.png",
+                                                elem_id="ai-cancel-btn",
+                                                elem_classes="custom-btn btn-ai-cancel",
                                             )
 
                                 with gr.Tab(i18n("Файлы"), id=4):
@@ -324,24 +320,18 @@ def create_interface(api_key):
                                         )
                                     with gr.Row(elem_id="button-row"):
                                         with gr.Column(min_width=140):
-                                            yes_button = gr.HTML(
-                                                f"""
-                                                <button class="custom-btn btn-yes" id="yes-btn"">
-                                                    <img src='https://rybakov-k.ru/assets/icon/like.png' 
-                                                         alt='Analyze icon'/> 
-                                                    {i18n('Да')}
-                                                </button>
-                                                """
+                                            yes_button = gr.Button(
+                                                value=i18n("Да"),
+                                                icon="https://rybakov-k.ru/assets/icon/like.png",
+                                                elem_id="yes-btn",
+                                                elem_classes="custom-btn btn-yes",
                                             )
                                         with gr.Column(min_width=140):
-                                            no_button = gr.HTML(
-                                                f"""
-                                                <button class="custom-btn btn-no" id="no-btn"">
-                                                    <img src='https://rybakov-k.ru/assets/icon/dislike.png' 
-                                                         alt='Clear icon'/> 
-                                                    {i18n('Нет')}
-                                                </button>
-                                                """
+                                            no_button = gr.Button(
+                                                value=i18n("Нет"),
+                                                icon="https://rybakov-k.ru/assets/icon/dislike.png",
+                                                elem_id="no-btn",
+                                                elem_classes="custom-btn btn-no",
                                             )
 
                 with gr.Tab(i18n("Настройки"), elem_id="setting"):
@@ -406,15 +396,15 @@ def create_interface(api_key):
                                 value="1024x1024",
                                 label=i18n("Разрешение изображения"),
                             )
-                    with gr.Row() as number_detections_row:
-                        number_detections = gr.Slider(
-                            minimum=1,
-                            maximum=10000,
-                            value=1000,
-                            step=100,
-                            label=i18n("Максимальное количество обнаружений"),
-                            elem_id="number-detections",
-                        )
+                        with gr.Column():
+                            number_detections = gr.Slider(
+                                minimum=1,
+                                maximum=10000,
+                                value=1000,
+                                step=100,
+                                label=i18n("Количество обнаружений"),
+                                elem_id="number-detections",
+                            )
                     with gr.Row(visible=False):
                         round_value = gr.Dropdown(
                             [0, 1, 2, 3, 4, 5, 6],
@@ -435,22 +425,39 @@ def create_interface(api_key):
                                 label=i18n("Включить"),
                                 info=i18n("Включить отображение диаметров Ферета?"),
                             )
-                        with gr.Column(min_width=150):
+                        with gr.Column():
                             show_polylines = gr.Checkbox(
                                 value=True,
                                 label=i18n("Включить"),
                                 info=i18n("Включить контур?"),
                             )
-                        with gr.Column(min_width=300):
+                        with gr.Column():
                             outline_color = gr.ColorPicker(
                                 value="rgb(0, 255, 0, 1)", label=i18n("Цвет контура")
                             )
-                        with gr.Column(min_width=150):
+                        with gr.Column(min_width=100):
                             show_fillPoly = gr.Checkbox(
                                 label=i18n("Включить"),
                                 info=i18n("Включить заливку?"),
                             )
-
+                        with gr.Column(min_width=250):
+                            fill_type_color = gr.Radio(
+                                ("Random", "Permanent"),
+                                value="Random",
+                                label=i18n("Тип заливки"),
+                            )
+                        with gr.Column(min_width=300):
+                            fill_color = gr.ColorPicker(
+                                value="rgb(0, 255, 0, 1)", label=i18n("Цвет заливки")
+                            )
+                        with gr.Column():
+                            fill_alpha = gr.Slider(
+                                minimum=0,
+                                maximum=1,
+                                value=0.3,
+                                step=0.01,
+                                label=i18n("Прозрачность заливки"),
+                            )
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as slider:
@@ -503,6 +510,7 @@ def create_interface(api_key):
                         label=f"I [{i18n('ед.')}]",
                     )
                 # with gr.Row():
+                # apply_filter = gr.Button(value=i18n('Применить фильтр'), icon='https://rybakov-k.ru/assets/icon/dislike.png', elem_id='filter-btn', elem_classes='custom-btn btn-f')
                 # apply_filter = gr.HTML(
                 # f"""
                 # <button class="custom-btn btn-f" id="filter-btn" style="display: flex; align-items: center; gap: 8px;">
@@ -534,6 +542,9 @@ def create_interface(api_key):
                 outline_color,
                 show_fillPoly,
                 show_polylines,
+                fill_type_color,
+                fill_color,
+                fill_alpha,
                 api_key,
             ],
             outputs=[
@@ -564,7 +575,39 @@ def create_interface(api_key):
         )
 
         process_button.click(translate_chatbot, None, chatbot)
-
+        delete_row.click(
+            particle_removal,
+            inputs=[output_table_image2, points_df, output_table],
+            outputs=[output_table_image2_row, points_df, output_table],
+        ).success(
+            fn=statistic_an,
+            inputs=[
+                output_table,
+                points_df,
+                scale_selector,
+                round_value,
+                number_of_bins,
+                d_max_slider,
+                d_min_slider,
+                theta_max_slider,
+                theta_min_slider,
+                e_slider,
+                S_slider,
+                P_slider,
+                I_slider,
+                im,
+                in_image,
+                solution,
+                sahi_mode,
+                outline_color,
+                show_fillPoly,
+                show_polylines,
+                fill_type_color,
+                fill_color,
+                fill_alpha,
+            ],
+            outputs=[output_table2, output_plot, output_image],
+        )
         gr.on(
             triggers=[
                 d_max_slider.release,
@@ -598,6 +641,9 @@ def create_interface(api_key):
                 outline_color,
                 show_fillPoly,
                 show_polylines,
+                fill_type_color,
+                fill_color,
+                fill_alpha,
             ],
             outputs=[output_table2, output_plot, output_image],
         )
@@ -631,7 +677,6 @@ def create_interface(api_key):
             outputs=[
                 slice_row,
                 slice_row2,
-                number_detections_row,
                 solution_and_segment_mode_row,
             ],
             show_progress="hide",

@@ -109,7 +109,6 @@ def sahi_mode_visibility(sahi_mode):
         gr.update(visible=sahi_mode),
         gr.update(visible=sahi_mode),
         gr.update(visible=not sahi_mode),
-        gr.update(visible=not sahi_mode),
     )
 
 
@@ -235,12 +234,15 @@ def statistic_an(
     outline_color,
     show_fillPoly,
     show_polylines,
+    fill_type_color,
+    fill_color,
+    fill_alpha,
 ):
 
     lang = LanguageContext.get_language()
     scale_config = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
     selected_image = image["background"] if scale_config["scale"] else image2
-
+    selected_image = cv2.cvtColor(selected_image, cv2.COLOR_RGB2BGR)
     selected_image, scale_factor_glob = ImagePreprocessor.resize_image(
         selected_image, solution, sahi_mode
     )
@@ -299,8 +301,16 @@ def statistic_an(
         if show_fillPoly:
             overlay = selected_image.copy()
             for contour in points_arrays:
-                cv2.fillPoly(overlay, [contour], ParticleAnalyzer.get_random_color())
-            alpha = 0.3
+                cv2.fillPoly(
+                    overlay,
+                    [contour],
+                    (
+                        ParticleAnalyzer.get_random_color()
+                        if fill_type_color == "Random"
+                        else ParticleAnalyzer.rgba_to_bgr(fill_color)
+                    ),
+                )
+            alpha = fill_alpha
             cv2.addWeighted(
                 overlay, alpha, selected_image, 1 - alpha, 0, selected_image
             )
@@ -312,6 +322,7 @@ def statistic_an(
                 color=ParticleAnalyzer.rgba_to_bgr(outline_color),
                 thickness=thickness,
             )
+    selected_image = cv2.cvtColor(selected_image, cv2.COLOR_BGR2RGB)
 
     return stats_df, fig, selected_image
 
@@ -343,6 +354,32 @@ def select_particle_from_image(points_df, output_table, evt: gr.SelectData):
 
     selected_idx = matching_contours[0]
     return output_table.iloc[[selected_idx]], gr.update(visible=True)
+
+
+def particle_removal(output_table_image2, points_df, output_table):
+    if not output_table_image2.empty and "№" in output_table_image2.columns:
+        try:
+            number_to_remove = int(output_table_image2.iloc[0]["№"])
+
+            if "№" in output_table.columns:
+                output_table_index = output_table[
+                    output_table["№"] == number_to_remove
+                ].index
+                if not output_table_index.empty:
+                    index_to_remove = output_table_index[0]
+
+                    output_table = output_table.drop(index_to_remove).reset_index(
+                        drop=True
+                    )
+                    if index_to_remove in points_df.index:
+                        points_df = points_df.drop(index_to_remove).reset_index(
+                            drop=True
+                        )
+
+        except (ValueError, KeyError) as e:
+            print(f"Ошибка при удалении строки: {e}")
+
+    return gr.update(visible=False), points_df, output_table
 
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
