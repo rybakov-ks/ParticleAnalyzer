@@ -265,13 +265,13 @@ input:checked + .slider:before {
 .btn-ai-run {
   background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   margin-left: auto;
-  width: 200px;
+  width: 240px;
 }
 
 .btn-ai-cancel {
   background: linear-gradient(135deg, #ff6b6b 0%, #ffa3a3 100%);
   margin-right: auto;
-  width: 200px;
+  width: 240px;
 }
 
 .btn-yes {
@@ -287,6 +287,22 @@ input:checked + .slider:before {
 .btn-f {
   background: linear-gradient(135deg, #2563eb 0%, #9333ea 100%);
   width: 300px;
+}
+
+.btn-delete-row {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ffa3a3 100%);
+  margin-left: auto;
+  width: auto;
+  min-width: 80px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.btn-delete-row img {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
 }
 
 /* Ripple эффект */
@@ -380,11 +396,11 @@ footer {
 }
 
 #button-row, #example-row {
-    margin-top: -10px; /* расстояние между строками */
+    margin-top: 0px; /* расстояние между строками */
 }
 #button-row {
   display: flex;
-  gap: 0px; /* расстояние между колонками */
+  gap: 10px; /* расстояние между колонками */
 }
 
 /* Для мобильных устройств */
