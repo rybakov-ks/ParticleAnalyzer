@@ -34,20 +34,15 @@ about_ru = f"""
         border-bottom:1px solid var(--border-color-primary);
         box-shadow:var(--block-shadow)
     ">
-        <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
-                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
-                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                    </text>
-                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
-                        SEM Image Analysis Tool
-                    </text>
-                </g>
-                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-            </svg>
+        <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
+            <a href="https://particleanalyzer.ru" target="_blank">
+              <img 
+                src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                alt="ParticleAnalyzer" 
+                style="max-height: 50px; width: auto; height: auto;"
+                class="logo-image"
+              >
+            </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             Инструмент для  <strong style="color:var(--block-label-text-color)">автоматической сегментации</strong>
@@ -59,14 +54,13 @@ about_ru = f"""
     <!-- Video Demo Block -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 Видео-демонстрация работы</h3>
-        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
-            <iframe src="https://rutube.ru/play/embed/1f879a0e65c95168704ba53b94f9109a" 
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
-                    frameborder="0" 
-                    allow="cross-origin-isolated; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
-        </div>
+            <div style="margin-top:15px;">
+                <a href="https://rutube.ru/play/embed/1f879a0e65c95168704ba53b94f9109a" 
+                   style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
+                   target="_blank">
+                    Ссылка на видео-демонстрацию
+                </a>
+            </div>
         <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
             Посмотрите, как работает ParticleAnalyzer на реальных примерах
         </p>
@@ -136,20 +130,15 @@ about_en = f"""
         border-bottom:1px solid var(--border-color-primary);
         box-shadow:var(--block-shadow)
     ">
-        <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
-                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
-                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                    </text>
-                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
-                        SEM Image Analysis Tool
-                    </text>
-                </g>
-                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-            </svg>
+        <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
+            <a href="https://particleanalyzer.ru" target="_blank">
+              <img 
+                src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                alt="ParticleAnalyzer" 
+                style="max-height: 50px; width: auto; height: auto;"
+                class="logo-image"
+              >
+            </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             A tool for analyzing <strong style="color:var(--block-label-text-color)">particle size characteristics</strong> 
@@ -161,13 +150,12 @@ about_en = f"""
     <!-- Video Demo Block -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 Video Demonstration</h3>
-        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
-            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+        <div style="margin-top:15px;">
+            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
+               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
+               target="_blank">
+                Link to video demonstration
+            </a>
         </div>
         <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
             See how ParticleAnalyzer works with real examples
@@ -238,20 +226,15 @@ about_zh_cn = f"""
         border-bottom:1px solid var(--border-color-primary);
         box-shadow:var(--block-shadow)
     ">
-        <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
-                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
-                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                    </text>
-                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
-                        SEM Image Analysis Tool
-                    </text>
-                </g>
-                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-            </svg>
+        <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
+            <a href="https://particleanalyzer.ru" target="_blank">
+              <img 
+                src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                alt="ParticleAnalyzer" 
+                style="max-height: 50px; width: auto; height: auto;"
+                class="logo-image"
+              >
+            </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             一款用于分析<strong style="color:var(--block-label-text-color)">颗粒尺寸特征</strong>的工具，
@@ -262,13 +245,12 @@ about_zh_cn = f"""
     <!-- 视频演示 -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 视频演示</h3>
-        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
-            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+        <div style="margin-top:15px;">
+            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
+               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
+               target="_blank">
+                影片示範連結
+            </a>
         </div>
         <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
             观看颗粒分析器在实际案例中的应用
@@ -339,20 +321,15 @@ about_zh_tw = f"""
         border-bottom:1px solid var(--border-color-primary);
         box-shadow:var(--block-shadow)
     ">
-        <div style="display:flex;align-items:center;gap:15px;margin-bottom:15px;">
-            <svg width="250" height="55" viewBox="0 0 250 55" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <image x="2" y="0" width="46" height="46" preserveAspectRatio="xMidYMid meet"
-                       xlink:href="https://svgsilh.com/svg/305079-2196f3.svg"/>
-                <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" text-rendering="optimizeLegibility">
-                    <text x="55" y="25" font-size="22" font-weight="600" letter-spacing="-0.3">
-                        <tspan fill="#3b82f6">ParticleAnalyzer</tspan>
-                    </text>
-                    <text x="56" y="40" font-size="11" fill="#64748b" font-weight="500">
-                        SEM Image Analysis Tool
-                    </text>
-                </g>
-                <line x1="49" y1="0" x2="49" y2="50" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="3,2"/>
-            </svg>
+        <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
+            <a href="https://particleanalyzer.ru" target="_blank">
+              <img 
+                src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                alt="ParticleAnalyzer" 
+                style="max-height: 50px; width: auto; height: auto;"
+                class="logo-image"
+              >
+            </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
             用於分析<strong style="color:var(--block-label-text-color)">粒子尺寸特徵</strong>的工具，
@@ -363,16 +340,15 @@ about_zh_tw = f"""
     <!-- 影片示範 -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 影片示範</h3>
-        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
-            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
-                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowfullscreen>
-            </iframe>
+        <div style="margin-top:15px;">
+            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
+               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
+               target="_blank">
+                影片示範連結
+            </a>
         </div>
         <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
-            觀看粒子分析器的實際操作範例
+            影片示範連結
         </p>
     </div>
 

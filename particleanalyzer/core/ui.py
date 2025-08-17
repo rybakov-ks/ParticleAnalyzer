@@ -17,6 +17,7 @@ from particleanalyzer.core.utils import (
     statistic_an,
     select_particle_from_image,
     particle_removal,
+    reset_selection,
 )
 from particleanalyzer.core.about import about_ru
 from particleanalyzer.core.parameter_information import reference_ru
@@ -75,12 +76,14 @@ def create_interface(api_key):
                     f"""
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
-                          <img 
-                            src="https://rybakov-k.ru/assets/icon/Logo2.png" 
-                            alt="ParticleAnalyzer" 
-                            style="max-height: 50px; width: auto; height: auto;"
-                            class="logo-image"
-                          >
+                            <a href="https://particleanalyzer.ru" target="_blank">
+                              <img 
+                                src="https://rybakov-k.ru/assets/icon/Logo2.png" 
+                                alt="ParticleAnalyzer" 
+                                style="max-height: 50px; width: auto; height: auto;"
+                                class="logo-image"
+                              >
+                            </a>
                         </div>
 
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -172,7 +175,9 @@ def create_interface(api_key):
                                         label=i18n("Результат сегментации"),
                                         elem_id="output-image",
                                     )
-                            with gr.Row(visible=False) as output_table_image2_row:
+                            with gr.Row(
+                                visible=False, elem_id="output-table-image2-row"
+                            ) as output_table_image2_row:
                                 with gr.Column():
                                     output_table_image2 = gr.Dataframe(
                                         value=empty_df_ParticleCharacteristics,
@@ -181,8 +186,19 @@ def create_interface(api_key):
                                         elem_id="dataframe-table",
                                         show_copy_button=True,
                                     )
+                            with gr.Row(
+                                visible=False, elem_id="reset-delete-buttons-row"
+                            ) as reset_delete_buttons_row:
+                                with gr.Column():
+                                    reset_df = gr.Button(
+                                        value=i18n("Сбросить таблицу"),
+                                        icon="https://rybakov-k.ru/assets/icon/reset-14414.png",
+                                        elem_id="reset-row-btn",
+                                        elem_classes="custom-btn btn-reset-row",
+                                    )
+                                with gr.Column():
                                     delete_row = gr.Button(
-                                        value=i18n("Удалить частицу"),
+                                        value=i18n("Удалить частицы"),
                                         icon="https://rybakov-k.ru/assets/icon/incorrect.png",
                                         elem_id="delete-row-btn",
                                         elem_classes="custom-btn btn-delete-row",
@@ -460,7 +476,7 @@ def create_interface(api_key):
                             )
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
-        with gr.Row(visible=False) as slider:
+        with gr.Row(visible=False) as sidebar:
             with gr.Sidebar(width=400):
                 with gr.Row():
                     gr.HTML(
@@ -563,7 +579,7 @@ def create_interface(api_key):
                 S_slider,
                 P_slider,
                 I_slider,
-                slider,
+                sidebar,
             ],
             show_progress_on=output_image,
         )
@@ -571,14 +587,32 @@ def create_interface(api_key):
         output_image.select(
             select_particle_from_image,
             inputs=[points_df, output_table],
-            outputs=[output_table_image2, output_table_image2_row],
+            outputs=[
+                output_table_image2,
+                output_table_image2_row,
+                reset_delete_buttons_row,
+            ],
         )
 
         process_button.click(translate_chatbot, None, chatbot)
         delete_row.click(
             particle_removal,
-            inputs=[output_table_image2, points_df, output_table],
-            outputs=[output_table_image2_row, points_df, output_table],
+            inputs=[output_table_image2, points_df, output_table, round_value, scale_selector],
+            outputs=[
+                output_table_image2_row,
+                reset_delete_buttons_row,
+                points_df,
+                output_table,
+                d_max_slider,
+                d_min_slider,
+                theta_max_slider,
+                theta_min_slider,
+                e_slider,
+                S_slider,
+                P_slider,
+                I_slider,
+            ],
+            show_progress_on=[output_table2, output_plot, output_image],
         ).success(
             fn=statistic_an,
             inputs=[
@@ -607,6 +641,16 @@ def create_interface(api_key):
                 fill_alpha,
             ],
             outputs=[output_table2, output_plot, output_image],
+        )
+        gr.on(
+            triggers=[reset_df.click, process_button.click],
+            fn=reset_selection,
+            inputs=output_table_image2,
+            outputs=[
+                output_table_image2,
+                output_table_image2_row,
+                reset_delete_buttons_row,
+            ],
         )
         gr.on(
             triggers=[
@@ -693,9 +737,10 @@ def create_interface(api_key):
                 output_plot,
                 in_image,
                 output_table_image2_row,
+                reset_delete_buttons_row,
                 chatbot,
                 results_row,
-                slider,
+                sidebar,
             ],
             cancels=[analyze],
             show_progress="hide",
@@ -710,8 +755,10 @@ def create_interface(api_key):
                 output_plot,
                 in_image,
                 output_table_image2_row,
+                reset_delete_buttons_row,
                 chatbot,
                 results_row,
+                sidebar,
             ],
             show_progress="hide",
             show_progress_on=question_row,

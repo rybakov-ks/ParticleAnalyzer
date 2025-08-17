@@ -290,16 +290,32 @@ input:checked + .slider:before {
 }
 
 .btn-delete-row {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ffa3a3 100%);
-  margin-left: auto;
+  background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
   width: auto;
-  min-width: 80px;
+  min-width: 30px;
   height: 32px;
   padding: 0 12px;
   font-size: 12px;
+  margin-left: auto;
 }
 
 .btn-delete-row img {
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+}
+
+.btn-reset-row {
+  background: linear-gradient(135deg, #9D50BB 0%, #6E48AA 100%);
+  width: auto;
+  min-width: 30px;
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  margin-right: auto;
+}
+
+.btn-reset-row img {
   width: 14px;
   height: 14px;
   margin-right: 6px;
@@ -401,6 +417,10 @@ footer {
 #button-row {
   display: flex;
   gap: 10px; /* расстояние между колонками */
+}
+
+#output-table-image2-row, #reset-delete-buttons-row {
+    margin-top: -10px; /* расстояние между строками */
 }
 
 /* Для мобильных устройств */

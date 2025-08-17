@@ -114,12 +114,15 @@ def sahi_mode_visibility(sahi_mode):
 
 def reset_interface(scale_value):
     """Функция для сброса интерфейса"""
+    global selected_particles
+    selected_particles = []
     return (
         {"background": None, "layers": [], "composite": None},  # Очищаем im
         None,  # Очищаем output_image
         None,  # Очищаем графики
         None,  # Очищаем input_image
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
+        gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
@@ -128,11 +131,14 @@ def reset_interface(scale_value):
 
 def reset_interface2(scale_value):
     """Функция для сброса интерфейса"""
+    global selected_particles
+    selected_particles = []
     return (
         None,  # Очищаем output_image
         None,  # Очищаем графики
         None,  # Очищаем input_image
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
+        gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
@@ -327,10 +333,26 @@ def statistic_an(
     return stats_df, fig, selected_image
 
 
+selected_particles = []  # Глобальный список для хранения выбранных частиц
+
+
 def select_particle_from_image(points_df, output_table, evt: gr.SelectData):
+    global selected_particles
     target_point = (evt.index[0], evt.index[1])
 
     matching_contours = []
+    already_selected = False
+
+    for selected_idx in selected_particles:
+        contour_points = points_df.loc[selected_idx, "points"]
+        if contour_points and len(contour_points) >= 3:
+            contour = np.array(contour_points, dtype=np.int32).reshape((-1, 1, 2))
+            if cv2.pointPolygonTest(contour, target_point, measureDist=False) >= 0:
+                already_selected = True
+                break
+
+    if already_selected:
+        return gr.skip(), gr.skip(), gr.skip()
 
     for idx, contour_points in points_df["points"].items():
         if not contour_points or len(contour_points) < 3:
@@ -339,11 +361,11 @@ def select_particle_from_image(points_df, output_table, evt: gr.SelectData):
         contour = np.array(contour_points, dtype=np.int32).reshape((-1, 1, 2))
         distance = cv2.pointPolygonTest(contour, target_point, measureDist=False)
 
-        if distance >= 0:
+        if distance >= 0 and idx not in selected_particles:
             matching_contours.append(idx)
 
     if not matching_contours:
-        return output_table.iloc[[]], gr.update(visible=False)
+        return gr.skip(), gr.skip(), gr.skip()
 
     if len(matching_contours) > 1:
         matching_contours.sort(
@@ -351,36 +373,90 @@ def select_particle_from_image(points_df, output_table, evt: gr.SelectData):
                 np.array(points_df.loc[x, "points"]).reshape((-1, 1, 2))
             )
         )
+    selected_particles.append(matching_contours[0])
 
-    selected_idx = matching_contours[0]
-    return output_table.iloc[[selected_idx]], gr.update(visible=True)
+    return (
+        output_table.iloc[selected_particles],
+        gr.update(visible=True),
+        gr.update(visible=True),
+    )
 
 
-def particle_removal(output_table_image2, points_df, output_table):
+def reset_selection(output_table_image2):
+    global selected_particles
+    selected_particles = []
+    return (
+        output_table_image2.iloc[[]],
+        gr.update(visible=False),
+        gr.update(visible=False),
+    )
+
+
+def particle_removal(output_table_image2, points_df, output_table, round_value, scale_selector):
+    global selected_particles
     if not output_table_image2.empty and "№" in output_table_image2.columns:
         try:
-            number_to_remove = int(output_table_image2.iloc[0]["№"])
+            numbers_to_remove = output_table_image2["№"].astype(int).tolist()
 
-            if "№" in output_table.columns:
-                output_table_index = output_table[
-                    output_table["№"] == number_to_remove
-                ].index
-                if not output_table_index.empty:
-                    index_to_remove = output_table_index[0]
+            rows_to_remove = output_table[output_table["№"].isin(numbers_to_remove)]
 
-                    output_table = output_table.drop(index_to_remove).reset_index(
-                        drop=True
-                    )
-                    if index_to_remove in points_df.index:
-                        points_df = points_df.drop(index_to_remove).reset_index(
-                            drop=True
-                        )
+            if not rows_to_remove.empty:
+                output_table = output_table.drop(rows_to_remove.index).reset_index(
+                    drop=True
+                )
 
+                points_df = points_df.drop(rows_to_remove.index).reset_index(drop=True)
+                selected_particles = []
         except (ValueError, KeyError) as e:
-            print(f"Ошибка при удалении строки: {e}")
-
-    return gr.update(visible=False), points_df, output_table
-
+            print(f"Ошибка при удалении строк: {e}")
+    limits = ParticleAnalyzer.calculate_limits(output_table, round_value)
+    scale_selector = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
+    return (
+        gr.update(visible=False), 
+        gr.update(visible=False), 
+        points_df, 
+        output_table,
+        gr.update(
+            minimum=limits["d_max_min"],
+            maximum=limits["d_max_max"],
+            value=(limits["d_max_min"], limits["d_max_max"]),
+            step=limits["d_max_max"] * 0.01,
+            label=f"Dₘₐₓ [{get_translation(scale_selector['unit'])}]",
+        ),
+        gr.update(
+            minimum=limits["d_min_min"],
+            maximum=limits["d_min_max"] ,
+            value=(limits["d_min_min"], limits["d_min_max"] ),
+            step=limits["d_min_max"]  * 0.01,
+            label=f"Dₘᵢₙ [{get_translation(scale_selector['unit'])}]",
+        ),
+        gr.update(
+            minimum=limits["theta_max_min"],
+            maximum=limits["theta_max_max"],
+            value=(limits["theta_max_min"], limits["theta_max_max"]),
+        ),
+        gr.update(
+            minimum=limits["theta_min_min"],
+            maximum=limits["theta_min_max"],
+            value=(limits["theta_min_min"], limits["theta_min_max"]),
+        ),
+        gr.update(minimum=0, maximum=1, value=(0, 1)),
+        gr.update(
+            minimum=limits["S_min"],
+            maximum=limits["S_max"],
+            value=(limits["S_min"], limits["S_max"]),
+            step=limits["S_max"] * 0.01,
+            label=f"S [{get_translation(scale_selector['unit'])}²]",
+        ),
+        gr.update(
+            minimum=limits["P_min"],
+            maximum=limits["P_max"],
+            value=(limits["P_min"], limits["P_max"]),
+            step=limits["P_max"] * 0.01,
+            label=f"P [{get_translation(scale_selector['unit'])}]",
+        ),
+        gr.update(minimum=limits["I_min"], maximum=limits["I_max"], value=(limits["I_min"], limits["I_max"])),
+    )
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
 empty_df_ParticleStatistics = get_stats_columns()
