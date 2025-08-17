@@ -12,14 +12,18 @@
 
 ## ParticleAnalyzer
 [![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
+[![Slow Demo?](https://img.shields.io/badge/Telegram-Try%20Mini%20App-blue)](https://t.me/particleanalyzer_bot)
 [![PyPI Version](https://img.shields.io/pypi/v/particleanalyzer?label=PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Monthly Downloads](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
+> [!WARNING]
+> If the website [particleanalyzer.ru](http://particleanalyzer.ru/) runs slowly for you, try our faster Telegram Mini App: [@particleanalyzer_bot](https://t.me/particleanalyzer_bot)
 <div align="left">
   <a href="https://particleanalyzer.ru/">
     <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
   </a>
 </div>
   <p>A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.</p>
+
 <div align="center">
   <h3>Video demonstrations:</h3>
   <p>
@@ -199,9 +203,8 @@ https://github.com/user-attachments/assets/6548071a-3c83-4539-897a-6ebf175bec17
 - **Histogram Bins**: Number of intervals for distribution plots
 
 ## 📐 Scale Calibration
-<div align="center">
-  <img src="Images/5.png" alt="Scale Calibration">
-</div>
+
+  https://github.com/user-attachments/assets/12ccb7b5-4dbc-4472-afcb-574332947971
 
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
