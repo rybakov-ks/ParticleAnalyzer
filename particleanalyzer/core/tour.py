@@ -1,4 +1,11 @@
-tour = """
+"""
+HTML/JS intro tour script for ParticleAnalyzer UI.
+The string is injected into the Gradio page to initialize Intro.js steps.
+"""
+
+__all__ = ["tour"]
+
+tour: str = """
 <script>
 
 function getBrowserLanguage() {
