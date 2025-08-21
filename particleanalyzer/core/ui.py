@@ -138,7 +138,21 @@ def create_interface(api_key):
                                     elem_classes="styled-dropdown",
                                 )
                             with gr.Row() as row_image_file:
-                                image_file = gr.File(label=i18n("Загрузить изображение СЭМ"), file_types=[".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp", ".webp"], file_count="single", elem_id="image-file",)  
+                                image_file = gr.File(
+                                    label=i18n("Загрузить изображение СЭМ"),
+                                    file_types=[
+                                        ".tif",
+                                        ".tiff",
+                                        ".png",
+                                        ".jpg",
+                                        ".jpeg",
+                                        ".bmp",
+                                        ".webp",
+                                    ],
+                                    file_count="single",
+                                    elem_id="image-file",
+                                    height=450,
+                                )
                             with gr.Row(visible=False) as row_analysis:
                                 with gr.Column():
                                     with gr.Row(
@@ -195,7 +209,8 @@ def create_interface(api_key):
                                                 show_copy_button=True,
                                             )
                                     with gr.Row(
-                                        visible=False, elem_id="reset-delete-buttons-row"
+                                        visible=False,
+                                        elem_id="reset-delete-buttons-row",
                                     ) as reset_delete_buttons_row:
                                         with gr.Column():
                                             reset_df = gr.Button(
@@ -235,14 +250,14 @@ def create_interface(api_key):
                                                 elem_classes="custom-btn btn-clear",
                                             )
 
-                    with gr.Row(elem_id="example-row") as in_image_example_row:
+                    with gr.Row(elem_id="example-row"):
                         gr.Examples(
                             examples=[
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/100%20r-.jpg",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Tv30_1.webp",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/A02-1.webp",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg",
-                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/image_c_01.webp",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Cathode_LiCoVO4.jpg",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Chitosan.webp",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Silicon_oxide.webp",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Gold_on_carbon.jpg",
+                                "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Colloidal_silver.webp",
                             ],
                             inputs=[image_file],
                             label=i18n("Примеры"),
@@ -541,7 +556,11 @@ def create_interface(api_key):
                 # </button>
                 # """
                 # )
-        image_file.change(fn=handle_file_upload, inputs=[image_file, scale_selector], outputs=[in_image, im, row_image_file, row_analysis])      
+        image_file.change(
+            fn=handle_file_upload,
+            inputs=[image_file, scale_selector],
+            outputs=[in_image, im, row_image_file, row_analysis],
+        )
         analyze = process_button.click(
             fn=analyzer.analyze_image,
             inputs=[
@@ -626,7 +645,7 @@ def create_interface(api_key):
                 I_slider,
             ],
             show_progress="hide",
-            show_progress_on=[points_df]
+            show_progress_on=[points_df],
         ).success(
             fn=statistic_an,
             inputs=[

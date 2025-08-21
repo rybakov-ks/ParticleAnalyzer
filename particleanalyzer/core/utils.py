@@ -5,7 +5,6 @@ import cv2
 from PIL import Image
 import csv
 import os
-from pathlib import Path
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
@@ -127,7 +126,7 @@ def reset_interface(scale_value):
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
-        gr.update(visible=True),   # Показываем строку row_image_file
+        gr.update(visible=True),  # Показываем строку row_image_file
         gr.update(visible=False),  # Скрываем строку row_analysis
         None,  # Очищаем image_file
     )
@@ -333,7 +332,11 @@ def statistic_an(
             )
     selected_image = cv2.cvtColor(selected_image, cv2.COLOR_BGR2RGB)
 
-    return selected_image, stats_df, fig, 
+    return (
+        selected_image,
+        stats_df,
+        fig,
+    )
 
 
 selected_particles = []  # Глобальный список для хранения выбранных частиц
@@ -395,7 +398,9 @@ def reset_selection(output_table_image2):
     )
 
 
-def particle_removal(output_table_image2, points_df, output_table, round_value, scale_selector):
+def particle_removal(
+    output_table_image2, points_df, output_table, round_value, scale_selector
+):
     global selected_particles
     if not output_table_image2.empty and "№" in output_table_image2.columns:
         try:
@@ -415,9 +420,9 @@ def particle_removal(output_table_image2, points_df, output_table, round_value, 
     limits = ParticleAnalyzer.calculate_limits(output_table, round_value)
     scale_selector = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
     return (
-        gr.update(visible=False), 
-        gr.update(visible=False), 
-        points_df, 
+        gr.update(visible=False),
+        gr.update(visible=False),
+        points_df,
         output_table,
         gr.update(
             minimum=limits["d_max_min"],
@@ -428,9 +433,9 @@ def particle_removal(output_table_image2, points_df, output_table, round_value, 
         ),
         gr.update(
             minimum=limits["d_min_min"],
-            maximum=limits["d_min_max"] ,
-            value=(limits["d_min_min"], limits["d_min_max"] ),
-            step=limits["d_min_max"]  * 0.01,
+            maximum=limits["d_min_max"],
+            value=(limits["d_min_min"], limits["d_min_max"]),
+            step=limits["d_min_max"] * 0.01,
             label=f"Dₘᵢₙ [{get_translation(scale_selector['unit'])}]",
         ),
         gr.update(
@@ -458,8 +463,13 @@ def particle_removal(output_table_image2, points_df, output_table, round_value, 
             step=limits["P_max"] * 0.01,
             label=f"P [{get_translation(scale_selector['unit'])}]",
         ),
-        gr.update(minimum=limits["I_min"], maximum=limits["I_max"], value=(limits["I_min"], limits["I_max"])),
+        gr.update(
+            minimum=limits["I_min"],
+            maximum=limits["I_max"],
+            value=(limits["I_min"], limits["I_max"]),
+        ),
     )
+
 
 def img_to_numpy_array(file_path):
     try:
@@ -469,15 +479,13 @@ def img_to_numpy_array(file_path):
     except Exception as e:
         print(f"Ошибка при загрузке TIFF: {e}")
         return None, None
-        
+
+
 def handle_file_upload(file, scale_selector):
     if file is None:
         return gr.skip(), gr.skip(), gr.update(visible=True), gr.update(visible=False)
-    
-    scale = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]["scale"]
-    
+
     file_path = file.name
-    file_ext = Path(file_path).suffix.lower()[1:]
     in_image, im = img_to_numpy_array(file_path)
 
     return (
@@ -486,6 +494,7 @@ def handle_file_upload(file, scale_selector):
         gr.update(visible=False),
         gr.update(visible=True),
     )
+
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
 empty_df_ParticleStatistics = get_stats_columns()
