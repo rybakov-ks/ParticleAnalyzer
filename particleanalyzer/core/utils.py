@@ -2,8 +2,10 @@ import gradio as gr
 import pandas as pd
 import numpy as np
 import cv2
+from PIL import Image
 import csv
 import os
+from pathlib import Path
 from datetime import datetime
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
@@ -89,7 +91,6 @@ def scale_input_visibility(scale_value):
         gr.update(visible=(is_scaled)),
         gr.update(visible=(not is_scaled)),
         gr.update(value=(get_columns(scale_value))),
-        gr.update(visible=(not is_scaled)),
         gr.update(value=(get_columns(scale_value))),
         gr.update(visible=(is_scaled)),
     )
@@ -126,6 +127,9 @@ def reset_interface(scale_value):
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
+        gr.update(visible=True),   # Показываем строку row_image_file
+        gr.update(visible=False),  # Скрываем строку row_analysis
+        None,  # Очищаем image_file
     )
 
 
@@ -136,7 +140,6 @@ def reset_interface2(scale_value):
     return (
         None,  # Очищаем output_image
         None,  # Очищаем графики
-        None,  # Очищаем input_image
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
         [(None, None)],  # Очищаем chatbot
@@ -330,7 +333,7 @@ def statistic_an(
             )
     selected_image = cv2.cvtColor(selected_image, cv2.COLOR_BGR2RGB)
 
-    return stats_df, fig, selected_image
+    return selected_image, stats_df, fig, 
 
 
 selected_particles = []  # Глобальный список для хранения выбранных частиц
@@ -456,6 +459,32 @@ def particle_removal(output_table_image2, points_df, output_table, round_value, 
             label=f"P [{get_translation(scale_selector['unit'])}]",
         ),
         gr.update(minimum=limits["I_min"], maximum=limits["I_max"], value=(limits["I_min"], limits["I_max"])),
+    )
+
+def img_to_numpy_array(file_path):
+    try:
+        with Image.open(file_path) as img:
+            array = np.array(img)
+            return array, {"background": array, "layers": None, "composite": None}
+    except Exception as e:
+        print(f"Ошибка при загрузке TIFF: {e}")
+        return None, None
+        
+def handle_file_upload(file, scale_selector):
+    if file is None:
+        return gr.skip(), gr.skip(), gr.update(visible=True), gr.update(visible=False)
+    
+    scale = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]["scale"]
+    
+    file_path = file.name
+    file_ext = Path(file_path).suffix.lower()[1:]
+    in_image, im = img_to_numpy_array(file_path)
+
+    return (
+        in_image,
+        im,
+        gr.update(visible=False),
+        gr.update(visible=True),
     )
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")

@@ -16,7 +16,7 @@ tour: str = """
     // Словарь переводов
     const translations = {
       'ru': {
-        notificationText: 'Перейдите на вкладку <strong>"Анализ"</strong> для начала работы.',
+        notificationText: 'Перейдите на вкладку <strong>"Анализ"</strong> и загрузите изображение для начала работы.',
         welcomeText: "Привет! Сейчас мы покажем, как работать с ParticleAnalyzer.",
         scaleSelectorText: "Здесь выберите, в каких единицах работать: пиксели, микроны или нанометры.",
         paintUploaderText: "Загрузите изображение СЭМ, затем с помощью инструмента 'Кисть' отметьте две точки для определения границ шкалы. При необходимости воспользуйтесь 'Ластиком' для корректировки и функцией 'Масштаб' для более точного позиционирования.",
@@ -41,7 +41,7 @@ tour: str = """
         }
       },
       'en': {
-        notificationText: 'Go to the <strong>"Analysis"</strong> tab to get started.',
+        notificationText: 'Go to the <strong>"Analysis"</strong> tab and upload an image to get started.',
         welcomeText: "Hello! We'll now show you how to work with ParticleAnalyzer.",
         scaleSelectorText: "Here you can select the units to work with: pixels, microns, or nanometers.",
         paintUploaderText: "Upload your SEM image, then use the 'Brush' tool to mark two points to define the scale boundaries. If needed, use the 'Eraser' for corrections and the 'Zoom' function for more precise positioning.",
@@ -66,7 +66,7 @@ tour: str = """
         }
       },
       'zh-TW': {
-        notificationText: '請切換至<strong>"分析"</strong>標籤頁開始使用。',
+        notificationText: '前往<strong>“分析”</strong>選項卡並上傳圖像即可開始。',
         welcomeText: "您好！我們將為您展示如何使用ParticleAnalyzer。",
         scaleSelectorText: "在此選擇工作單位：像素、微米或奈米。",
         paintUploaderText: "上傳您的SEM圖像，然後使用'畫筆'工具標記兩個點以定義比例尺邊界。如需修正，可使用'橡皮擦'進行調整，並使用'縮放'功能進行更精確的定位。",
@@ -91,7 +91,7 @@ tour: str = """
         }
       },
       'zh-CN': {
-        notificationText: '请切换到<strong>"分析"</strong>标签页开始使用。',
+        notificationText: '转到<strong>“分析”</strong>选项卡并上传图像即可开始。',
         welcomeText: "您好！我们将为您展示如何使用ParticleAnalyzer。",
         scaleSelectorText: "在此选择工作单位：像素、微米或纳米。",
         paintUploaderText: "上传您的SEM图像，然后使用'画笔'工具标记两个点以定义比例尺边界。如需修正，可使用'橡皮擦'进行调整，并使用'缩放'功能进行更精确的定位。",
@@ -125,10 +125,60 @@ tour: str = """
       return el && el.offsetWidth > 0 && el.offsetHeight > 0;
     };
 
+    let isKeyboardBlocked = false;
+    let originalKeyDownHandler = null;
+
+    function blockAllKeys(e) {
+      if (isKeyboardBlocked) {
+        console.log('Key blocked:', e.key);
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }
+
+    function setKeyboardBlocking(block) {
+      isKeyboardBlocked = block;
+      
+      if (block) {
+        console.log('Keyboard blocking enabled');
+        // Добавляем обработчики для всех клавиатурных событий
+        document.addEventListener('keydown', blockAllKeys, true);
+        document.addEventListener('keypress', blockAllKeys, true);
+        document.addEventListener('keyup', blockAllKeys, true);
+        
+        const introInstance = introJs();
+        if (introInstance && introInstance._onKeyDown) {
+          originalKeyDownHandler = introInstance._onKeyDown;
+          introInstance._onKeyDown = function(e) {
+            console.log('IntroJS key blocked:', e.key);
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+          };
+        }
+      } else {
+        console.log('Keyboard blocking disabled');
+
+        document.removeEventListener('keydown', blockAllKeys, true);
+        document.removeEventListener('keypress', blockAllKeys, true);
+        document.removeEventListener('keyup', blockAllKeys, true);
+        
+        if (originalKeyDownHandler) {
+          const introInstance = introJs();
+          if (introInstance) {
+            introInstance._onKeyDown = originalKeyDownHandler;
+          }
+          originalKeyDownHandler = null;
+        }
+      }
+    }
+
     const checkVisibility = () => {
       const paintVisible = isElementVisible('#in-image-paint');
       const normalVisible = isElementVisible('#in-image');
-
+      
       if (!paintVisible && !normalVisible) {
         // Создаем уведомление с крестиком
         const notification = document.createElement('div');
@@ -147,7 +197,7 @@ tour: str = """
         notification.style.display = 'flex';
         notification.style.alignItems = 'center';
         notification.style.gap = '15px';
-
+        
         const closeBtn = document.createElement('button');
         closeBtn.innerHTML = '&times;';
         closeBtn.style.position = 'absolute';
@@ -159,19 +209,19 @@ tour: str = """
         closeBtn.style.cursor = 'pointer';
         closeBtn.style.padding = '0 5px';
         closeBtn.style.color = '#6c757d';
-
-        closeBtn.onclick = function () {
+        
+        closeBtn.onclick = function() {
           document.body.removeChild(notification);
           clearInterval(checkInterval);
         };
-
+        
         notification.innerHTML = `
           <p style="margin: 0;">${t.notificationText}</p>
         `;
-
+        
         notification.appendChild(closeBtn);
         document.body.appendChild(notification);
-
+        
         const checkInterval = setInterval(() => {
           if (isElementVisible('#in-image-paint') || isElementVisible('#in-image')) {
             clearInterval(checkInterval);
@@ -187,7 +237,7 @@ tour: str = """
     const initTour = () => {
       // Базовые шаги тура
       const steps = [
-        {
+        { 
           intro: t.welcomeText,
           position: 'bottom'
         },
@@ -200,16 +250,13 @@ tour: str = """
       ];
 
       const getActiveUploader = () => {
-        return isElementVisible('#in-image-paint')
-          ? '#in-image-paint'
-          : isElementVisible('#in-image')
-          ? '#in-image'
-          : null;
+        return isElementVisible('#in-image-paint') ? '#in-image-paint' : 
+               isElementVisible('#in-image') ? '#in-image' : null;
       };
 
       steps.push({
         element: '#in-image-paint, #in-image',
-        intro: function () {
+        intro: function() {
           const uploader = getActiveUploader();
           return uploader === '#in-image-paint' ? t.paintUploaderText : t.normalUploaderText;
         },
@@ -217,12 +264,12 @@ tour: str = """
       });
 
       const getActiveThirdStep = () => {
-        return isElementVisible('#in-image-paint') ? '#scale-input' : '#examples_images';
+        return isElementVisible('#in-image-paint') ? '#scale-input' : '#example-row';
       };
 
       steps.push({
-        element: '#scale-input, #examples_images',
-        intro: function () {
+        element: '#scale-input, #example-row',
+        intro: function() {
           const thirdStep = getActiveThirdStep();
           return thirdStep === '#scale-input' ? t.scaleInputText : t.examplesText;
         },
@@ -256,7 +303,7 @@ tour: str = """
           position: 'right'
         },
         {
-          element: '#tabs',
+          element: '#setting-button',
           intro: t.tabsText,
           position: 'top',
           disableInteraction: false
@@ -274,10 +321,10 @@ tour: str = """
           position: 'right'
         },
         {
-          element: '#solution-segment-mode-setting',
+          element: '#solution-setting',
           intro: t.solutionSegmentText,
           disableInteraction: true,
-          position: 'right'
+          position: 'left'
         },
         {
           element: '#number-detections',
@@ -308,7 +355,7 @@ tour: str = """
         });
       };
 
-      const intro = introJs().setOptions({
+      const intro = introJs().setOptions({ 
         steps: filterSteps(),
         nextLabel: t.buttons.next,
         prevLabel: t.buttons.prev,
@@ -317,50 +364,53 @@ tour: str = """
         showBullets: false,
         tooltipClass: 'custom-introjs-tooltip',
         highlightClass: 'custom-introjs-highlight',
-        exitOnOverlayClick: false
+        exitOnOverlayClick: false,
+        keyboardNavigation: false
       });
 
-      intro.onbeforechange(function (targetElement) {
+      setTimeout(() => {
+        setKeyboardBlocking(true);
+      }, 100);
+
+      intro.onbeforechange(function(targetElement) {
         const triggerElements = ['#in-image', '#in-image-paint', '#scale-selector'];
         if (targetElement && triggerElements.includes('#' + targetElement.id)) {
           intro._options.steps = filterSteps();
 
           const currentUploader = getActiveUploader();
           if (currentUploader) {
-            const uploaderStepIndex = intro._introItems.findIndex(
-              (item) =>
-                item.element === document.querySelector('#in-image-paint') ||
-                item.element === document.querySelector('#in-image')
+            const uploaderStepIndex = intro._introItems.findIndex(item => 
+              item.element === document.querySelector('#in-image-paint') || 
+              item.element === document.querySelector('#in-image')
             );
-
+            
             if (uploaderStepIndex !== -1) {
               intro._introItems[uploaderStepIndex].element = document.querySelector(currentUploader);
-              intro._introItems[uploaderStepIndex].intro =
-                currentUploader === '#in-image-paint' ? t.paintUploaderText : t.normalUploaderText;
+              intro._introItems[uploaderStepIndex].intro = currentUploader === '#in-image-paint' ? 
+                t.paintUploaderText : t.normalUploaderText;
             }
           }
-
+          
           const currentThirdStep = getActiveThirdStep();
-          const thirdStepIndex = intro._introItems.findIndex(
-            (item) =>
-              item.element === document.querySelector('#scale-input') ||
-              item.element === document.querySelector('#examples_images')
+          const thirdStepIndex = intro._introItems.findIndex(item => 
+            item.element === document.querySelector('#scale-input') || 
+            item.element === document.querySelector('#example-row')
           );
-
+          
           if (thirdStepIndex !== -1) {
             intro._introItems[thirdStepIndex].element = document.querySelector(currentThirdStep);
-            intro._introItems[thirdStepIndex].intro =
-              currentThirdStep === '#scale-input' ? t.scaleInputText : t.examplesText;
+            intro._introItems[thirdStepIndex].intro = currentThirdStep === '#scale-input' ? 
+              t.scaleInputText : t.examplesText;
           }
-
+          
           intro.refresh();
         }
 
-        if (targetElement && targetElement.id === 'tabs') {
+        if (targetElement && targetElement.id === 'setting-button') {
           const nextButton = document.querySelector('.introjs-nextbutton');
           if (nextButton) {
             nextButton.style.display = 'none';
-
+            
             const checkSettingsTab = setInterval(() => {
               if (isElementVisible('#model-setting')) {
                 clearInterval(checkSettingsTab);
@@ -373,7 +423,7 @@ tour: str = """
             }, 100);
           }
         }
-
+        
         return true;
       });
 
@@ -389,16 +439,22 @@ tour: str = """
       `;
       document.head.appendChild(style);
 
-      intro.onexit(function () {
-        document.querySelectorAll('.custom-introjs-highlight').forEach((el) => {
+      intro.onexit(function() {
+        document.querySelectorAll('.custom-introjs-highlight').forEach(el => {
           el.classList.remove('custom-introjs-highlight');
         });
-
+        
         const nextButton = document.querySelector('.introjs-nextbutton');
         if (nextButton) {
           nextButton.style.display = 'inline-block';
           nextButton.style.animation = '';
         }
+        
+        setKeyboardBlocking(false);
+      });
+
+      intro.oncomplete(function() {
+        setKeyboardBlocking(false);
       });
 
       intro.start();

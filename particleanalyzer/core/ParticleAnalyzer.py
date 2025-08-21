@@ -7,7 +7,7 @@ from torch import device as torch_device
 import os
 import gc
 from tqdm import tqdm
-from typing import Optional, Tuple, Dict    
+from typing import Optional, Tuple, Dict
 from scipy.spatial.distance import pdist
 import random
 import re
@@ -286,9 +286,9 @@ class ParticleAnalyzer:
                 ),
                 gr.update(
                     minimum=limits["d_min_min"],
-                    maximum=limits["d_min_max"] ,
-                    value=(limits["d_min_min"], limits["d_min_max"] ),
-                    step=limits["d_min_max"]  * 0.01,
+                    maximum=limits["d_min_max"],
+                    value=(limits["d_min_min"], limits["d_min_max"]),
+                    step=limits["d_min_max"] * 0.01,
                     label=f"Dₘᵢₙ [{self._get_translation(scale_selector['unit'])}]",
                 ),
                 gr.update(
@@ -316,7 +316,11 @@ class ParticleAnalyzer:
                     step=limits["P_max"] * 0.01,
                     label=f"P [{self._get_translation(scale_selector['unit'])}]",
                 ),
-                gr.update(minimum=limits["I_min"], maximum=limits["I_max"], value=(limits["I_min"], limits["I_max"])),
+                gr.update(
+                    minimum=limits["I_min"],
+                    maximum=limits["I_max"],
+                    value=(limits["I_min"], limits["I_max"]),
+                ),
                 gr.update(visible=True),
             )
         except Exception as e:
@@ -761,31 +765,44 @@ class ParticleAnalyzer:
 
         return (b, g, r)
 
-
     @staticmethod
     def calculate_limits(df: pd.DataFrame, round_value: int) -> Dict[str, float]:
-        
+
         results = {}
-        
-        results["d_max_max"] = round(df.iloc[:, 2].max() + df.iloc[:, 2].max() * 0.01, round_value)
+
+        results["d_max_max"] = round(
+            df.iloc[:, 2].max() + df.iloc[:, 2].max() * 0.01, round_value
+        )
         results["d_max_min"] = round(df.iloc[:, 2].min(), round_value)
-        results["d_min_max"] = round(df.iloc[:, 3].max() + df.iloc[:, 3].max() * 0.01, round_value)
+        results["d_min_max"] = round(
+            df.iloc[:, 3].max() + df.iloc[:, 3].max() * 0.01, round_value
+        )
         results["d_min_min"] = round(df.iloc[:, 3].min(), round_value)
-        
-        results["theta_max_max"] = round(df.iloc[:, 5].max() + df.iloc[:, 5].max() * 0.01, round_value)
+
+        results["theta_max_max"] = round(
+            df.iloc[:, 5].max() + df.iloc[:, 5].max() * 0.01, round_value
+        )
         results["theta_max_min"] = round(df.iloc[:, 5].min(), round_value)
-        results["theta_min_max"] = round(df.iloc[:, 6].max() + df.iloc[:, 6].max() * 0.01, round_value)
+        results["theta_min_max"] = round(
+            df.iloc[:, 6].max() + df.iloc[:, 6].max() * 0.01, round_value
+        )
         results["theta_min_min"] = round(df.iloc[:, 6].min(), round_value)
-        
-        results["S_max"] = round(df.iloc[:, 7].max() + df.iloc[:, 7].max() * 0.01, round_value)
+
+        results["S_max"] = round(
+            df.iloc[:, 7].max() + df.iloc[:, 7].max() * 0.01, round_value
+        )
         results["S_min"] = round(df.iloc[:, 7].min(), round_value)
-        
-        results["P_max"] = round(df.iloc[:, 8].max() + df.iloc[:, 8].max() * 0.01, round_value)
+
+        results["P_max"] = round(
+            df.iloc[:, 8].max() + df.iloc[:, 8].max() * 0.01, round_value
+        )
         results["P_min"] = round(df.iloc[:, 8].min(), round_value)
-        
-        results["I_max"] = round(df.iloc[:, 10].max() + df.iloc[:, 10].max() * 0.01, round_value)
+
+        results["I_max"] = round(
+            df.iloc[:, 10].max() + df.iloc[:, 10].max() * 0.01, round_value
+        )
         results["I_min"] = round(df.iloc[:, 10].min(), round_value)
-        
+
         return results
 
     def _cleanup(self, pbar: Optional[tqdm] = None):

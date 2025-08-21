@@ -137,9 +137,9 @@ def create_interface(api_key):
                                     elem_id="scale-selector",
                                     elem_classes="styled-dropdown",
                                 )
-                            with gr.Row() as row_image_file:
-                                image_file = gr.File(label=i18n("Загрузить изображение СЭМ"), file_types=[".tif", ".tiff", ".png", ".jpg", ".jpeg", ".bmp", ".webp"], file_count="single", elem_id="image-file",)  
-                            with gr.Row(visible=False) as row_analysis:
+
+                              
+                            with gr.Row() as row_analysis:
                                 with gr.Column():
                                     with gr.Row(
                                         visible=False, variant="default"
@@ -159,7 +159,6 @@ def create_interface(api_key):
                                                 label=i18n("Изображение СЭМ"),
                                                 type="numpy",
                                                 canvas_size=(600, 600),
-                                                sources=None,
                                                 brush=gr.Brush(
                                                     color_mode="fixed",
                                                     default_color="green",
@@ -169,11 +168,9 @@ def create_interface(api_key):
                                                 layers=False,
                                                 eraser=gr.Eraser(default_size=200),
                                                 elem_id="in-image-paint",
-                                                image_mode="RGB",
                                             )
                                         with gr.Column() as Image_row:
                                             in_image = gr.Image(
-                                                sources=[],
                                                 label=i18n("Изображение СЭМ"),
                                                 elem_id="in-image",
                                             )
@@ -244,13 +241,13 @@ def create_interface(api_key):
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/Resolution%20in%20SEM%201.jpg",
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/main/example/image_c_01.webp",
                             ],
-                            inputs=[image_file],
+                            example_labels=["Cathode material LiCoVO4", "Chitosan nanoparticles", "Silicon oxide", "Gold on carbon", "Colloidal silver"],
+                            inputs=[in_image],
                             label=i18n("Примеры"),
                             elem_id="examples_images",
                         )
 
                     with gr.Row(visible=False, min_height=650) as results_row:
-
                         with gr.Column():
                             gr.HTML(
                                 f"""
@@ -480,6 +477,7 @@ def create_interface(api_key):
                                 step=0.01,
                                 label=i18n("Прозрачность заливки"),
                             )
+                   
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as sidebar:
@@ -541,7 +539,6 @@ def create_interface(api_key):
                 # </button>
                 # """
                 # )
-        image_file.change(fn=handle_file_upload, inputs=[image_file, scale_selector], outputs=[in_image, im, row_image_file, row_analysis])      
         analyze = process_button.click(
             fn=analyzer.analyze_image,
             inputs=[
@@ -625,8 +622,7 @@ def create_interface(api_key):
                 P_slider,
                 I_slider,
             ],
-            show_progress="hide",
-            show_progress_on=[points_df]
+            show_progress_on=[output_table2, output_plot, output_image],
         ).success(
             fn=statistic_an,
             inputs=[
@@ -654,7 +650,7 @@ def create_interface(api_key):
                 fill_color,
                 fill_alpha,
             ],
-            outputs=[output_image, output_table2, output_plot],
+            outputs=[output_table2, output_plot, output_image],
         )
         gr.on(
             triggers=[reset_df.click, process_button.click],
@@ -703,7 +699,7 @@ def create_interface(api_key):
                 fill_color,
                 fill_alpha,
             ],
-            outputs=[output_image, output_table2, output_plot],
+            outputs=[output_table2, output_plot, output_image],
         )
 
         llm_start = llm_run.click(
@@ -754,9 +750,7 @@ def create_interface(api_key):
                 chatbot,
                 results_row,
                 sidebar,
-                row_image_file,
-                row_analysis,
-                image_file,
+                row_analysis,      
             ],
             cancels=[analyze],
             show_progress="hide",
@@ -814,5 +808,7 @@ def create_interface(api_key):
             inputs=[output_table, output_table2],
             outputs=download_output,
         )
+        
+
 
     return demo
