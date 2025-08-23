@@ -25,6 +25,7 @@ from particleanalyzer.core.parameter_information import reference_ru
 from particleanalyzer.core.ui_styles import css, custom_head
 from particleanalyzer.core.languages import i18n
 from particleanalyzer.core.LLMAnalysis import LLMAnalysis
+from particleanalyzer.core.PointManager import PointManager
 from .YOLOLoader import YOLOLoader
 
 try:
@@ -47,6 +48,7 @@ def assets_path(name: str):
     return os.path.join(os.path.dirname(__file__), "..", "assets", name)
 
 
+point_manager = PointManager()
 analyzer = ParticleAnalyzer()
 
 my_theme = gr.Theme.load(f"{assets_path('')}/themes/theme_schema@0.0.1.json").set(
@@ -71,6 +73,9 @@ def create_interface(api_key):
     with demo:
         api_key = gr.State(True if api_key else False)
         points_df = gr.State()
+        scale = gr.State()
+        points_scale = gr.State()
+
         with gr.Column(elem_id="app-container"):
             with gr.Row(equal_height=True, elem_id="gr-head"):
                 gr.HTML(
@@ -168,31 +173,18 @@ def create_interface(api_key):
                                                 label=i18n("Видео инструкция"),
                                             )
                                     with gr.Row(equal_height=True):
-                                        with gr.Column(visible=False) as Paint_row:
-                                            im = gr.ImageEditor(
-                                                label=i18n("Изображение СЭМ"),
-                                                type="numpy",
-                                                canvas_size=(600, 600),
-                                                sources=None,
-                                                brush=gr.Brush(
-                                                    color_mode="fixed",
-                                                    default_color="green",
-                                                    colors=["green"],
-                                                ),
-                                                transforms="crop",
-                                                layers=False,
-                                                eraser=gr.Eraser(default_size=200),
-                                                elem_id="in-image-paint",
-                                                image_mode="RGB",
-                                            )
-                                        with gr.Column() as Image_row:
+                                        with gr.Column():
                                             in_image = gr.Image(
                                                 sources=[],
                                                 label=i18n("Изображение СЭМ"),
                                                 elem_id="in-image",
+                                                type="numpy",
+                                                show_fullscreen_button=False,
                                             )
 
-                                        with gr.Column():
+                                        with gr.Column(
+                                            visible=False
+                                        ) as output_image_row:
                                             output_image = gr.Image(
                                                 label=i18n("Результат сегментации"),
                                                 elem_id="output-image",
@@ -227,7 +219,15 @@ def create_interface(api_key):
                                                 elem_classes="custom-btn btn-delete-row",
                                             )
 
-                                    with gr.Row(visible=False) as scale_input_row:
+                                    with gr.Row(
+                                        visible=False, elem_id="scale-input-row"
+                                    ) as scale_input_row:
+                                        scale_input_status = gr.Textbox(
+                                            value=i18n(
+                                                "Выберите две крайние точки на шкале"
+                                            ),
+                                            label=i18n("Статус калибровки масштаба"),
+                                        )
                                         scale_input = gr.Number(
                                             label="Длина шкалы в мкм",
                                             value=1.0,
@@ -258,6 +258,13 @@ def create_interface(api_key):
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Silicon_oxide.webp",
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Gold_on_carbon.jpg",
                                 "https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/example/Colloidal_silver.webp",
+                            ],
+                            example_labels=[
+                                "Cathode material LiCoVO₄",
+                                "Chitosan nanoparticles",
+                                "Silicon oxide",
+                                "Gold on carbon",
+                                "Colloidal silver",
                             ],
                             inputs=[image_file],
                             label=i18n("Примеры"),
@@ -556,16 +563,24 @@ def create_interface(api_key):
                 # </button>
                 # """
                 # )
+
         image_file.change(
             fn=handle_file_upload,
             inputs=[image_file, scale_selector],
-            outputs=[in_image, im, row_image_file, row_analysis],
+            outputs=[in_image, row_image_file, row_analysis],
         )
+
+        in_image.select(
+            fn=point_manager.handle_select,
+            outputs=[scale_input_status, scale, points_scale],
+        )
+
         analyze = process_button.click(
             fn=analyzer.analyze_image,
             inputs=[
-                im,
                 in_image,
+                scale,
+                points_scale,
                 scale_input,
                 confidence_threshold,
                 scale_selector,
@@ -606,8 +621,9 @@ def create_interface(api_key):
                 P_slider,
                 I_slider,
                 sidebar,
+                output_image_row,
             ],
-            show_progress_on=output_image,
+            show_progress_on=in_image,
         )
 
         output_image.select(
@@ -662,7 +678,6 @@ def create_interface(api_key):
                 S_slider,
                 P_slider,
                 I_slider,
-                im,
                 in_image,
                 solution,
                 sahi_mode,
@@ -711,7 +726,6 @@ def create_interface(api_key):
                 S_slider,
                 P_slider,
                 I_slider,
-                im,
                 in_image,
                 solution,
                 sahi_mode,
@@ -737,8 +751,6 @@ def create_interface(api_key):
             inputs=scale_selector,
             outputs=[
                 scale_input_row,
-                Paint_row,
-                Image_row,
                 output_table,
                 output_table_image2,
                 row_instruction,
@@ -760,11 +772,10 @@ def create_interface(api_key):
         )
 
         gr.on(
-            triggers=[clear_button.click, in_image.clear, im.clear],
+            triggers=[clear_button.click, in_image.clear, in_image.upload],
             fn=reset_interface,
             inputs=[scale_selector],
             outputs=[
-                im,
                 output_image,
                 output_plot,
                 in_image,
@@ -776,6 +787,9 @@ def create_interface(api_key):
                 row_image_file,
                 row_analysis,
                 image_file,
+                scale_input_status,
+                scale,
+                output_image_row,
             ],
             cancels=[analyze],
             show_progress="hide",
@@ -793,6 +807,7 @@ def create_interface(api_key):
                 chatbot,
                 results_row,
                 sidebar,
+                output_image_row,
             ],
             show_progress="hide",
             show_progress_on=question_row,

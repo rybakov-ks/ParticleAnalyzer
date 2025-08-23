@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from PIL import Image
 import csv
+import io
 import os
 from datetime import datetime
 from particleanalyzer.core.languages import translations
@@ -87,8 +88,6 @@ def scale_input_visibility(scale_value):
     is_scaled = ParticleAnalyzer.SCALE_OPTIONS[scale_value]["scale"]
     return (
         gr.update(visible=(is_scaled)),
-        gr.update(visible=(is_scaled)),
-        gr.update(visible=(not is_scaled)),
         gr.update(value=(get_columns(scale_value))),
         gr.update(value=(get_columns(scale_value))),
         gr.update(visible=(is_scaled)),
@@ -117,7 +116,6 @@ def reset_interface(scale_value):
     global selected_particles
     selected_particles = []
     return (
-        {"background": None, "layers": [], "composite": None},  # Очищаем im
         None,  # Очищаем output_image
         None,  # Очищаем графики
         None,  # Очищаем input_image
@@ -129,6 +127,11 @@ def reset_interface(scale_value):
         gr.update(visible=True),  # Показываем строку row_image_file
         gr.update(visible=False),  # Скрываем строку row_analysis
         None,  # Очищаем image_file
+        get_translation(
+            "Выберите две крайние точки на шкале"
+        ),  # Очищаем scale_input_status
+        None,  # Очищаем scale
+        gr.update(visible=False),  # Скрываем output_image_row
     )
 
 
@@ -144,6 +147,7 @@ def reset_interface2(scale_value):
         [(None, None)],  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
+        gr.update(visible=False),  # Скрываем output_image_row
     )
 
 
@@ -235,7 +239,6 @@ def statistic_an(
     S_slider,
     P_slider,
     I_slider,
-    image: np.ndarray,
     image2: np.ndarray,
     solution,
     sahi_mode,
@@ -249,7 +252,7 @@ def statistic_an(
 
     lang = LanguageContext.get_language()
     scale_config = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
-    selected_image = image["background"] if scale_config["scale"] else image2
+    selected_image = image2
     selected_image = cv2.cvtColor(selected_image, cv2.COLOR_RGB2BGR)
     selected_image, scale_factor_glob = ImagePreprocessor.resize_image(
         selected_image, solution, sahi_mode
@@ -471,26 +474,39 @@ def particle_removal(
     )
 
 
-def img_to_numpy_array(file_path):
+def img_to_numpy_array(file_path, max_size_kb=500, quality=85):
     try:
         with Image.open(file_path) as img:
-            array = np.array(img)
-            return array, {"background": array, "layers": None, "composite": None}
-    except Exception as e:
-        print(f"Ошибка при загрузке TIFF: {e}")
-        return None, None
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
+
+            current_size_kb = len(img_byte_arr.getvalue()) / 1024
+
+            while current_size_kb > max_size_kb and quality > 10:
+                quality -= 10
+                img_byte_arr = io.BytesIO()
+                img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
+                current_size_kb = len(img_byte_arr.getvalue()) / 1024
+
+            img_byte_arr.seek(0)
+            compressed_img = Image.open(img_byte_arr)
+
+            # print(f"Сжато до: {current_size_kb:.1f}KB, качество: {quality}")
+            return np.array(compressed_img)
+
+    except (IOError, OSError, ValueError) as e:
+        print(f"Ошибка при загрузке изображения {file_path}: {e}")
+        return None
 
 
 def handle_file_upload(file, scale_selector):
     if file is None:
-        return gr.skip(), gr.skip(), gr.update(visible=True), gr.update(visible=False)
+        return gr.skip(), gr.update(visible=True), gr.update(visible=False)
 
-    file_path = file.name
-    in_image, im = img_to_numpy_array(file_path)
+    in_image = img_to_numpy_array(file.name)
 
     return (
         in_image,
-        im,
         gr.update(visible=False),
         gr.update(visible=True),
     )

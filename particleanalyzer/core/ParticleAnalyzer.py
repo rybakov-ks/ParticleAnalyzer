@@ -27,8 +27,11 @@ from particleanalyzer.core.ImagePreprocessor import ImagePreprocessor
 from particleanalyzer.core.StatisticsBuilder import StatisticsBuilder
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
+from particleanalyzer.core.PointManager import PointManager
 
 lang = "en"
+
+point_manager = PointManager()
 
 
 class ParticleAnalyzer:
@@ -133,12 +136,14 @@ class ParticleAnalyzer:
             None,
             None,
             gr.update(visible=False),
+            gr.update(visible=False),
         )
 
     def analyze_image(
         self,
-        image: np.ndarray,
         image2: Optional[np.ndarray],
+        scale: float,
+        points_scale: tuple,
         scale_input: float,
         confidence_threshold: float,
         scale_selector: str,
@@ -178,24 +183,16 @@ class ParticleAnalyzer:
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]",
             )
             pr(0, desc=self._get_translation("Подготовка..."))
-            selected_image = image if scale_selector["scale"] else image2
-            if scale_selector["scale"]:
-                if (
-                    image.get("background") is None
-                    and image.get("composite") is None
-                    and not image.get("layers")
-                ):
-                    gr.Warning(
-                        self._get_translation("Ошибка: изображение отсутствует...")
-                    )
-                    return self._create_error_return()
-            elif image2 is None:
+            selected_image = image2
+
+            if selected_image is None:
                 gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
                 return self._create_error_return()
 
             image, orig_image, gray_image, scale, scale_factor_glob = (
                 self.preprocessor.preprocess_image(
                     image=selected_image,
+                    scale=scale,
                     scale_selector=scale_selector,
                     solution=solution,
                     request=request,
@@ -244,6 +241,11 @@ class ParticleAnalyzer:
                 return self._create_error_return()
 
             output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+            if scale_selector["scale"]:
+                output_image = point_manager.draw_scale_on_image(
+                    output_image, scale_factor_glob, scale, *points_scale
+                )
+
             df = pd.DataFrame(particle_data)
             points_df = pd.DataFrame(df["points"])
             df = df.drop(columns=["points"])
@@ -321,6 +323,7 @@ class ParticleAnalyzer:
                     maximum=limits["I_max"],
                     value=(limits["I_min"], limits["I_max"]),
                 ),
+                gr.update(visible=True),
                 gr.update(visible=True),
             )
         except Exception as e:
