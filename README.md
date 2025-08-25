@@ -207,7 +207,7 @@ https://github.com/user-attachments/assets/6548071a-3c83-4539-897a-6ebf175bec17
 
 ## 📐 Scale Calibration
 
-  https://github.com/user-attachments/assets/12ccb7b5-4dbc-4472-afcb-574332947971
+https://github.com/user-attachments/assets/cf2e272b-6d04-4347-abff-7a1eadaa3033
 
 Micrometer values are calculated by:
 1. Identifying the SEM image's scale bar using two marker points
