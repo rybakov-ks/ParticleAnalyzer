@@ -9,6 +9,7 @@
 7. ⚙️ [Advanced Settings](#-advanced-settings)
 8. 📏 [Scale Calibration](#-scale-calibration)
 9. 📧 [Contributors](#-contributors)
+10. 📖 [Citation](#-citation)
 
 ## ParticleAnalyzer
 [![Online Demo](https://img.shields.io/badge/DEMO-Available%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
