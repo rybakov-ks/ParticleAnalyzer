@@ -223,9 +223,9 @@ Micrometer values are calculated by:
 - The scale bar was created at the same magnification as your particles
 
 ## 📧 Contributors  
-**Kirill Rybakov**  
-*Saratov State University*  
-📧 [rybakov-ks@ya.ru](mailto:rybakov-ks@ya.ru)
+Kirill Rybakov, PhD | Chemistry  
+Affiliation: Saratov State University  
+*Email*: [rybakov-ks@ya.ru](mailto:rybakov-ks@ya.ru)
 
 ## 📖 Citation
 If you plan to publish results obtained using ParticleAnalyzer, we would appreciate it if you mention the use of ParticleAnalyzer (https://github.com/rybakov-ks/ParticleAnalyzer).
