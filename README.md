@@ -152,7 +152,7 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 
 ### Statistical Data Table
 <div align="center">
-  <img src="Images/8.png" alt="Statistics Table">
+  <img src="Images/8.webp" alt="Statistics Table">
 </div>
 
 <div align="center">
