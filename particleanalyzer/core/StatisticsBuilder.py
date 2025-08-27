@@ -6,9 +6,6 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from particleanalyzer.core.languages import translations
 
-from PIL import Image
-from io import BytesIO
-
 
 class StatisticsBuilder:
     def __init__(self, df, scale_selector, round_value, number_of_bins, lang="ru"):
@@ -115,10 +112,11 @@ class StatisticsBuilder:
 
     def build_distribution_fig(self, image):
         if self.df.empty:
-            return None
-        row_heights = [0.14, 0.14, 0.14, 0.14, 0.14, 0.30]
+            return None, None
+
+        row_heights = [0.2, 0.2, 0.2, 0.2, 0.2]
         fig = make_subplots(
-            rows=6,
+            rows=5,
             cols=2,
             row_heights=row_heights,
             subplot_titles=(
@@ -132,8 +130,6 @@ class StatisticsBuilder:
                 self._get_translation("Распределение периметра"),
                 self._get_translation("Распределение эксцентриситета"),
                 self._get_translation("Распределение интенсивности"),
-                self._get_translation("Векторное поле ориентации"),
-                "",
             ),
             specs=[
                 [{"secondary_y": True}, {"secondary_y": True}],
@@ -141,13 +137,11 @@ class StatisticsBuilder:
                 [{"secondary_y": True}, {"secondary_y": True}],
                 [{"secondary_y": True}, {"secondary_y": True}],
                 [{"secondary_y": True}, {"secondary_y": True}],
-                [{"secondary_y": True, "colspan": 2}, None],
             ],
-            vertical_spacing=0.05,
+            vertical_spacing=0.07,
             horizontal_spacing=0.11,
         )
 
-        # Базовые параметры (одинаковые для всех режимов)
         base_params = [
             (1, 1, "D", self._get_translation("Диаметр"), "red"),
             (1, 2, "Dₘₑₐₙ", self._get_translation("Средний диаметр"), "darksalmon"),
@@ -167,10 +161,8 @@ class StatisticsBuilder:
             (5, 2, "I", self._get_translation("Интенсивность"), "cyan"),
         ]
 
-        # Получаем единицу измерения из scale_selector
         unit = self._get_translation(self.scale_selector["unit"])
 
-        # Формируем финальный список параметров
         params = []
         for row, col, short_name, full_name, color in base_params:
             if short_name in ["D", "Dₘₑₐₙ", "Dₘₐₓ", "Dₘᵢₙ", "P"]:
@@ -197,26 +189,8 @@ class StatisticsBuilder:
                 showlegend=False,
             )
 
-        if "centroid_x" in self.df.columns and "centroid_y" in self.df.columns:
-            self._add_vector_field(fig, self.df, row=6, col=1, image=image)
-
-            fig.update_traces(showlegend=True, selector=dict(row=6, col=1))
-            fig.update_layout(
-                legend=dict(
-                    itemsizing="constant",
-                    itemclick="toggle",
-                    itemdoubleclick=False,
-                    orientation="h",
-                    yanchor="top",
-                    y=-0.025,
-                    xanchor="center",
-                    x=0.475,
-                    font=dict(size=16),
-                )
-            )
-
         fig.update_layout(
-            height=1600,
+            height=1150,
             plot_bgcolor="white",
             margin=dict(l=50, r=50, b=50, t=50),
             modebar={
@@ -237,7 +211,11 @@ class StatisticsBuilder:
             },
         )
 
-        return fig
+        vector_fig = None
+        if "centroid_x" in self.df.columns and "centroid_y" in self.df.columns:
+            vector_fig = self._create_vector_field_fig(self.df, image)
+
+        return fig, vector_fig
 
     def _add_distribution(self, fig, row, col, data, title, color):
         if data.dropna().empty:
@@ -320,26 +298,75 @@ class StatisticsBuilder:
             showgrid=False,
         )
 
-    def _add_vector_field(self, fig, df, row, col, image):
+    def _create_vector_field_fig(self, df, image):
+        vector_fig = go.Figure()
+
+        self._add_vector_field_to_fig(vector_fig, df, image)
+
+        vector_fig.update_layout(
+            height=600,
+            width=800,
+            plot_bgcolor="white",
+            margin=dict(l=50, r=130, b=20, t=50),
+            legend=dict(
+                itemsizing="constant",
+                itemclick="toggle",
+                itemdoubleclick=False,
+                orientation="h",
+                yanchor="top",
+                y=-0.10,
+                xanchor="center",
+                x=0.48,
+                font=dict(size=14),
+            ),
+            modebar={
+                "orientation": "h",
+                "remove": [
+                    "zoom",
+                    "pan",
+                    "select",
+                    "lasso",
+                    "reset",
+                    "zoomIn2d",
+                    "zoomOut2d",
+                    "autoscale",
+                    "resetScale2d",
+                    "toggleSpikelines",
+                    "hoverCompareCartesian",
+                ],
+            },
+        )
+
+        vector_fig.add_annotation(
+            text=self._get_translation("Векторное поле ориентации"),
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=1.07,
+            showarrow=False,
+            font=dict(size=18),
+            xanchor="center",
+            yanchor="top",
+        )
+
+        return vector_fig
+    
+    def _add_vector_field_to_fig(self, fig, df, image):
         image = np.flipud(image)
-        image_pil = Image.fromarray(image.astype(np.uint8))
-        buffer = BytesIO()
-        image_pil.save(buffer, format="PNG")
 
         fig.add_trace(
             go.Image(
                 z=image,
                 opacity=1,
                 x0=0,
-                y0=image.shape[0],
+                y0=0,
                 dx=1,
-                dy=-1,
+                dy=1,
                 hoverinfo="skip",
                 name="Background Image",
-            ),
-            row=row,
-            col=col,
+            )
         )
+
         df = df.head(1000)
         required_columns = {"centroid_x", "centroid_y"}
         if not required_columns.issubset(df.columns):
@@ -360,6 +387,8 @@ class StatisticsBuilder:
 
         x = df["centroid_x"].values
         y = df["centroid_y"].values
+
+        y = image.shape[0] - y
 
         theta_max_deg = df[angle_max_col].values
         theta_max_rad = np.deg2rad(theta_max_deg)
@@ -415,12 +444,10 @@ class StatisticsBuilder:
         )
 
         for trace in quiver_max.data + quiver_min.data:
-            fig.add_trace(trace, row=row, col=col)
+            fig.add_trace(trace)
 
         fig.update_xaxes(
             title_text=self._get_translation("X"),
-            row=row,
-            col=col,
             range=[0, image.shape[1]],
             constrain="domain",
             showgrid=False,
@@ -428,10 +455,8 @@ class StatisticsBuilder:
 
         fig.update_yaxes(
             title_text=self._get_translation("Y"),
-            row=row,
-            col=col,
-            range=[image.shape[0], 0],
-            scaleanchor=f"x{2*(row-1)+col}",
+            range=[0, image.shape[0]],
+            scaleanchor="x",
             scaleratio=1,
             constrain="domain",
             showgrid=False,

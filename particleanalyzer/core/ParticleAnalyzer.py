@@ -125,6 +125,7 @@ class ParticleAnalyzer:
             None,
             None,
             None,
+            None,
             gr.update(visible=False),
             gr.update(visible=False),
             None,
@@ -268,7 +269,7 @@ class ParticleAnalyzer:
 
             pbar.set_description(self._get_translation("Построение графиков..."))
             pr(0.9, desc=self._get_translation("Построение графиков..."))
-            fig = builder.build_distribution_fig(image)
+            fig, vector_fig = builder.build_distribution_fig(image)
             pbar.update(1)
             pr(1, desc=self._get_translation("Готово!"))
             return (
@@ -276,6 +277,7 @@ class ParticleAnalyzer:
                 df,
                 points_df,
                 fig,
+                vector_fig,
                 stats_df,
                 gr.update(visible=api_key),
                 gr.update(visible=True),

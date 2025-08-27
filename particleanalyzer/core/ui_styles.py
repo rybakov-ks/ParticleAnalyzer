@@ -156,16 +156,12 @@ css = """
    🖼 ИЗОБРАЖЕНИЯ
    ========================================================================== */
 #image-file,
-#in-image-paint,
 #in-image,
 #output-image {
   border-radius: 12px !important;
   border: 1px solid var(--border) !important;
   box-shadow: var(--shadow) !important;
   background: var(--card-bg) !important;
-  padding: 8px !important;
-  object-fit: contain;
-  width: 100%;
   transition: all 0.4s ease;
 }
 
@@ -264,7 +260,7 @@ input:checked + .slider:before {
 }
 
 .btn-ai-run {
-  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
   margin-left: auto;
   width: 240px;
 }
@@ -456,7 +452,7 @@ custom_head = (
 <meta name="description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
 
 <!-- Facebook Meta Tags -->
-<meta property="og:url" content="https://sem.rybakov-k.ru/" />
+<meta property="og:url" content="https://particleanalyzer.ru/" />
 <meta property="og:type" content="website" />
 <meta property="og:title" content="ParticleAnalyzer" />
 <meta property="og:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
@@ -468,12 +464,12 @@ custom_head = (
 <meta name="twitter:title" content="ParticleAnalyzer" />
 <meta name="twitter:description" content="A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images." />
 <meta name="twitter:image" content="https://rybakov-k.ru/assets/icon/logo_og.png" />
-<meta property="twitter:domain" content="sem.rybakov-k.ru" />
-<meta property="twitter:url" content="https://sem.rybakov-k.ru/" />
-<!-- Meta Tags Generated via https://www.opengraph.xyz/ -->
+<meta property="twitter:domain" content="particleanalyzer.ru" />
+<meta property="twitter:url" content="https://particleanalyzer.ru/" />
 
 <!-- Favicon -->
 <link rel="icon" href="https://rybakov-k.ru/assets/icon/favicon.png" type="image/x-icon" />
+
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/introjs.min.css" rel="stylesheet">
