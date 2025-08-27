@@ -111,13 +111,14 @@ def sahi_mode_visibility(sahi_mode):
     )
 
 
-def reset_interface(scale_value):
+def reset_interface():
     """Функция для сброса интерфейса"""
     global selected_particles
     selected_particles = []
     return (
         None,  # Очищаем output_image
         None,  # Очищаем графики
+        None,  # Очищаем vector_field
         None,  # Очищаем input_image
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
@@ -135,13 +136,14 @@ def reset_interface(scale_value):
     )
 
 
-def reset_interface2(scale_value):
+def reset_interface2():
     """Функция для сброса интерфейса"""
     global selected_particles
     selected_particles = []
     return (
         None,  # Очищаем output_image
         None,  # Очищаем графики
+        None,  # Очищаем vector_field
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
         [(None, None)],  # Очищаем chatbot
@@ -165,7 +167,6 @@ def save_data_to_csv(
 ):
     """Сохраняет данные частиц в CSV файлы"""
     os.makedirs(output_dir, exist_ok=True)
-
     particle_path = os.path.join(output_dir, "particle_characteristics.csv")
     stats_path = os.path.join(output_dir, "particle_statistics.csv")
 
@@ -296,7 +297,7 @@ def statistic_an(
         lang=lang,
     )
     stats_df = builder.build_stats_table()
-    fig = builder.build_distribution_fig(selected_image)
+    fig, vector_fig = builder.build_distribution_fig(selected_image)
 
     thickness = ParticleAnalyzer._get_scaled_thickness(
         selected_image.shape[1], selected_image.shape[0]
@@ -339,6 +340,7 @@ def statistic_an(
         selected_image,
         stats_df,
         fig,
+        vector_fig,
     )
 
 

@@ -1,10 +1,11 @@
 reference_ru = """
+<img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/Images/8.webp" style="display:block; margin:0; padding:0;">
 <table style="
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    margin: 20px 0;
+    margin: 0;
 ">
     <thead>
         <tr>
@@ -140,12 +141,13 @@ reference_ru = """
 """
 
 reference_en = """
+<img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/Images/8.webp" style="display:block; margin:0; padding:0;">
 <table style="
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    margin: 20px 0;
+    margin: 0;
 ">
     <thead>
         <tr>
@@ -281,12 +283,13 @@ reference_en = """
 """
 
 reference_zh_tw = """
+<img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/Images/8.webp" style="display:block; margin:0; padding:0;">
 <table style="
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    margin: 20px 0;
+    margin: 0;
 ">
     <thead>
         <tr>
@@ -422,12 +425,13 @@ reference_zh_tw = """
 """
 
 reference_zh_cn = """
+<img src="https://raw.githubusercontent.com/rybakov-ks/ParticleAnalyzer/refs/heads/main/Images/8.webp" style="display:block; margin:0; padding:0;">
 <table style="
     width: 100%;
     border-collapse: collapse;
     font-size: 0.95em;
     font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    margin: 20px 0;
+    margin: 0;
 ">
     <thead>
         <tr>

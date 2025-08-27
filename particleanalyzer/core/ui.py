@@ -179,7 +179,6 @@ def create_interface(api_key):
                                                 label=i18n("Изображение СЭМ"),
                                                 elem_id="in-image",
                                                 type="numpy",
-                                                show_fullscreen_button=False,
                                             )
 
                                         with gr.Column(
@@ -238,14 +237,14 @@ def create_interface(api_key):
                                         with gr.Column(min_width=140):
                                             process_button = gr.Button(
                                                 value=i18n("Анализировать"),
-                                                icon="https://rybakov-k.ru/assets/icon/icons8-химия-50.png",
+                                                icon="https://rybakov-k.ru/assets/icon/icons8-химия-50-white.png",
                                                 elem_id="process-button",
                                                 elem_classes="custom-btn btn-analyze",
                                             )
                                         with gr.Column(min_width=140):
                                             clear_button = gr.Button(
                                                 value=i18n("Очистить"),
-                                                icon="https://rybakov-k.ru/assets/icon/icons8-метла-50.png",
+                                                icon="https://rybakov-k.ru/assets/icon/icons8-метла-50-white.png",
                                                 elem_id="clear-btn",
                                                 elem_classes="custom-btn btn-clear",
                                             )
@@ -272,7 +271,6 @@ def create_interface(api_key):
                         )
 
                     with gr.Row(visible=False, min_height=650) as results_row:
-
                         with gr.Column():
                             gr.HTML(
                                 f"""
@@ -310,8 +308,14 @@ def create_interface(api_key):
                                         output_plot = gr.Plot(
                                             label=i18n("Графики распределения")
                                         )
+                                with gr.Tab(i18n("Ориентация"), id=3):
+                                    with gr.Row():
+                                        vector_field = gr.Plot(
+                                            label=i18n("Векторное поле ориентации"),
+                                            show_label=False,
+                                        )
                                 with gr.Tab(
-                                    i18n("ИИ-анализ"), id=3, visible=False
+                                    i18n("ИИ-анализ"), id=4, visible=False
                                 ) as chatbot_row:
                                     with gr.Group():
                                         with gr.Column(scale=1):
@@ -337,25 +341,25 @@ def create_interface(api_key):
                                         with gr.Column(min_width=140):
                                             llm_run = gr.Button(
                                                 value=i18n("Запустить ИИ-анализ"),
-                                                icon="https://rybakov-k.ru/assets/icon/ai.png",
+                                                icon="https://rybakov-k.ru/assets/icon/ai-white.png",
                                                 elem_id="ai-run-btn",
                                                 elem_classes="custom-btn btn-ai-run",
                                             )
                                         with gr.Column(min_width=140):
                                             cancel_llm_button = gr.Button(
                                                 value=i18n("Отменить"),
-                                                icon="https://rybakov-k.ru/assets/icon/incorrect.png",
+                                                icon="https://rybakov-k.ru/assets/icon/incorrect-white.png",
                                                 elem_id="ai-cancel-btn",
                                                 elem_classes="custom-btn btn-ai-cancel",
                                             )
 
-                                with gr.Tab(i18n("Файлы"), id=4):
+                                with gr.Tab(i18n("Файлы"), id=5):
                                     with gr.Row():
                                         download_output = gr.Files(
                                             label=i18n("Файлы для скачивания")
                                         )
                                 with gr.Tab(
-                                    i18n("Оценить результаты"), id=5
+                                    i18n("Оценить результаты"), id=6
                                 ) as question_row:
                                     with gr.Row():
                                         gr.Markdown(
@@ -367,20 +371,23 @@ def create_interface(api_key):
                                         with gr.Column(min_width=140):
                                             yes_button = gr.Button(
                                                 value=i18n("Да"),
-                                                icon="https://rybakov-k.ru/assets/icon/like.png",
+                                                icon="https://rybakov-k.ru/assets/icon/like-white.png",
                                                 elem_id="yes-btn",
                                                 elem_classes="custom-btn btn-yes",
                                             )
                                         with gr.Column(min_width=140):
                                             no_button = gr.Button(
                                                 value=i18n("Нет"),
-                                                icon="https://rybakov-k.ru/assets/icon/dislike.png",
+                                                icon="https://rybakov-k.ru/assets/icon/dislike-white.png",
                                                 elem_id="no-btn",
                                                 elem_classes="custom-btn btn-no",
                                             )
 
                 with gr.Tab(i18n("Настройки"), elem_id="setting"):
                     with gr.Group(elem_id="model-setting"):
+                        gr.Markdown(
+                            f"<h3 style='margin-left: 7px;'><i class='fas fa-search'></i> {i18n('Настройки обнаружения')}</h3>"
+                        )
                         with gr.Row():
                             model_change = gr.Dropdown(
                                 get_available_models(),
@@ -403,6 +410,9 @@ def create_interface(api_key):
                                 label=i18n("Порог перекрытия (IoU)"),
                             )
                     with gr.Group(elem_id="sahi-setting"):
+                        gr.Markdown(
+                            f"<h3 style='margin-left: 7px;'><i class='fas fa-puzzle-piece'></i> {i18n('Обработка с разбиением (SAHI)')}</h3>"
+                        )
                         with gr.Row():
                             sahi_mode = gr.Checkbox(
                                 label=i18n("Включить"),
@@ -432,76 +442,87 @@ def create_interface(api_key):
                                 step=0.01,
                                 label=i18n("Перекрытие по ширине"),
                             )
-                    with gr.Row(equal_height=True) as solution_and_segment_mode_row:
-                        with gr.Column():
-                            solution = gr.Radio(
-                                ("Original", "640x640", "1024x1024"),
-                                value="1024x1024",
-                                label=i18n("Разрешение изображения"),
-                                elem_id="solution-setting",
-                            )
-                        with gr.Column():
-                            number_detections = gr.Slider(
-                                minimum=1,
-                                maximum=10000,
-                                value=1000,
-                                step=100,
-                                label=i18n("Количество обнаружений"),
-                                elem_id="number-detections",
-                            )
-                    with gr.Row(visible=False):
-                        round_value = gr.Dropdown(
-                            [0, 1, 2, 3, 4, 5, 6],
-                            value=4,
-                            label=i18n("Округлять результаты до"),
+                    with gr.Group():
+                        gr.Markdown(
+                            f"<h3 style='margin-left: 7px;'><i class='fas fa-sliders-h'></i> {i18n('Основные параметры')}</h3>"
                         )
-                    with gr.Row(equal_height=True, elem_id="bins-feret-diametr"):
-                        with gr.Column(scale=1):
-                            number_of_bins = gr.Slider(
-                                minimum=0.0,
-                                maximum=100,
-                                value=20,
-                                step=1,
-                                label=i18n("Интервалов на гистограмме"),
+                        with gr.Row(equal_height=True) as solution_and_segment_mode_row:
+                            with gr.Column():
+                                solution = gr.Radio(
+                                    ("Original", "640x640", "1024x1024"),
+                                    value="1024x1024",
+                                    label=i18n("Разрешение изображения"),
+                                    elem_id="solution-setting",
+                                )
+                            with gr.Column():
+                                number_detections = gr.Slider(
+                                    minimum=1,
+                                    maximum=10000,
+                                    value=1000,
+                                    step=100,
+                                    label=i18n("Количество обнаружений"),
+                                    elem_id="number-detections",
+                                )
+                        with gr.Row(visible=False):
+                            round_value = gr.Dropdown(
+                                [0, 1, 2, 3, 4, 5, 6],
+                                value=4,
+                                label=i18n("Округлять результаты до"),
                             )
-                        with gr.Column(scale=1):
-                            show_Feret_diametr = gr.Checkbox(
-                                label=i18n("Включить"),
-                                info=i18n("Включить отображение диаметров Ферета?"),
-                            )
-                        with gr.Column():
-                            show_polylines = gr.Checkbox(
-                                value=True,
-                                label=i18n("Включить"),
-                                info=i18n("Включить контур?"),
-                            )
-                        with gr.Column():
-                            outline_color = gr.ColorPicker(
-                                value="rgb(0, 255, 0, 1)", label=i18n("Цвет контура")
-                            )
-                        with gr.Column(min_width=100):
-                            show_fillPoly = gr.Checkbox(
-                                label=i18n("Включить"),
-                                info=i18n("Включить заливку?"),
-                            )
-                        with gr.Column(min_width=250):
-                            fill_type_color = gr.Radio(
-                                ("Random", "Permanent"),
-                                value="Random",
-                                label=i18n("Тип заливки"),
-                            )
-                        with gr.Column(min_width=300):
-                            fill_color = gr.ColorPicker(
-                                value="rgb(0, 255, 0, 1)", label=i18n("Цвет заливки")
-                            )
-                        with gr.Column():
-                            fill_alpha = gr.Slider(
-                                minimum=0,
-                                maximum=1,
-                                value=0.3,
-                                step=0.01,
-                                label=i18n("Прозрачность заливки"),
-                            )
+                        with gr.Row(equal_height=True, elem_id="bins-feret-diametr"):
+                            with gr.Column(scale=1):
+                                number_of_bins = gr.Slider(
+                                    minimum=0.0,
+                                    maximum=100,
+                                    value=20,
+                                    step=1,
+                                    label=i18n("Интервалов на гистограмме"),
+                                )
+                            with gr.Column(scale=1):
+                                show_Feret_diametr = gr.Checkbox(
+                                    label=i18n("Включить"),
+                                    info=i18n("Включить отображение диаметров Ферета?"),
+                                )
+                    with gr.Group(elem_id="visualization-settings"):
+                        gr.Markdown(
+                            f"<h3 style='margin-left: 7px;'><i class='fas fa-paint-brush'></i> {i18n('Параметры визуализации')}</h3>"
+                        )
+                        with gr.Row(equal_height=True):
+                            with gr.Column():
+                                show_polylines = gr.Checkbox(
+                                    value=True,
+                                    label=i18n("Включить"),
+                                    info=i18n("Включить контур?"),
+                                )
+                            with gr.Column():
+                                outline_color = gr.ColorPicker(
+                                    value="rgb(0, 255, 0, 1)",
+                                    label=i18n("Цвет контура"),
+                                )
+                            with gr.Column(min_width=100):
+                                show_fillPoly = gr.Checkbox(
+                                    label=i18n("Включить"),
+                                    info=i18n("Включить заливку?"),
+                                )
+                            with gr.Column(min_width=250):
+                                fill_type_color = gr.Radio(
+                                    ("Random", "Permanent"),
+                                    value="Random",
+                                    label=i18n("Тип заливки"),
+                                )
+                            with gr.Column(min_width=300):
+                                fill_color = gr.ColorPicker(
+                                    value="rgb(0, 255, 0, 1)",
+                                    label=i18n("Цвет заливки"),
+                                )
+                            with gr.Column():
+                                fill_alpha = gr.Slider(
+                                    minimum=0,
+                                    maximum=1,
+                                    value=0.3,
+                                    step=0.01,
+                                    label=i18n("Прозрачность заливки"),
+                                )
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as sidebar:
@@ -572,6 +593,7 @@ def create_interface(api_key):
 
         in_image.select(
             fn=point_manager.handle_select,
+            inputs=scale_selector,
             outputs=[scale_input_status, scale, points_scale],
         )
 
@@ -609,6 +631,7 @@ def create_interface(api_key):
                 output_table,
                 points_df,
                 output_plot,
+                vector_field,
                 output_table2,
                 chatbot_row,
                 results_row,
@@ -688,7 +711,7 @@ def create_interface(api_key):
                 fill_color,
                 fill_alpha,
             ],
-            outputs=[output_image, output_table2, output_plot],
+            outputs=[output_image, output_table2, output_plot, vector_field],
         )
         gr.on(
             triggers=[reset_df.click, process_button.click],
@@ -736,7 +759,7 @@ def create_interface(api_key):
                 fill_color,
                 fill_alpha,
             ],
-            outputs=[output_image, output_table2, output_plot],
+            outputs=[output_image, output_table2, output_plot, vector_field],
         )
 
         llm_start = llm_run.click(
@@ -772,12 +795,12 @@ def create_interface(api_key):
         )
 
         gr.on(
-            triggers=[clear_button.click, in_image.clear, in_image.upload],
+            triggers=[clear_button.click, in_image.clear],
             fn=reset_interface,
-            inputs=[scale_selector],
             outputs=[
                 output_image,
                 output_plot,
+                vector_field,
                 in_image,
                 output_table_image2_row,
                 reset_delete_buttons_row,
@@ -796,12 +819,13 @@ def create_interface(api_key):
             show_progress_on=question_row,
         )
 
-        scale_selector.change(
+        gr.on(
+            triggers=[scale_selector.change, image_file.change],
             fn=reset_interface2,
-            inputs=[scale_selector],
             outputs=[
                 output_image,
                 output_plot,
+                vector_field,
                 output_table_image2_row,
                 reset_delete_buttons_row,
                 chatbot,

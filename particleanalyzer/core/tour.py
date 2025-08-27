@@ -33,7 +33,8 @@ tour: str = """
         sahiSettingText: "Для анализа больших изображений (свыше 2000 пикселей) с мелкими или слипшимися частицами рекомендуется включить режим SAHI (Slicing Aided Hyper Inference). Оптимальные параметры включают размер сегментов 200-400 пикселей и перекрытие 10-20% - такие настройки обеспечивают баланс между точностью детекции и производительностью. Уменьшение размера сегментов повышает детализацию анализа, но увеличивает время обработки, в то время как регулировка процента перекрытия помогает улучшить обнаружение частиц в областях стыков сегментов, особенно при неоднородном распределении объектов. Эти параметры особенно важны при работе со сложными изображениями, где требуется высокая точность сегментации.",
         solutionSegmentText: "В данном разделе можно настроить разрешение: увеличение этого параметра повышает точность анализа, однако приводит к более длительной обработке.",
         numberDetectionsText: "Ограничение количества частиц: уменьшите, если система тормозит, увеличьте для редких частиц на больших площадях. Сначала попробуйте 1000, затем корректируйте.",
-        binsFeretText: "В этом разделе можно настроить количество бинов гистограммы для анализа распределения частиц — оптимальное значение составляет 10-20 бинов, так как оно обеспечивает четкие и хорошо различимые пики. Также здесь доступна опция отображения диаметров Ферета, которые показывают ориентацию частиц непосредственно на результатах сегментации. Имеется возможность задать цвет контура и включить заливку для сегментированных частиц.",
+        binsFeretText: "В этом разделе можно настроить количество бинов гистограммы для анализа распределения частиц — оптимальное значение составляет 10-20 бинов, так как оно обеспечивает четкие и хорошо различимые пики. Также здесь доступна опция отображения диаметров Ферета, которые показывают ориентацию частиц непосредственно на результатах сегментации.",
+        visualizationSettings: "В данном разделе можно задать параметры визуализации контура и заливки сегментированных частиц.",
         modelParamsText: "Отлично! Теперь настройте параметры модели.",
         buttons: {
           next: 'Далее',
@@ -59,7 +60,8 @@ tour: str = """
         sahiSettingText: "For analyzing large images (over 2000 pixels) with small or overlapping particles, enabling SAHI mode (Slicing Aided Hyper Inference) is recommended. Optimal parameters include segment sizes of 200-400 pixels and 10-20% overlap - these settings provide a balance between detection accuracy and performance. Reducing segment size increases analysis detail but increases processing time, while adjusting the overlap percentage helps improve particle detection in segment junction areas, especially with non-uniform object distribution. These parameters are particularly important when working with complex images requiring high segmentation accuracy.",
         solutionSegmentText: "In this section, you can configure the resolution: increasing this parameter improves analysis accuracy but leads to longer processing times.",
         numberDetectionsText: "Limit the number of particles: decrease if the system is slow, increase for rare particles in large areas. Start with 1000, then adjust as needed.",
-        binsFeretText: "In this section, you can configure the number of histogram bins for particle distribution analysis - the optimal value is 10-20 bins, as it provides clear and well-distinguishable peaks. Also available here is the option to display Feret diameters, which show particle orientation directly on the segmentation results. It is possible to set the outline color and enable fill for segmented particles.",
+        binsFeretText: "In this section, you can configure the number of histogram bins for particle distribution analysis - the optimal value is 10-20 bins, as it provides clear and well-distinguishable peaks. Also available here is the option to display Feret diameters, which show particle orientation directly on the segmentation results.",
+        visualizationSettings: "In this section you can set the parameters for visualizing the outline and filling of segmented particles.",
         modelParamsText: "Great! Now configure the model parameters.",
         buttons: {
           next: 'Next',
@@ -85,7 +87,8 @@ tour: str = """
         sahiSettingText: "分析大型圖像（超過2000像素）且含有微小或重疊粒子時，建議啟用SAHI模式（切片輔助超推論）。最佳參數包括200-400像素的切片大小和10-20%的重疊 - 這些設置在檢測精度和性能之間提供平衡。減小切片尺寸可增加分析細節但會增加處理時間，而調整重疊百分比有助於改善切片連接區域的粒子檢測，特別是在非均勻物體分布情況下。這些參數對於需要高分割精度的複雜圖像處理尤為重要。",
         solutionSegmentText: "在本區塊中，您可以配置解析度：提高此參數可改善分析精度，但會導致更長的處理時間。",
         numberDetectionsText: "限制粒子數量：系統運行緩慢時減少，大面積稀有粒子時增加。先從1000開始，然後根據需要調整。",
-        binsFeretText: "在本區塊中，您可以配置用於粒子分布分析的直方圖區間數 - 最佳值為10-20個區間，因其能提供清晰且易於區分的峰值。此處還提供顯示Feret直徑的選項，可直接在分割結果上顯示粒子方向。可以設定輪廓顏色並為分段粒子啟用填滿。",
+        binsFeretText: "在本區塊中，您可以配置用於粒子分布分析的直方圖區間數 - 最佳值為10-20個區間，因其能提供清晰且易於區分的峰值。此處還提供顯示Feret直徑的選項，可直接在分割結果上顯示粒子方向。",
+        visualizationSettings: "在本節中，您可以設定可視化分段粒子輪廓和填充的參數。",
         modelParamsText: "很好！現在配置模型參數。",
         buttons: {
           next: '下一步',
@@ -111,7 +114,8 @@ tour: str = """
         sahiSettingText: "分析大型图像（超过2000像素）且含有微小或重叠粒子时，建议启用SAHI模式（切片辅助超推理）。最佳参数包括200-400像素的切片大小和10-20%的重叠 - 这些设置在检测精度和性能之间提供平衡。减小切片尺寸可增加分析细节但会增加处理时间，而调整重叠百分比有助于改善切片连接区域的粒子检测，特别是在非均匀物体分布情况下。这些参数对于需要高分割精度的复杂图像处理尤为重要。",
         solutionSegmentText: "在本区域中，您可以配置分辨率：提高此参数可改善分析精度，但会导致更长的处理时间。",
         numberDetectionsText: "限制粒子数量：系统运行缓慢时减少，大面积稀有粒子时增加。先从1000开始，然后根据需要调整。",
-        binsFeretText: "在本区域中，您可以配置用于粒子分布分析的直方图区间数 - 最佳值为10-20个区间，因其能提供清晰且易于区分的峰值。此处还提供显示Feret直径的选项，可直接在分割结果上显示粒子方向。可以设置轮廓颜色并为分段粒子启用填充。",
+        binsFeretText: "在本区域中，您可以配置用于粒子分布分析的直方图区间数 - 最佳值为10-20个区间，因其能提供清晰且易于区分的峰值。此处还提供显示Feret直径的选项，可直接在分割结果上显示粒子方向。",
+        visualizationSettings: "在本节中，您可以设置可视化分段粒子轮廓和填充的参数。",
         modelParamsText: "很好！现在配置模型参数。",
         buttons: {
           next: '下一步',
@@ -359,8 +363,14 @@ tour: str = """
           element: '#bins-feret-diametr',
           intro: t.binsFeretText,
           disableInteraction: true,
+          position: 'right'
+        },
+        {
+          element: '#visualization-settings',
+          intro: t.visualizationSettings,
+          disableInteraction: true,
           position: 'top'
-        }
+        },  
       ];
 
       const allSteps = steps.concat(commonSteps);
