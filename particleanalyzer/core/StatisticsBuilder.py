@@ -350,7 +350,7 @@ class StatisticsBuilder:
         )
 
         return vector_fig
-    
+
     def _add_vector_field_to_fig(self, fig, df, image):
         image = np.flipud(image)
 

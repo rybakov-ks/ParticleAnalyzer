@@ -480,20 +480,22 @@ def img_to_numpy_array(file_path, max_size_kb=500, quality=85):
     try:
         with Image.open(file_path) as img:
             img_byte_arr = io.BytesIO()
-            img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
+            
+            img.save(img_byte_arr, format="PNG", optimize=True)
 
             current_size_kb = len(img_byte_arr.getvalue()) / 1024
 
-            while current_size_kb > max_size_kb and quality > 10:
-                quality -= 10
+            if current_size_kb > max_size_kb:
+                ratio = (max_size_kb / current_size_kb) ** 0.5
+                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
+                
                 img_byte_arr = io.BytesIO()
-                img.save(img_byte_arr, format="JPEG", quality=quality, optimize=True)
-                current_size_kb = len(img_byte_arr.getvalue()) / 1024
+                img.save(img_byte_arr, format="PNG", optimize=True)
 
             img_byte_arr.seek(0)
             compressed_img = Image.open(img_byte_arr)
 
-            # print(f"Сжато до: {current_size_kb:.1f}KB, качество: {quality}")
             return np.array(compressed_img)
 
     except (IOError, OSError, ValueError) as e:
