@@ -16,9 +16,9 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 class Detectron2Loader:
     MODEL_MAPPING = {
-        "Mask R-CNN X152 (dataset 8)": {
+        "Mask R-CNN X152 (dataset 9)": {
             "config_file": "Misc/cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
-            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv_d8.pth",
+            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv_d9.pth",
             "config_path": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
         }
     }

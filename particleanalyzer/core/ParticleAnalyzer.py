@@ -160,9 +160,10 @@ class ParticleAnalyzer:
         sahi_mode: bool,
         number_of_bins: int,
         show_Feret_diametr: bool,
+        show_Scale_bar: bool,
         outline_color,
-        show_fillPoly,
-        show_polylines,
+        show_fillPoly: bool,
+        show_polylines: bool,
         fill_type_color,
         fill_color,
         fill_alpha,
@@ -242,7 +243,7 @@ class ParticleAnalyzer:
                 return self._create_error_return()
 
             output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
-            if scale_selector["scale"]:
+            if scale_selector["scale"] and show_Scale_bar:
                 output_image = point_manager.draw_scale_on_image(
                     output_image, scale_factor_glob, scale, *points_scale
                 )
