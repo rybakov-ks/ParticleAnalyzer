@@ -499,17 +499,17 @@ def img_to_numpy_array(file_path, max_size_kb=500, quality=85):
             return np.array(compressed_img)
 
     except (IOError, OSError, ValueError) as e:
+        gr.Info(
+            get_translation(
+                "Не поддерживаемый формат изображения."
+            )
+        )
         print(f"Ошибка при загрузке изображения {file_path}: {e}")
         return None
 
 
 def handle_file_upload(file, scale_selector):
     if file is None:
-        gr.Info(
-            get_translation(
-                "Не поддерживаемый формат изображения."
-            )
-        )
         return gr.skip(), gr.update(visible=True), gr.update(visible=False)
 
     in_image = img_to_numpy_array(file.name)

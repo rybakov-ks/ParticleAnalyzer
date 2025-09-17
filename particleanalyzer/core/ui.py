@@ -9,6 +9,7 @@ from particleanalyzer.core.utils import (
     reset_interface2,
     log_analytics,
     empty_df_ParticleCharacteristics,
+    empty_df_ParticleCharacteristics,
     empty_df_ParticleStatistics,
     save_data_to_csv,
     scale_input_unit_measurement,
@@ -478,11 +479,6 @@ def create_interface(api_key):
                                     step=1,
                                     label=i18n("Интервалов на гистограмме"),
                                 )
-                            with gr.Column(scale=1):
-                                show_Feret_diametr = gr.Checkbox(
-                                    label=i18n("Включить"),
-                                    info=i18n("Включить отображение диаметров Ферета?"),
-                                )
                     with gr.Group(elem_id="visualization-settings"):
                         gr.Markdown(
                             f"<h3 style='margin-left: 7px;'><i class='fas fa-paint-brush'></i> {i18n('Параметры визуализации')}</h3>"
@@ -515,7 +511,7 @@ def create_interface(api_key):
                                     value="rgb(0, 255, 0, 1)",
                                     label=i18n("Цвет заливки"),
                                 )
-                            with gr.Column():
+                            with gr.Column(min_width=700):
                                 fill_alpha = gr.Slider(
                                     minimum=0,
                                     maximum=1,
@@ -523,10 +519,21 @@ def create_interface(api_key):
                                     step=0.01,
                                     label=i18n("Прозрачность заливки"),
                                 )
+                            with gr.Column(scale=1):
+                                show_Feret_diametr = gr.Checkbox(
+                                    label=i18n("Включить"),
+                                    info=i18n("Включить отображение диаметров Ферета?"),
+                                )
+                            with gr.Column(scale=1):
+                                show_Scale_bar = gr.Checkbox(
+                                    value=True,
+                                    label=i18n("Включить"),
+                                    info=i18n("Включить отображение масштабной шкалы?"),
+                                )
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as sidebar:
-            with gr.Sidebar(width=400):
+            with gr.Column(elem_classes="sidebar-fixed"):
                 with gr.Row():
                     gr.HTML(
                         f"""<h2 style="display: flex; align-items: center; gap: 8px;">
@@ -618,6 +625,7 @@ def create_interface(api_key):
                 sahi_mode,
                 number_of_bins,
                 show_Feret_diametr,
+                show_Scale_bar,
                 outline_color,
                 show_fillPoly,
                 show_polylines,

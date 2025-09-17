@@ -62,6 +62,20 @@ css = """
   margin: 0 auto;
 }
 
+/* === САЙДБАР === */
+.sidebar-fixed {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 400px !important;
+    height: 100vh !important;
+    padding: 20px;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.2);
+    background: white;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
 /* ==========================================================================
    🧩 ХЕДЕР
    ========================================================================== */
