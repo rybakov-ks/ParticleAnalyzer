@@ -16,9 +16,6 @@
 [![Slow Demo?](https://img.shields.io/badge/Telegram-Try%20Mini%20App-blue)](https://t.me/particleanalyzer_bot)
 [![PyPI Version](https://img.shields.io/pypi/v/particleanalyzer?label=PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Monthly Downloads](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
-> [!WARNING]
-> If you experience low performance of the demo version, we suggest following this [link](https://c5b073e0e5987636b7.gradio.live) as a solution.
-
 
 <div align="left">
   <a href="https://particleanalyzer.ru/">
