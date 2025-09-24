@@ -38,6 +38,15 @@ css = """
   transition: all 0.3s ease !important;
 }
 
+.fillable {
+    width: 100% !important;
+    max-width: unset !important; 
+}
+.fillable .sidebar-parent {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
 .dark .gradio-container {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
 }
@@ -60,20 +69,6 @@ css = """
 #app-container {
   max-width: 790px;
   margin: 0 auto;
-}
-
-/* === САЙДБАР === */
-.sidebar-fixed {
-    position: fixed !important;
-    top: 0;
-    left: 0;
-    width: 400px !important;
-    height: 100vh !important;
-    padding: 20px;
-    box-shadow: -4px 0 15px rgba(0,0,0,0.2);
-    background: white;
-    overflow-y: auto;
-    z-index: 9999;
 }
 
 /* ==========================================================================

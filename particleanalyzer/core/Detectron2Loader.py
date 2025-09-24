@@ -18,7 +18,7 @@ class Detectron2Loader:
     MODEL_MAPPING = {
         "Mask R-CNN X152 (dataset 9)": {
             "config_file": "Misc/cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
-            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv_d9.pth",
+            "weights_file": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv_d10.pth",
             "config_path": "cascade_mask_rcnn_X_152_32x8d_FPN_IN5k_gn_dconv.yaml",
         }
     }
