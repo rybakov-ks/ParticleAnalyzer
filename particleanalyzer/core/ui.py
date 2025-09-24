@@ -533,7 +533,7 @@ def create_interface(api_key):
                 with gr.Tab(i18n("О программе")):
                     gr.HTML(i18n(about_ru))
         with gr.Row(visible=False) as sidebar:
-            with gr.Column(elem_classes="sidebar-fixed"):
+            with gr.Sidebar(open=False, width=400):
                 with gr.Row():
                     gr.HTML(
                         f"""<h2 style="display: flex; align-items: center; gap: 8px;">
