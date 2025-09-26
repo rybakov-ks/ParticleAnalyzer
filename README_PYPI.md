@@ -12,7 +12,8 @@
   </a>
 </div>
 
-**ParticleAnalyzer** Is A Computer Vision-Based Tool for Automatic Segmentation and Size Analysis of Nanoparticles in Scanning Electron Microscope (SEM) and Transmission Electron Microscope (TEM) Images
+**ParticleAnalyzer** Is A Computer Vision-Based Tool for Automatic Segmentation and Size Analysis of Nanoparticles in Scanning Electron Microscope (SEM) and Transmission Electron Microscope (TEM) Images.
+
 ---
 
 ## 🎬 Demonstration
