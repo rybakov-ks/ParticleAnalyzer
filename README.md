@@ -22,7 +22,7 @@
     <img src="./Images/Logo.png" alt="ParticleAnalyzer Logo" width="300"/>
   </a>
 </div>
-  <p>A Computer Vision Tool for Automatic Particle Segmentation and Size Analysis in Scanning Electron Microscope (SEM) Images.</p>
+  <p>A Computer Vision-Based Tool for Automatic Segmentation and Size Analysis of Nanoparticles in Scanning Electron Microscope (SEM) and Transmission Electron Microscope (TEM) Images.</p>
 
 <div align="center">
   <h3>Video demonstrations:</h3>
