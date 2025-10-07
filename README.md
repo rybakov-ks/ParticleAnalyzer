@@ -72,7 +72,7 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 - Comprehensive statistical analysis of particle characteristics
 - Interactive visualization of size distributions
 - Dual unit support — switch between pixels and micrometers (µm)
-- Supports multiple AI models: YOLOv11, YOLOv12, and Detectron2
+- Supports multiple AI models: YOLOv11, YOLOv12, RF-DETR Seg (Preview) and Detectron2
 - Advanced configuration options for fine-tuning detection accuracy
 - AI Interpretation of SEM Data
 - Multi-language interface: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en)
@@ -141,6 +141,7 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
 |-------------|----------------------------|-----------|------------------------------------|
 | **YOLOv11** 🆕 | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
 | **YOLOv12** 🆕 | High precision detection    | ⚡⚡⚡ Fast | Critical measurements              |
+| **RF-DETR Seg (Preview)** 🆕 | High precision detection    | ⚡⚡⚡ Fast | Limit of 200 objects per image              |
 | **Mask R-CNN X152** 🆕 | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
 
 </div>
