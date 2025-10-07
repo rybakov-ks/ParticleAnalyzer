@@ -41,6 +41,8 @@ setup(
         "numpy",
         "pandas",
         "supervision",
+        "easyocr",
+        "onnxruntime",
     ],
     python_requires=">=3.10",
     author="Kirill Rybakov",

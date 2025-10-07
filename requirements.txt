@@ -20,6 +20,9 @@ Pillow
 # Machine Learning
 ultralytics
 sahi
+supervision
+easyocr
+onnxruntime
 
 # AI/LLM Integration
 huggingface_hub
