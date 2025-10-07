@@ -139,10 +139,10 @@ ParticleAnalyzer run --port 5000 --api-key YOUR_OPENROUTER_API_KEY
    
 | Model       | Best For                   | Speed     | Recommended Use Case               |
 |-------------|----------------------------|-----------|------------------------------------|
-| **YOLOv11** 🆕 | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
-| **YOLOv12** 🆕 | High precision detection    | ⚡⚡⚡ Fast | Critical measurements              |
-| **RF-DETR Seg (Preview)** 🆕 | High precision detection    | ⚡⚡⚡ Fast | Limit of 200 objects per image              |
-| **Mask R-CNN X152** 🆕 | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
+| **YOLOv11**  | General use (balanced)      | ⚡⚡⚡ Fast | Quick analysis of standard samples |
+| **YOLOv12**  | High precision detection    | ⚡⚡⚡ Fast | Critical measurements              |
+| **RF-DETR Seg (Preview)** 🆕 | Transformer-based segmentation    | ⚡⚡⚡ Fast | Precise object counting and segmentation with limited density (200 objects per image)            |
+| **Mask R-CNN X152**  | Challenging morphology   | ⚡ Slow    | Irregular/overlapping particles    |
 
 </div>
 
