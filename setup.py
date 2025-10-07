@@ -9,7 +9,7 @@ def read_file(filename):
 
 setup(
     name="ParticleAnalyzer",
-    version="1.2.3",
+    version="1.3.0",
     packages=find_packages(exclude=["tests*"]),
     package_data={
         "particleanalyzer": [
@@ -40,11 +40,12 @@ setup(
         "Requests",
         "numpy",
         "pandas",
+        "supervision",
     ],
     python_requires=">=3.10",
     author="Kirill Rybakov",
     author_email="rybakov-ks@ya.ru",
-    description="SEM Image Analysis Tool",
+    description="ParticleAnalyzer is a computer vision tool for automatic particle segmentation and size analysis in Scanning Electron Microscope (SEM) images.",
     long_description=read_file("README_PYPI.md"),
     long_description_content_type="text/markdown",
     url="https://github.com/rybakov-ks/ParticleAnalyzer",
@@ -55,6 +56,7 @@ setup(
     ],
     keywords=[
         "SEM",
+        "TEM",
         "microscopy",
         "image-analysis",
         "particle-analysis",
@@ -74,6 +76,7 @@ setup(
         "material-characterization",
         "automated-measurements",
         "research-tools",
+        "onnxruntime",
     ],
     project_urls={
         "Bug Reports": "https://github.com/rybakov-ks/ParticleAnalyzer/issues",

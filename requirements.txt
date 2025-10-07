@@ -1,0 +1,33 @@
+# Core dependencies (install PyTorch separately with CUDA support)
+# torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Web Interface
+gradio==5.47.2
+gradio-rangeslider
+
+# Data Science and Visualization
+numpy
+pandas
+matplotlib
+plotly
+scipy
+
+# Computer Vision and Image Processing
+opencv-python
+opencv-python-headless
+Pillow
+
+# Machine Learning
+ultralytics
+sahi
+
+# AI/LLM Integration
+huggingface_hub
+openai
+
+# Utilities
+tqdm
+Requests
+
+# Optional: Detectron2 (install separately if needed)
+# git+https://github.com/facebookresearch/detectron2.git

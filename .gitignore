@@ -1,6 +1,7 @@
 # Игнорировать все .pt и .pth файлы в model/
 particleanalyzer/model/*.pt
 particleanalyzer/model/*.pth
+particleanalyzer/model/*.onnx
 
 # Игнорировать все .yaml файлы в model/
 particleanalyzer/model/*.yaml

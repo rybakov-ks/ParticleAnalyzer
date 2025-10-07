@@ -11,6 +11,8 @@ from typing import Optional, Tuple, Dict
 from scipy.spatial.distance import pdist
 import random
 import re
+from PIL import Image
+import io
 
 try:
     from detectron2.engine import DefaultPredictor
@@ -28,10 +30,10 @@ from particleanalyzer.core.StatisticsBuilder import StatisticsBuilder
 from particleanalyzer.core.languages import translations
 from particleanalyzer.core.language_context import LanguageContext
 from particleanalyzer.core.PointManager import PointManager
+from particleanalyzer.core.EnhancementPipeline import EnhancementPipeline
+from particleanalyzer.core.ScaleProcessor import ScaleProcessor
 
 lang = "en"
-
-point_manager = PointManager()
 
 
 class ParticleAnalyzer:
@@ -64,6 +66,12 @@ class ParticleAnalyzer:
         self._setup_environment(device)
         self.model_manager = ModelManager(device=self.device)
         self.preprocessor = ImagePreprocessor()
+        self.point_manager = PointManager()
+        self.scale_processor = ScaleProcessor(
+            model=self.model_manager.get_model("ScaleProcessor"), device=self.device
+        )
+        # Улучшение качетсва изображения
+        self.enhancement_pipeline = EnhancementPipeline()
         self.error_return = self._create_error_return()
         self.default_lang = default_lang
         # Устанавливаем язык в контекст
@@ -167,6 +175,7 @@ class ParticleAnalyzer:
         fill_type_color,
         fill_color,
         fill_alpha,
+        pipelines_enhancer: str,
         api_key: bool,
         request: gr.Request,
         pr=gr.Progress(),
@@ -204,6 +213,10 @@ class ParticleAnalyzer:
                     lang=self.lang,
                 )
             )
+            if pipelines_enhancer:
+                image = self.enhancement_pipeline.apply_pipeline(
+                    image, pipelines_enhancer
+                )
 
             if not scale and scale_selector["scale"]:
                 return self._create_error_return()
@@ -244,7 +257,7 @@ class ParticleAnalyzer:
 
             output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
             if scale_selector["scale"] and show_Scale_bar:
-                output_image = point_manager.draw_scale_on_image(
+                output_image = self.point_manager.draw_scale_on_image(
                     output_image, scale_factor_glob, scale, *points_scale
                 )
 
@@ -344,7 +357,79 @@ class ParticleAnalyzer:
             return self._process_with_yolo
         if model_name in self.model_manager.detectron_loader.MODEL_MAPPING:
             return self._process_with_detectron
+        if model_name in self.model_manager.onnx_loader.MODEL_MAPPING:
+            return self._process_with_onnx
         raise ValueError(f"Неизвестная модель или неподдерживаемый тип: {model_name}")
+
+    def _process_with_onnx(self, **config):
+        """Обработка с использованием ONNX моделей"""
+        config["pbar"].set_description(
+            self._get_translation("RF-DETR обрабатывает изображение...")
+        )
+        config["pr"](
+            0.5, desc=self._get_translation("RF-DETR обрабатывает изображение...")
+        )
+
+        try:
+            # Просто передаем numpy массив
+            detections = self.model_manager.predict(
+                model_name=config["model_change"],
+                image_np=config["image"],  # numpy массив
+                confidence_threshold=config["confidence_threshold"],
+                max_detections=config["number_detections"],
+            )
+
+        except Exception as e:
+            self._handle_error(e)
+            return None, None, None
+
+        if len(detections) == 0:
+            gr.Info(self._get_translation("Объекты не обнаружены."))
+            return None, None, None
+        elif len(detections) == config["number_detections"]:
+            gr.Info(
+                self._get_translation(
+                    "Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."
+                )
+            )
+
+        config["pbar"].update(1)
+
+        config["pbar"].set_description(self._get_translation("Обработка частиц..."))
+        config["pr"](0.62, desc=self._get_translation("Обработка частиц..."))
+
+        output_image = config["orig_image"].copy()
+        thickness = self._get_scaled_thickness(
+            output_image.shape[1], output_image.shape[0]
+        )
+        particle_counter, particle_data, annotations = 1, [], []
+
+        # Обработка детекций
+        for i in range(len(detections.xyxy)):
+            mask = detections.mask[i] if detections.mask is not None else None
+
+            if mask is not None:
+                contours, _ = cv2.findContours(
+                    mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+                )
+
+                if contours:
+                    main_contour = max(contours, key=cv2.contourArea)
+                    points = main_contour.reshape(-1, 2)
+
+                    particle_counter = self._analyze_particle(
+                        points=points,
+                        output_image=output_image,
+                        thickness=thickness,
+                        particle_data=particle_data,
+                        annotations=annotations,
+                        raw_mask=mask,
+                        particle_counter=particle_counter,
+                        **config,
+                    )
+
+        config["pbar"].update(1)
+        return output_image, particle_data, annotations
 
     def _process_with_yolo(self, **config):
         """Обработка с использованием YOLO"""
@@ -818,3 +903,126 @@ class ParticleAnalyzer:
         gc.collect()
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+    def _img_to_numpy_array(self, file_path, max_size_kb=500, quality=85):
+        try:
+            with Image.open(file_path) as img:
+                img_byte_arr = io.BytesIO()
+
+                img.save(img_byte_arr, format="PNG", optimize=True)
+
+                current_size_kb = len(img_byte_arr.getvalue()) / 1024
+
+                if current_size_kb > max_size_kb:
+                    ratio = (max_size_kb / current_size_kb) ** 0.5
+                    new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                    img = img.resize(new_size, Image.Resampling.LANCZOS)
+
+                    img_byte_arr = io.BytesIO()
+                    img.save(img_byte_arr, format="PNG", optimize=True)
+
+                img_byte_arr.seek(0)
+                compressed_img = Image.open(img_byte_arr)
+
+                return np.array(compressed_img)
+
+        except (IOError, OSError, ValueError) as e:
+            gr.Info(self._get_translation("Не поддерживаемый формат изображения."))
+            print(f"Ошибка при загрузке изображения {file_path}: {e}")
+            return None
+
+    def handle_file_upload(self, file, scale_selector, request: gr.Request):
+        # Быстрая проверка на None файл
+        if file is None:
+            return (
+                gr.skip(),
+                gr.update(visible=True),
+                gr.update(visible=False),
+                gr.skip(),
+                gr.skip(),
+                gr.skip(),
+                gr.skip(),
+                gr.skip(),
+                gr.skip(),
+            )
+
+        # Установка языка
+        lang = self._determine_language(request.headers.get("Accept-Language", ""))
+        LanguageContext.set_language(lang)
+        self.lang = lang
+
+        # Обработка изображения
+        in_image = self._img_to_numpy_array(file.name)
+        (
+            crop_in_image,
+            info_bar_image,
+            scale_bar_image,
+            scale_text_image,
+            result,
+            points_scale,
+        ) = self.scale_processor.process_image(in_image, 0.1)
+
+        scale_type = result[2]
+
+        # Обработка значений с защитой от None
+        scale_bar_width = self._safe_float_convert(result[0], default=1.0)
+        scale_value = self._safe_float_convert(result[1], default=1.0)
+
+        # Формирование статусного текста
+        status_text = (
+            self._get_translation("Выберите две крайние точки на шкале")
+            if result[0] is None
+            else f"{self._get_translation('Расстояние равно')}: {scale_bar_width:.0f} {self._get_translation('пикселей')}"
+        )
+
+        # Если шкала не в микрометрах или нанометрах - возвращаем пиксельный результат
+        if scale_type not in ("µm", "nm"):
+            gr.Info(
+                "Автоматическое определение масштабной шкалы не удалось. Укажите шкалу вручную или продолжите анализ в пикселях."
+            )
+            return self._get_pixel_result(in_image, status_text)
+
+        # Формирование результата для µm/nm случаев
+        type_scale = self._get_scale_type_display(scale_type)
+        gr.Info(
+            "Масштабная шкала обнаружена и распознана автоматически. Можно продолжить дальнейший анализ."
+        )
+        return (
+            in_image,
+            gr.update(visible=False),
+            gr.update(visible=True),
+            gr.update(visible=True),  # scale_input_row
+            scale_bar_width,  # scale
+            points_scale,  # points_scale
+            gr.update(value=status_text),  # scale_input_status
+            gr.update(value=scale_value),  # scale_input
+            gr.update(value=type_scale),  # scale_selector
+        )
+
+    def _safe_float_convert(self, value, default=0.0):
+        """Безопасно конвертирует значение в float"""
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+
+    def _get_scale_type_display(self, scale_type):
+        """Возвращает отображаемое название типа шкалы"""
+        type_scale_map = {"µm": "Micrometers (µm)", "nm": "Nanometers (nm)"}
+        return type_scale_map.get(scale_type, "Pixels")
+
+    def _get_pixel_result(self, in_image, status_text):
+        """Возвращает результат для пиксельного случая"""
+        return (
+            in_image,
+            gr.update(visible=False),
+            gr.update(visible=True),
+            gr.skip(),  # scale_input_row
+            gr.skip(),  # scale
+            gr.skip(),  # points_scale
+            gr.update(value=status_text),  # scale_input_status
+            gr.update(value=1.0),  # scale_input
+            gr.update(value="Pixels"),  # scale_selector
+        )
