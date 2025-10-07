@@ -1,7 +1,9 @@
 import os
 import requests
+import numpy as np
 from tqdm import tqdm
 from .YOLOLoader import YOLOLoader
+from .ONNXLoader import ONNXLoader
 
 try:
     from detectron2.engine import DefaultPredictor
@@ -23,6 +25,8 @@ class ModelManager:
         os.makedirs(self.MODELS_DIR, exist_ok=True)
 
         yolo_files = list(YOLOLoader.MODEL_MAPPING.values())
+        onnx_files = list(ONNXLoader.MODEL_MAPPING.values())
+
         detectron_files = []
         if DETECTRON2_AVAILABLE:
             detectron_files = [
@@ -30,10 +34,11 @@ class ModelManager:
             ]
 
         # Проверяем и загружаем модели
-        self._ensure_models_available(yolo_files + detectron_files)
+        self._ensure_models_available(yolo_files + onnx_files + detectron_files)
 
         # Инициализация загрузчиков
         self.yolo_loader = YOLOLoader()
+        self.onnx_loader = ONNXLoader(device=self.device)
         self.detectron_loader = (
             Detectron2Loader(device=self.device) if DETECTRON2_AVAILABLE else None
         )
@@ -59,12 +64,15 @@ class ModelManager:
             response = requests.get(url, stream=True)
             response.raise_for_status()
 
-            with open(save_path, "wb") as f, tqdm(
-                desc=filename,
-                total=int(response.headers.get("content-length", 0)),
-                unit="B",
-                unit_scale=True,
-            ) as pbar:
+            with (
+                open(save_path, "wb") as f,
+                tqdm(
+                    desc=filename,
+                    total=int(response.headers.get("content-length", 0)),
+                    unit="B",
+                    unit_scale=True,
+                ) as pbar,
+            ):
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         f.write(chunk)
@@ -80,6 +88,8 @@ class ModelManager:
         """Возвращает модель по имени"""
         if model_name in self.yolo_loader.MODEL_MAPPING:
             return self.yolo_loader.get_model(model_name)
+        elif model_name in self.onnx_loader.MODEL_MAPPING:
+            return self.onnx_loader.get_model(model_name)
         elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             return self.detectron_loader.get_config(model_name)
         raise ValueError(f"Unknown model: {model_name}")
@@ -91,10 +101,19 @@ class ModelManager:
             return DefaultPredictor(cfg)
         return None
 
+    def predict(self, model_name: str, image_np: np.ndarray, **kwargs):
+        """Универсальный метод для предсказания из numpy массива"""
+        if model_name in self.onnx_loader.MODEL_MAPPING:
+            return self.onnx_loader.predict_from_numpy(model_name, image_np, **kwargs)
+
+        raise ValueError(f"Model {model_name} doesn't support predict method")
+
     def get_model_path(self, model_name: str) -> str:
         """Возвращает путь к модели по её имени"""
         if model_name in self.yolo_loader.MODEL_MAPPING:
             return self.yolo_loader.get_model_path(model_name)
+        elif model_name in self.onnx_loader.MODEL_MAPPING:
+            return self.onnx_loader.get_model_path(model_name)
         elif DETECTRON2_AVAILABLE and model_name in self.detectron_loader.MODEL_MAPPING:
             return self.detectron_loader.get_model_path(model_name)
         raise ValueError(f"Model {model_name} not found")

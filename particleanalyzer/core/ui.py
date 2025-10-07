@@ -9,7 +9,6 @@ from particleanalyzer.core.utils import (
     reset_interface2,
     log_analytics,
     empty_df_ParticleCharacteristics,
-    empty_df_ParticleCharacteristics,
     empty_df_ParticleStatistics,
     save_data_to_csv,
     scale_input_unit_measurement,
@@ -19,7 +18,7 @@ from particleanalyzer.core.utils import (
     select_particle_from_image,
     particle_removal,
     reset_selection,
-    handle_file_upload,
+    sahi_row_visibility,
 )
 from particleanalyzer.core.about import about_ru
 from particleanalyzer.core.parameter_information import reference_ru
@@ -27,7 +26,9 @@ from particleanalyzer.core.ui_styles import css, custom_head
 from particleanalyzer.core.languages import i18n
 from particleanalyzer.core.LLMAnalysis import LLMAnalysis
 from particleanalyzer.core.PointManager import PointManager
+from particleanalyzer.core.EnhancementPipeline import EnhancementPipeline
 from .YOLOLoader import YOLOLoader
+from .ONNXLoader import ONNXLoader
 
 try:
     import detectron2  # noqa: F401
@@ -40,9 +41,12 @@ except ImportError:
 
 def get_available_models():
     yolo_models = list(YOLOLoader.MODEL_MAPPING.keys())
+    rfdetr_models = list(ONNXLoader.MODEL_MAPPING.keys())
     if not DETECTRON2_AVAILABLE:
-        return yolo_models
-    return yolo_models + list(Detectron2Loader.MODEL_MAPPING.keys())
+        return yolo_models[:-1]
+    return (
+        yolo_models[:-1] + rfdetr_models + list(Detectron2Loader.MODEL_MAPPING.keys())
+    )
 
 
 def assets_path(name: str):
@@ -51,6 +55,7 @@ def assets_path(name: str):
 
 point_manager = PointManager()
 analyzer = ParticleAnalyzer()
+enhancement_pipelines = EnhancementPipeline.get_pipeline_names()
 
 my_theme = gr.Theme.load(f"{assets_path('')}/themes/theme_schema@0.0.1.json").set(
     checkbox_label_background_fill="#2196f3",
@@ -410,7 +415,7 @@ def create_interface(api_key):
                                 step=0.01,
                                 label=i18n("Порог перекрытия (IoU)"),
                             )
-                    with gr.Group(elem_id="sahi-setting"):
+                    with gr.Group(elem_id="sahi-setting") as sahi_row:
                         gr.Markdown(
                             f"<h3 style='margin-left: 7px;'><i class='fas fa-puzzle-piece'></i> {i18n('Обработка с разбиением (SAHI)')}</h3>"
                         )
@@ -478,6 +483,12 @@ def create_interface(api_key):
                                     value=20,
                                     step=1,
                                     label=i18n("Интервалов на гистограмме"),
+                                )
+                            with gr.Column(scale=1):
+                                pipelines_enhancer = gr.Dropdown(
+                                    [None] + enhancement_pipelines,
+                                    value=None,
+                                    label=i18n("Улучшение изображения"),
                                 )
                     with gr.Group(elem_id="visualization-settings"):
                         gr.Markdown(
@@ -593,9 +604,20 @@ def create_interface(api_key):
                 # )
 
         image_file.change(
-            fn=handle_file_upload,
+            fn=analyzer.handle_file_upload,
             inputs=[image_file, scale_selector],
-            outputs=[in_image, row_image_file, row_analysis],
+            outputs=[
+                in_image,
+                row_image_file,
+                row_analysis,
+                scale_input_row,
+                scale,
+                points_scale,
+                scale_input_status,
+                scale_input,
+                scale_selector,
+            ],
+            show_progress="hidden",
         )
 
         in_image.select(
@@ -632,6 +654,7 @@ def create_interface(api_key):
                 fill_type_color,
                 fill_color,
                 fill_alpha,
+                pipelines_enhancer,
                 api_key,
             ],
             outputs=[
@@ -879,6 +902,14 @@ def create_interface(api_key):
             fn=save_data_to_csv,
             inputs=[output_table, output_table2],
             outputs=download_output,
+        )
+
+        model_change.change(
+            fn=sahi_row_visibility,
+            inputs=model_change,
+            outputs=[sahi_row, number_detections, confidence_iou],
+            show_progress="hide",
+            show_progress_on=question_row,
         )
 
     return demo

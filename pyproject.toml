@@ -1,3 +1,171 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "ParticleAnalyzer"
+version = "1.2.3"
+description = "SEM Image Analysis Tool for Automatic Particle Segmentation and Size Analysis"
+readme = "README_PYPI.md"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0"}
+authors = [
+    {name = "Kirill Rybakov", email = "rybakov-ks@ya.ru"}
+]
+maintainers = [
+    {name = "Kirill Rybakov", email = "rybakov-ks@ya.ru"}
+]
+keywords = [
+    "SEM",
+    "microscopy", 
+    "image-analysis",
+    "particle-analysis",
+    "materials-science",
+    "nanoparticles",
+    "computer-vision",
+    "opencv",
+    "python",
+    "scientific-computing",
+    "microstructure",
+    "particle-size",
+    "image-processing",
+    "detectron2",
+    "YOLO",
+    "deep-learning",
+    "microscope-images",
+    "material-characterization",
+    "automated-measurements",
+    "research-tools"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "gradio==5.47.2",
+    "gradio-rangeslider",
+    "matplotlib",
+    "opencv-python",
+    "opencv-python-headless",
+    "Pillow",
+    "plotly",
+    "sahi",
+    "scipy",
+    "tqdm",
+    "ultralytics",
+    "huggingface_hub",
+    "openai",
+    "Requests",
+    "numpy",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+    "isort>=5.12.0",
+]
+docs = [
+    "sphinx>=6.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+    "myst-parser>=1.0.0",
+]
+detectron2 = [
+    "git+https://github.com/facebookresearch/detectron2.git",
+]
+
+[project.urls]
+Homepage = "https://github.com/rybakov-ks/ParticleAnalyzer"
+Documentation = "https://github.com/rybakov-ks/ParticleAnalyzer#readme"
+Repository = "https://github.com/rybakov-ks/ParticleAnalyzer.git"
+"Bug Tracker" = "https://github.com/rybakov-ks/ParticleAnalyzer/issues"
+"Live Demo" = "https://particleanalyzer.ru"
+"Telegram Bot" = "https://t.me/particleanalyzer_bot"
+
+[project.scripts]
+ParticleAnalyzer = "particleanalyzer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["particleanalyzer*"]
+exclude = ["tests*", "docs*", "examples*"]
+
+[tool.setuptools.package-data]
+particleanalyzer = [
+    "assets/**/*",
+    "core/*",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["particleanalyzer"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=particleanalyzer",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]

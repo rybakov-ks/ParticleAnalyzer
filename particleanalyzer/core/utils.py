@@ -2,9 +2,7 @@ import gradio as gr
 import pandas as pd
 import numpy as np
 import cv2
-from PIL import Image
 import csv
-import io
 import os
 from datetime import datetime
 from particleanalyzer.core.languages import translations
@@ -476,49 +474,8 @@ def particle_removal(
     )
 
 
-def img_to_numpy_array(file_path, max_size_kb=500, quality=85):
-    try:
-        with Image.open(file_path) as img:
-            img_byte_arr = io.BytesIO()
-            
-            img.save(img_byte_arr, format="PNG", optimize=True)
-
-            current_size_kb = len(img_byte_arr.getvalue()) / 1024
-
-            if current_size_kb > max_size_kb:
-                ratio = (max_size_kb / current_size_kb) ** 0.5
-                new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
-                img = img.resize(new_size, Image.Resampling.LANCZOS)
-                
-                img_byte_arr = io.BytesIO()
-                img.save(img_byte_arr, format="PNG", optimize=True)
-
-            img_byte_arr.seek(0)
-            compressed_img = Image.open(img_byte_arr)
-
-            return np.array(compressed_img)
-
-    except (IOError, OSError, ValueError) as e:
-        gr.Info(
-            get_translation(
-                "Не поддерживаемый формат изображения."
-            )
-        )
-        print(f"Ошибка при загрузке изображения {file_path}: {e}")
-        return None
-
-
-def handle_file_upload(file, scale_selector):
-    if file is None:
-        return gr.skip(), gr.update(visible=True), gr.update(visible=False)
-
-    in_image = img_to_numpy_array(file.name)
-
-    return (
-        in_image,
-        gr.update(visible=False),
-        gr.update(visible=True),
-    )
+def sahi_row_visibility(model_change):
+    return gr.update(visible=(model_change != "RF-DETR Seg (Preview)")), gr.update(interactive=(model_change != "RF-DETR Seg (Preview)")), gr.update(interactive=(model_change != "RF-DETR Seg (Preview)"))
 
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")
