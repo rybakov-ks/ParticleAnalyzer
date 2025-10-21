@@ -13,7 +13,6 @@
 
 ## ParticleAnalyzer
 [![LIVE Application](https://img.shields.io/badge/LIVE-Application%20at%20particleanalyzer.ru-brightgreen)](https://particleanalyzer.ru/)
-[![Slow Demo?](https://img.shields.io/badge/Telegram-Try%20Mini%20App-blue)](https://t.me/particleanalyzer_bot)
 [![PyPI Version](https://img.shields.io/pypi/v/particleanalyzer?label=PyPI)](https://pypi.org/project/particleanalyzer/)
 [![Monthly Downloads](https://static.pepy.tech/badge/particleanalyzer/month)](https://pepy.tech/project/particleanalyzer)
 
