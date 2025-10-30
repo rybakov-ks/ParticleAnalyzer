@@ -372,7 +372,7 @@ class ParticleAnalyzer:
 
         try:
             # Просто передаем numpy массив
-            detections = self.model_manager.predict(
+            results = self.model_manager.predict(
                 model_name=config["model_change"],
                 image_np=config["image"],  # numpy массив
                 confidence_threshold=config["confidence_threshold"],
@@ -383,10 +383,10 @@ class ParticleAnalyzer:
             self._handle_error(e)
             return None, None, None
 
-        if len(detections) == 0:
+        if len(results) == 0:
             gr.Info(self._get_translation("Объекты не обнаружены."))
             return None, None, None
-        elif len(detections) == config["number_detections"]:
+        elif len(results) == config["number_detections"]:
             gr.Info(
                 self._get_translation(
                     "Достигнут предел количества обнаружений. Увеличьте максимальное количество обнаружений в настройках."
@@ -405,8 +405,8 @@ class ParticleAnalyzer:
         particle_counter, particle_data, annotations = 1, [], []
 
         # Обработка детекций
-        for i in range(len(detections.xyxy)):
-            mask = detections.mask[i] if detections.mask is not None else None
+        for i in range(len(results.xyxy)):
+            mask = results.mask[i] if results.mask is not None else None
 
             if mask is not None:
                 contours, _ = cv2.findContours(
@@ -445,6 +445,7 @@ class ParticleAnalyzer:
             with torch.no_grad():
                 results = model(
                     config["image"],
+                    imgsz=640,
                     verbose=False,
                     conf=config["confidence_threshold"],
                     retina_masks=True,
@@ -900,37 +901,96 @@ class ParticleAnalyzer:
         """Очистка ресурсов"""
         if pbar:
             pbar.close()
+        
         gc.collect()
+        
         if torch.cuda.is_available():
+            # Синхронизация перед очисткой
+            torch.cuda.synchronize()
+            # Очистка кэша CUDA
             torch.cuda.empty_cache()
+            # Сброс статистики памяти
+            torch.cuda.reset_peak_memory_stats()
 
-    def _img_to_numpy_array(self, file_path, max_size_kb=500, quality=85):
+    def _img_to_numpy_array(self, file_path: str, max_size_kb: int = 500, quality: int = 85) -> Optional[np.ndarray]:
+        """
+        Конвертирует изображение в numpy array с обработкой различных форматов и оптимизацией размера.
+        
+        Args:
+            file_path: Путь к файлу изображения
+            max_size_kb: Максимальный размер в KB (по умолчанию 500)
+            quality: Качество JPEG сжатия (по умолчанию 85)
+            
+        Returns:
+            np.ndarray или None в случае ошибки
+        """
         try:
             with Image.open(file_path) as img:
-                img_byte_arr = io.BytesIO()
-
-                img.save(img_byte_arr, format="PNG", optimize=True)
-
-                current_size_kb = len(img_byte_arr.getvalue()) / 1024
-
+                original_mode = img.mode
+                
+                # Обработка специальных режимов изображений
+                if img.mode in ['I', 'I;16', 'I;16B', 'I;16L', 'F']:
+                    img_array = np.array(img)
+                    
+                    # Нормализация в 8-бит для специальных форматов
+                    if img_array.dtype in [np.uint16, np.int16]:
+                        img_array = (img_array / 256).astype(np.uint8)
+                    elif img_array.dtype in [np.float32, np.float64]:
+                        img_array = (img_array * 255).astype(np.uint8)
+                    elif img_array.dtype in [np.int32, np.int64]:
+                        img_array = (img_array / (img_array.max() / 255)).astype(np.uint8)
+                    
+                    img = Image.fromarray(img_array)
+                    
+                elif img.mode == 'CMYK':
+                    img = img.convert('RGB')
+                    
+                elif img.mode in ('RGBA', 'LA', 'P'):
+                    # Обработка прозрачности и палитровых изображений
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    
+                    if img.mode in ('RGBA', 'LA'):
+                        bands = img.split()
+                        alpha = bands[-1]
+                        
+                        # Черный фон для полностью прозрачных изображений
+                        if np.array(alpha).max() == 0:
+                            background = Image.new('RGB', img.size, (0, 0, 0))
+                    
+                    background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                    img = background
+                    
+                elif img.mode != 'RGB':
+                    img = img.convert('RGB')
+                
+                # Проверка и коррекция белых изображений
+                test_array = np.array(img)
+                if np.all(test_array >= 250):
+                    with Image.open(file_path) as img_alt:
+                        alt_array = np.array(img_alt)
+                        if alt_array.max() > 0 and alt_array.max() <= 255:
+                            normalized = (alt_array / alt_array.max() * 255).astype(np.uint8)
+                            img = Image.fromarray(normalized)
+                
+                # Оптимизация размера файла
+                with io.BytesIO() as buffer:
+                    img.save(buffer, format='JPEG', quality=quality)
+                    current_size_kb = len(buffer.getvalue()) / 1024
+                
                 if current_size_kb > max_size_kb:
                     ratio = (max_size_kb / current_size_kb) ** 0.5
-                    new_size = (int(img.size[0] * ratio), int(img.size[1] * ratio))
+                    new_size = (max(1, int(img.size[0] * ratio)), max(1, int(img.size[1] * ratio)))
                     img = img.resize(new_size, Image.Resampling.LANCZOS)
-
-                    img_byte_arr = io.BytesIO()
-                    img.save(img_byte_arr, format="PNG", optimize=True)
-
-                img_byte_arr.seek(0)
-                compressed_img = Image.open(img_byte_arr)
-
-                return np.array(compressed_img)
-
-        except (IOError, OSError, ValueError) as e:
+                
+                return np.array(img)
+                
+        except (IOError, OSError, ValueError, Exception):
             gr.Info(self._get_translation("Не поддерживаемый формат изображения."))
-            print(f"Ошибка при загрузке изображения {file_path}: {e}")
             return None
-
+      
     def handle_file_upload(self, file, scale_selector, request: gr.Request):
         # Быстрая проверка на None файл
         if file is None:

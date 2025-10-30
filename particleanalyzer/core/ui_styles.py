@@ -1,4 +1,3 @@
-from particleanalyzer.core.tour import tour
 
 # CSS для стилизации интерфейса
 css = """
@@ -481,44 +480,5 @@ custom_head = (
 
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/introjs.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/intro.js@7.0.1/minified/intro.min.js"></script>
-"""
-    + tour
-    + """
-<style>
-.custom-introjs-tooltip {
-  min-width: 300px;
-  max-width: 400px;
-  border-radius: 8px;
-  color: #000000 !important;
-}
-
-.custom-introjs-tooltip * {
-  color: #000000 !important;
-}
-
-.introjs-progress {
-  background-color: #e0e0e0;
-  height: 4px;
-}
-
-.introjs-progressbar {
-  background-color: #4CAF50;
-}
-
-.custom-introjs-tooltip .introjs-tooltip-title {
-  color: #000000 !important;
-}
-
-.custom-introjs-tooltip .introjs-tooltiptext {
-  color: #000000 !important;
-}
-
-.custom-introjs-tooltip .introjs-button {
-  color: #000000 !important;
-}
-</style>
-
 """
 )

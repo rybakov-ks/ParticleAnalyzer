@@ -97,40 +97,15 @@ def create_interface(api_key):
                               >
                             </a>
                         </div>
-
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <button onclick="startIntro()" style="
-                                background: #4285f4;
-                                color: white;
-                                border: none;
-                                border-radius: 20px;
-                                padding: 7px 16px 7px 12px;
-                                cursor: pointer;
-                                font-size: 14px;
-                                font-weight: 500;
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                transition: all 0.3s;
-                                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                                position: relative;
-                                top: 3px;
-                            " onmouseover="this.style.background='#3367d6'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.2)'" 
-                             onmouseout="this.style.background='#4285f4'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 1px;">
-                                    <circle cx="12" cy="12" r="10" fill="white"/>
-                                    <circle cx="12" cy="9" r="3" fill="#4285f4"/>
-                                    <path d="M12 12C15.5 12 18 14 18 16V18H6V16C6 14 8.5 12 12 12Z" fill="#4285f4"/>
-                                </svg>
-                                {i18n('Помощь')}
-                            </button>
-                            <i class="fas fa-sun" style="font-size: 18px;"></i>
+                            <i class="fas fa-sun" style="font-size: 18px; color: #3B82F6;"></i>
                             <label class="switch">
                                 <input type="checkbox" id="darkModeToggle">
                                 <span class="slider"></span>
                             </label>
-                            <i class="fas fa-moon" style="font-size: 18px;"></i>
+                            <i class="fas fa-moon" style="font-size: 18px; color: #3B82F6;"></i>
                         </div>
+                        
                     </div>
                     """
                 )
@@ -335,6 +310,7 @@ def create_interface(api_key):
                                                     label=i18n(
                                                         "ИИ-интерпретация SEM-данных"
                                                     ),
+                                                    type='messages',
                                                     height=600,
                                                     show_copy_all_button=True,
                                                     avatar_images=(
