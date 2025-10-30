@@ -9,14 +9,14 @@ def assets_path(name: str):
 
 def main(port=8000, api_key=""):
     demo = create_interface(api_key)
-    demo.queue(default_concurrency_limit=5, api_open=False).launch(
+    demo.queue(default_concurrency_limit=5, api_open=True).launch(
         server_name="127.0.0.1",
         server_port=port,
         pwa=True,
         favicon_path=f'{assets_path("")}/icon/favicon.png',
         i18n=i18n,
         ssr_mode=True,
-        show_api=False,
+        show_api=True,
         inbrowser=True,
         allowed_paths=[assets_path("")],
     )

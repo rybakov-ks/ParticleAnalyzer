@@ -46,7 +46,7 @@ def translate_chatbot():
         """🔬 **Добро пожаловать в систему анализа SEM-изображений!**
         Я – ваш виртуальный ассистент в сканирующей электронной микроскопии. Готов провести детальный анализ морфологии и размерных характеристик частиц."""
     )
-    return gr.update(value=[[None, text_chatbot]])
+    return [{"role": "assistant", "content": text_chatbot}]
 
 
 def get_columns(scale_value):
@@ -120,7 +120,7 @@ def reset_interface():
         None,  # Очищаем input_image
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
-        [(None, None)],  # Очищаем chatbot
+        gr.Chatbot(type="messages"),  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
         gr.update(visible=True),  # Показываем строку row_image_file
@@ -144,7 +144,7 @@ def reset_interface2():
         None,  # Очищаем vector_field
         gr.update(visible=False),  # Скрываем строку output_table_image2_row
         gr.update(visible=False),  # Скрываем строку reset_delete_buttons_row
-        [(None, None)],  # Очищаем chatbot
+        gr.Chatbot(type="messages"),  # Очищаем chatbot
         gr.update(visible=False),  # Скрываем строку results_row
         gr.update(visible=False),  # Скрываем sidebar
         gr.update(visible=False),  # Скрываем output_image_row

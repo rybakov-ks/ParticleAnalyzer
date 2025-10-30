@@ -6,7 +6,7 @@ class YOLOLoader:
     MODEL_MAPPING = {
         "Yolo11 (dataset 9)": "Yolo11_d10_batch45.pt",
         "Yolo12 (dataset 9)": "Yolo12_d10_batch45.pt",
-        "ScaleProcessor": "ScaleProcessor_dataset8_RT-DETR.pt",
+        "ScaleProcessor": "ScaleProcessor_dataset9_RT-DETR.pt",
     }
 
     def __init__(self):

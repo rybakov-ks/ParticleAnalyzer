@@ -103,7 +103,7 @@ class LLMAnalysis:
         self.lang = LanguageContext.get_language()
 
         if df.empty:
-            return [(None, "No particles detected")]
+            return [{"role": "assistant", "content": "No particles detected"}]
 
         # Вычисляем статистику
         stats = self._calculate_stats(df)
@@ -116,7 +116,7 @@ class LLMAnalysis:
             return self._format_response(response)
         except Exception as e:
             print(f"LLM analysis failed: {str(e)}")
-            return [(None, f"Analysis error: {str(e)}")]
+            return [{"role": "assistant", "content": f"Analysis error: {str(e)}"}]
 
     def _build_prompt(self, stats, count_particles) -> str:
         return f"""
@@ -192,4 +192,4 @@ class LLMAnalysis:
             analysis = response.choices[0].message.content
         elif self.provider == "huggingface":
             analysis = response.choices[0].message.content
-        return [(None, analysis)]
+        return [{"role": "assistant", "content": analysis}]
