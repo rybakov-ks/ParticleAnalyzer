@@ -4,6 +4,7 @@
 # Web Interface
 gradio==5.47.2
 gradio-rangeslider
+gradio_imagemeasurement
 
 # Data Science and Visualization
 numpy

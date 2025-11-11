@@ -54,7 +54,7 @@ classifiers = [
 
 dependencies = [
     "gradio==5.49.1",
-	"gradio_imagemeasurement"б
+	"gradio_imagemeasurement",
     "gradio-rangeslider",
     "matplotlib",
     "opencv-python",
