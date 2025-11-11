@@ -7,12 +7,13 @@ from torch import device as torch_device
 import os
 import gc
 from tqdm import tqdm
-from typing import Optional, Tuple, Dict
+from typing import Optional, Tuple, Dict, List
 from scipy.spatial.distance import pdist
 import random
 import re
 from PIL import Image
 import io
+import json
 
 try:
     from detectron2.engine import DefaultPredictor
@@ -61,7 +62,12 @@ class ParticleAnalyzer:
         },
     }
 
-    def __init__(self, default_lang="en", device=None):
+    def __init__(
+        self,
+        default_lang="en",
+        device=None,
+        output_dir: str = "output",
+    ):
         """Инициализация анализатора частиц с настройкой окружения"""
         self._setup_environment(device)
         self.model_manager = ModelManager(device=self.device)
@@ -76,6 +82,9 @@ class ParticleAnalyzer:
         self.default_lang = default_lang
         # Устанавливаем язык в контекст
         LanguageContext.set_language(default_lang)
+
+        # Устанавливаем папку для сохранения
+        self.output_dir = output_dir
 
     def _setup_environment(self, device=None):
         """Настройка параметров окружения и CUDA"""
@@ -146,6 +155,7 @@ class ParticleAnalyzer:
             None,
             gr.update(visible=False),
             gr.update(visible=False),
+            None,
         )
 
     def analyze_image(
@@ -189,9 +199,10 @@ class ParticleAnalyzer:
         scale_selector = self.__class__.SCALE_OPTIONS[scale_selector]
         try:
             pbar = tqdm(
-                total=5,
+                total=6,
                 desc=self._get_translation("Подготовка..."),
                 bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]",
+                leave=False,
             )
             pr(0, desc=self._get_translation("Подготовка..."))
             selected_image = image2
@@ -200,7 +211,7 @@ class ParticleAnalyzer:
                 gr.Warning(self._get_translation("Ошибка: изображение отсутствует..."))
                 return self._create_error_return()
 
-            image, orig_image, gray_image, scale, scale_factor_glob = (
+            image, orig_image, gray_image, scale, scale_factor_glob, image_name = (
                 self.preprocessor.preprocess_image(
                     image=selected_image,
                     scale=scale,
@@ -250,12 +261,16 @@ class ParticleAnalyzer:
             }
 
             # Выбор стратегии обработки
+
             processor = self._select_processor(model_change, sahi_mode)
             output_image, particle_data, annotations = processor(**config)
-            if output_image is None:
+
+            if output_image is None and particle_data is None and annotations is None:
+                self._cleanup(pbar)
                 return self._create_error_return()
 
-            output_image = cv2.cvtColor(output_image, cv2.COLOR_BGR2RGB)
+            self._create_binary_mask(annotations, image_name)
+
             if scale_selector["scale"] and show_Scale_bar:
                 output_image = self.point_manager.draw_scale_on_image(
                     output_image, scale_factor_glob, scale, *points_scale
@@ -263,6 +278,9 @@ class ParticleAnalyzer:
 
             df = pd.DataFrame(particle_data)
             points_df = pd.DataFrame(df["points"])
+
+            self._df_to_coco(points_df, output_image, image_name)
+
             df = df.drop(columns=["points"])
 
             pbar.set_description(self._get_translation("Построение таблицы..."))
@@ -285,6 +303,7 @@ class ParticleAnalyzer:
             pr(0.9, desc=self._get_translation("Построение графиков..."))
             fig, vector_fig = builder.build_distribution_fig(image)
             pbar.update(1)
+
             pr(1, desc=self._get_translation("Готово!"))
             return (
                 output_image,
@@ -341,6 +360,7 @@ class ParticleAnalyzer:
                 ),
                 gr.update(visible=True),
                 gr.update(visible=True),
+                image_name,
             )
         except Exception as e:
             self._handle_error(e)
@@ -606,9 +626,13 @@ class ParticleAnalyzer:
         thickness = self._get_scaled_thickness(
             output_image.shape[1], output_image.shape[0]
         )
+
+        image_height, image_width = config["orig_image"].shape[:2]
+
         particle_counter, particle_data, annotations = 1, [], []
         for r in results.object_prediction_list:
             mask = r.mask.segmentation
+            mask2 = self._sahi_polygon_to_binary_mask(mask, image_height, image_width)
             if isinstance(mask, list) and len(mask) > 0:
                 flat_coords = (
                     np.concatenate(mask).astype(np.int32)
@@ -623,8 +647,8 @@ class ParticleAnalyzer:
                     output_image=output_image,
                     thickness=thickness,
                     particle_data=particle_data,
-                    annotations=None,
-                    raw_mask=None,
+                    annotations=annotations,
+                    raw_mask=mask2,
                     particle_counter=particle_counter,
                     **config,
                 )
@@ -900,10 +924,11 @@ class ParticleAnalyzer:
     def _cleanup(self, pbar: Optional[tqdm] = None):
         """Очистка ресурсов"""
         if pbar:
+            pbar.set_description(self._get_translation("Готово!"))
             pbar.close()
-        
+
         gc.collect()
-        
+
         if torch.cuda.is_available():
             # Синхронизация перед очисткой
             torch.cuda.synchronize()
@@ -912,86 +937,98 @@ class ParticleAnalyzer:
             # Сброс статистики памяти
             torch.cuda.reset_peak_memory_stats()
 
-    def _img_to_numpy_array(self, file_path: str, max_size_kb: int = 500, quality: int = 85) -> Optional[np.ndarray]:
+    def _img_to_numpy_array(
+        self, file_path: str, max_size_kb: int = 500, quality: int = 85
+    ) -> Optional[np.ndarray]:
         """
         Конвертирует изображение в numpy array с обработкой различных форматов и оптимизацией размера.
-        
+
         Args:
             file_path: Путь к файлу изображения
             max_size_kb: Максимальный размер в KB (по умолчанию 500)
             quality: Качество JPEG сжатия (по умолчанию 85)
-            
+
         Returns:
             np.ndarray или None в случае ошибки
         """
         try:
             with Image.open(file_path) as img:
-                original_mode = img.mode
-                
                 # Обработка специальных режимов изображений
-                if img.mode in ['I', 'I;16', 'I;16B', 'I;16L', 'F']:
+                if img.mode in ["I", "I;16", "I;16B", "I;16L", "F"]:
                     img_array = np.array(img)
-                    
+
                     # Нормализация в 8-бит для специальных форматов
                     if img_array.dtype in [np.uint16, np.int16]:
                         img_array = (img_array / 256).astype(np.uint8)
                     elif img_array.dtype in [np.float32, np.float64]:
                         img_array = (img_array * 255).astype(np.uint8)
                     elif img_array.dtype in [np.int32, np.int64]:
-                        img_array = (img_array / (img_array.max() / 255)).astype(np.uint8)
-                    
+                        img_array = (img_array / (img_array.max() / 255)).astype(
+                            np.uint8
+                        )
+
                     img = Image.fromarray(img_array)
-                    
-                elif img.mode == 'CMYK':
-                    img = img.convert('RGB')
-                    
-                elif img.mode in ('RGBA', 'LA', 'P'):
+
+                elif img.mode == "CMYK":
+                    img = img.convert("RGB")
+
+                elif img.mode in ("RGBA", "LA", "P"):
                     # Обработка прозрачности и палитровых изображений
-                    background = Image.new('RGB', img.size, (255, 255, 255))
-                    
-                    if img.mode == 'P':
-                        img = img.convert('RGBA')
-                    
-                    if img.mode in ('RGBA', 'LA'):
+                    background = Image.new("RGB", img.size, (255, 255, 255))
+
+                    if img.mode == "P":
+                        img = img.convert("RGBA")
+
+                    if img.mode in ("RGBA", "LA"):
                         bands = img.split()
                         alpha = bands[-1]
-                        
+
                         # Черный фон для полностью прозрачных изображений
                         if np.array(alpha).max() == 0:
-                            background = Image.new('RGB', img.size, (0, 0, 0))
-                    
-                    background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                            background = Image.new("RGB", img.size, (0, 0, 0))
+
+                    background.paste(
+                        img,
+                        mask=img.split()[-1] if img.mode in ("RGBA", "LA") else None,
+                    )
                     img = background
-                    
-                elif img.mode != 'RGB':
-                    img = img.convert('RGB')
-                
+
+                elif img.mode != "RGB":
+                    img = img.convert("RGB")
+
                 # Проверка и коррекция белых изображений
                 test_array = np.array(img)
                 if np.all(test_array >= 250):
                     with Image.open(file_path) as img_alt:
                         alt_array = np.array(img_alt)
                         if alt_array.max() > 0 and alt_array.max() <= 255:
-                            normalized = (alt_array / alt_array.max() * 255).astype(np.uint8)
+                            normalized = (alt_array / alt_array.max() * 255).astype(
+                                np.uint8
+                            )
                             img = Image.fromarray(normalized)
-                
+
                 # Оптимизация размера файла
                 with io.BytesIO() as buffer:
-                    img.save(buffer, format='JPEG', quality=quality)
+                    img.save(buffer, format="JPEG", quality=quality)
                     current_size_kb = len(buffer.getvalue()) / 1024
-                
+
                 if current_size_kb > max_size_kb:
                     ratio = (max_size_kb / current_size_kb) ** 0.5
-                    new_size = (max(1, int(img.size[0] * ratio)), max(1, int(img.size[1] * ratio)))
+                    new_size = (
+                        max(1, int(img.size[0] * ratio)),
+                        max(1, int(img.size[1] * ratio)),
+                    )
                     img = img.resize(new_size, Image.Resampling.LANCZOS)
-                
+
                 return np.array(img)
-                
+
         except (IOError, OSError, ValueError, Exception):
             gr.Info(self._get_translation("Не поддерживаемый формат изображения."))
             return None
-      
-    def handle_file_upload(self, file, scale_selector, request: gr.Request):
+
+    def handle_file_upload(
+        self, file, scale_selector, auto_scale_mode, request: gr.Request
+    ):
         # Быстрая проверка на None файл
         if file is None:
             return (
@@ -1010,53 +1047,72 @@ class ParticleAnalyzer:
         lang = self._determine_language(request.headers.get("Accept-Language", ""))
         LanguageContext.set_language(lang)
         self.lang = lang
-
+        
+        ImagePreprocessor.file_name = os.path.basename(file.name).rsplit('.', 1)[0]
+        
         # Обработка изображения
         in_image = self._img_to_numpy_array(file.name)
-        (
-            crop_in_image,
-            info_bar_image,
-            scale_bar_image,
-            scale_text_image,
-            result,
-            points_scale,
-        ) = self.scale_processor.process_image(in_image, 0.1)
 
-        scale_type = result[2]
+        if auto_scale_mode:
+            (
+                crop_in_image,
+                info_bar_image,
+                scale_bar_image,
+                scale_text_image,
+                result,
+                points_scale,
+            ) = self.scale_processor.process_image(in_image, 0.1)
 
-        # Обработка значений с защитой от None
-        scale_bar_width = self._safe_float_convert(result[0], default=1.0)
-        scale_value = self._safe_float_convert(result[1], default=1.0)
+            scale_type = result[2]
 
-        # Формирование статусного текста
-        status_text = (
-            self._get_translation("Выберите две крайние точки на шкале")
-            if result[0] is None
-            else f"{self._get_translation('Расстояние равно')}: {scale_bar_width:.0f} {self._get_translation('пикселей')}"
-        )
+            # Обработка значений с защитой от None
+            scale_bar_width = self._safe_float_convert(result[0], default=1.0)
+            scale_value = self._safe_float_convert(result[1], default=1.0)
 
-        # Если шкала не в микрометрах или нанометрах - возвращаем пиксельный результат
-        if scale_type not in ("µm", "nm"):
-            gr.Info(
-                self._get_translation("Автоматическое определение масштабной шкалы не удалось. Укажите шкалу вручную или продолжите анализ в пикселях.")
+            # Формирование статусного текста
+            status_text = (
+                self._get_translation("Выберите две крайние точки на шкале")
+                if result[0] is None
+                else f"{self._get_translation('Расстояние равно')}: {scale_bar_width:.0f} {self._get_translation('пикселей')}"
             )
-            return self._get_pixel_result(in_image, status_text)
 
-        # Формирование результата для µm/nm случаев
-        type_scale = self._get_scale_type_display(scale_type)
-        gr.Info(
-            self._get_translation("Масштабная шкала обнаружена и распознана автоматически. Можно продолжить дальнейший анализ.")
-        )
+            # Если шкала не в микрометрах или нанометрах - возвращаем пиксельный результат
+            if scale_type not in ("µm", "nm"):
+                gr.Info(
+                    self._get_translation(
+                        "Автоматическое определение масштабной шкалы не удалось. Укажите шкалу вручную или продолжите анализ в пикселях."
+                    )
+                )
+                return self._get_pixel_result(in_image, status_text)
+
+            # Формирование результата для µm/nm случаев
+            type_scale = self._get_scale_type_display(scale_type)
+            gr.Info(
+                self._get_translation(
+                    "Масштабная шкала обнаружена и распознана автоматически. Можно продолжить дальнейший анализ."
+                )
+            )
+            return (
+                in_image,
+                gr.update(visible=False),
+                gr.update(visible=True),
+                gr.update(visible=True),  # scale_input_row
+                scale_bar_width,  # scale
+                points_scale,  # points_scale
+                gr.update(value=status_text),  # scale_input_status
+                gr.update(value=scale_value),  # scale_input
+                gr.update(value=type_scale),  # scale_selector
+            )
         return (
             in_image,
             gr.update(visible=False),
             gr.update(visible=True),
-            gr.update(visible=True),  # scale_input_row
-            scale_bar_width,  # scale
-            points_scale,  # points_scale
-            gr.update(value=status_text),  # scale_input_status
-            gr.update(value=scale_value),  # scale_input
-            gr.update(value=type_scale),  # scale_selector
+            gr.skip(),  # scale_input_row
+            gr.skip(),  # scale
+            gr.skip(),  # points_scale
+            gr.skip(),
+            gr.skip(),
+            gr.skip(),
         )
 
     def _safe_float_convert(self, value, default=0.0):
@@ -1086,3 +1142,171 @@ class ParticleAnalyzer:
             gr.update(value=1.0),  # scale_input
             gr.update(value="Pixels"),  # scale_selector
         )
+
+    def _create_binary_mask(
+        self, annotations: List[Tuple[np.ndarray, str]], image_name: str
+    ) -> np.ndarray:
+        """
+        Создает бинарное изображение из списка масок частиц.
+
+        Args:
+            annotations: Список кортежей (маска, имя_частицы)
+            output_path: Путь для сохранения результата
+
+        Returns:
+            Бинарное изображение с объединенными масками
+        """
+        if not annotations:
+            raise ValueError("Список аннотаций пуст")
+
+        # Берем размер из первой маски
+        first_mask, first_name = annotations[0]
+        height, width = first_mask.shape
+
+        # Создаем выходное изображение
+        binary_mask_output = np.zeros((height, width), dtype=np.uint8)
+
+        # Векторизованная обработка всех масок
+        for mask, particle_name in annotations:
+            # Используем in-place операцию для экономии памяти
+            np.maximum(
+                binary_mask_output,
+                (mask > 0).astype(np.uint8) * 255,
+                out=binary_mask_output,
+            )
+
+        # Сохраняем результат
+        image_path = os.path.join(self.output_dir, f"binary_mask_{image_name}.png")
+        cv2.imwrite(image_path, binary_mask_output)
+
+        return binary_mask_output
+
+    def _df_to_coco(self, df, image_np, image_name):
+        """
+        Преобразование DataFrame с точками контуров в COCO формат для одного изображения (numpy array)
+
+        Args:
+            df: DataFrame с колонкой 'points' (все аннотации для одного изображения)
+            image_np: изображение в формате numpy array (H, W, C)
+            image_name: имя файла для сохранения в COCO
+        """
+
+        # Получаем размеры из numpy array
+        height, width = image_np.shape[:2]
+
+        # Базовая структура COCO
+        coco_format = {
+            "images": [
+                {
+                    "id": 1,
+                    "file_name": f"{image_name}.png",
+                    "width": width,
+                    "height": height,
+                }
+            ],
+            "annotations": [],
+            "categories": [{"id": 1, "name": "Particle", "supercategory": "none"}],
+        }
+
+        # Обрабатываем каждую аннотацию
+        for annotation_id, (idx, row) in enumerate(df.iterrows(), 1):
+            points = row["points"]
+            segmentation = []
+
+            # Обрабатываем разные форматы точек
+            for point in points:
+                if isinstance(point[0], list):  # [[[x, y]]]
+                    x, y = point[0]
+                else:  # [[x, y]]
+                    x, y = point
+
+                # Проверяем границы координат
+                x = max(0, min(x, width - 1))
+                y = max(0, min(y, height - 1))
+                segmentation.extend([float(x), float(y)])
+
+            # Вычисляем bounding box только если есть точки
+            if len(segmentation) >= 4:  # минимум 2 точки
+                x_coords = segmentation[::2]
+                y_coords = segmentation[1::2]
+
+                x_min, x_max = min(x_coords), max(x_coords)
+                y_min, y_max = min(y_coords), max(y_coords)
+
+                bbox_width = x_max - x_min
+                bbox_height = y_max - y_min
+
+                bbox = [x_min, y_min, bbox_width, bbox_height]
+                area = bbox_width * bbox_height
+
+                # Добавляем аннотацию
+                coco_format["annotations"].append(
+                    {
+                        "id": annotation_id,
+                        "image_id": 1,
+                        "category_id": 1,
+                        "segmentation": [segmentation],
+                        "area": area,
+                        "bbox": bbox,
+                        "iscrowd": 0,
+                    }
+                )
+
+        # Сохраняем в файл
+        coco_path = os.path.join(self.output_dir, f"coco_file_{image_name}.json")
+        with open(coco_path, "w") as f:
+            json.dump(coco_format, f, indent=2)
+
+        return coco_format
+
+    def _sahi_polygon_to_binary_mask(
+        self, sahi_polygon: list, height: int, width: int
+    ) -> np.ndarray:
+        """
+        Преобразует полигон SAHI в бинарную маску
+        """
+        mask = np.zeros((height, width), dtype=np.uint8)
+
+        if not sahi_polygon:
+            return mask
+
+        try:
+            # Быстрое выравнивание через itertools (избегаем рекурсии)
+            from collections.abc import Iterable
+
+            def flatten_fast(lst):
+                for item in lst:
+                    if isinstance(item, Iterable) and not isinstance(
+                        item, (str, bytes)
+                    ):
+                        yield from flatten_fast(item)
+                    else:
+                        yield item
+
+            flat_coords = np.fromiter(flatten_fast(sahi_polygon), dtype=np.float32)
+
+            # Проверяем четность координат
+            if len(flat_coords) & 1:
+                print(f"Warning: Odd number of coordinates: {len(flat_coords)}")
+                return mask
+
+            points = flat_coords.reshape(-1, 2).astype(np.int32)
+
+            # Минимум 3 точки для полигона
+            if len(points) < 3:
+                return mask
+
+            # Клиппинг векторизованный
+            np.clip(points[:, 0], 0, width - 1, out=points[:, 0])
+            np.clip(points[:, 1], 0, height - 1, out=points[:, 1])
+
+            # Создаем маску
+            cv2.fillPoly(mask, [points], color=1)
+
+        except Exception as e:
+            print(f"Error in _sahi_polygon_to_binary_mask: {e}")
+            print(
+                f"Input polygon structure: {type(sahi_polygon)}, length: {len(sahi_polygon) if hasattr(sahi_polygon, '__len__') else 'N/A'}"
+            )
+
+        return mask

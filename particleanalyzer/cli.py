@@ -14,7 +14,10 @@ def main():
         help="Port to run the application on (default: 8000)",
     )
     run_parser.add_argument(
-        "--api-key", type=str, default="", help="The OpenRouter or Hugging Face API key for LLM output"
+        "--api-key",
+        type=str,
+        default="",
+        help="The OpenRouter or Hugging Face API key for LLM output",
     )
 
     run_parser.set_defaults(func=run_app)

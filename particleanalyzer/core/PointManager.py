@@ -24,28 +24,18 @@ class PointManager:
         self.points = []
         return self.points
 
-    def handle_select(self, scale_selector, evt: gr.SelectData):
+    def handle_select(self, scale_selector, DataMeasurement: gr.EventData):
+        DataMeasurement = DataMeasurement._data
         self.lang = LanguageContext.get_language()
-        if scale_selector != "Pixels":
-            self.add_point(evt.index)
-            if len(self.points) == 2:
-                point1, point2 = self.points[0], self.points[1]
-                distance = np.sqrt(
-                    (point2[0] - point1[0]) ** 2 + (point2[1] - point1[1]) ** 2
-                )
-                return (
-                    f"{self._get_translation('Расстояние равно')}: {distance:.0f} {self._get_translation('пикселей')}",
-                    distance,
-                    (point1, point2),
-                )
-            else:
-                return (
-                    f"{self._get_translation('Выбрано точек')}: {len(self.points)}/2",
-                    None,
-                    None,
-                )
-        else:
-            return gr.skip(), gr.skip(), gr.skip()
+
+        return (
+            f"{self._get_translation('Расстояние равно')}: {DataMeasurement['distance_px']:.0f} {self._get_translation('пикселей')}",
+            DataMeasurement["distance_px"],
+            (
+                (DataMeasurement["point_a"]["x"], DataMeasurement["point_a"]["y"]),
+                (DataMeasurement["point_b"]["x"], DataMeasurement["point_b"]["y"]),
+            ),
+        )
 
     def draw_scale_on_image(self, image, scale_factor, distance, point1, point2):
         pil_image = Image.fromarray(image)

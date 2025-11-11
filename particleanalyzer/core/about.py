@@ -45,40 +45,22 @@ about_ru = f"""
             </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
-            Инструмент для  <strong style="color:var(--block-label-text-color)">автоматической сегментации</strong>
-            частиц на SEM-изображениях, измерения их размерных характеристик, проведения статистического анализа
-            и экспорта полученных данных.          
+            Инструмент для <strong style="color:var(--block-label-text-color)">автоматической обработки</strong> SEM-изображений, который выполняет сегментацию частиц, 
+            измеряет их геометрические параметры, проводит статистический анализ 
+            и обеспечивает удобный экспорт полученных данных.
         </p>
     </div>
 
     <!-- Video Demo Block -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 Видео-демонстрация работы</h3>
-            <div style="margin-top:15px;">
-                <a href="https://rutube.ru/play/embed/1f879a0e65c95168704ba53b94f9109a" 
-                   style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
-                   target="_blank">
-                    Ссылка на видео-демонстрацию
-                </a>
-            </div>
-        <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
-            Посмотрите, как работает ParticleAnalyzer на реальных примерах
-        </p>
-    </div>
-
-    <!-- Support block -->
-    <div style="background:var(--block-background-fill);padding:15px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow)">
-        <h3 style="margin-top:0;color:#e65100;font-weight:600">🛠 Техническая поддержка</h3>
-        <div style="font-size:15px;line-height:1.5;color:var(--text-color)">
-            <div style="margin-bottom:8px">При возникновении проблем:</div>
-            <ul style="margin-top:8px;margin-bottom:12px;padding-left:20px;color:var(--text-color)">
-                <li>Приложите проблемное изображение</li>
-                <li>Приложите скриншот ошибки</li>
-                <li>Опишите ожидаемый результат</li>
-                <li>Укажите версию программы</li>
-            </ul>
-            <strong>Контакт:</strong> 
-            <a href="mailto:rybakov-ks@ya.ru" style="color:var(--link-text-color);text-decoration:none">rybakov-ks@ya.ru</a>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
+            <iframe src="https://rutube.ru/play/embed/1f879a0e65c95168704ba53b94f9109a" 
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
+                    frameborder="0" 
+                    allow="cross-origin-isolated; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
         </div>
     </div>
 
@@ -141,40 +123,22 @@ about_en = f"""
             </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
-            A tool for analyzing <strong style="color:var(--block-label-text-color)">particle size characteristics</strong> 
-            in SEM images with automatic segmentation, statistical analysis, 
-            and result export capabilities.
+            A tool for  <strong style="color:var(--block-label-text-color)">automated processing</strong> of SEM images that performs particle 
+            segmentation, measures their geometric parameters, 
+            conducts statistical analysis, and provides convenient export of the obtained data.
         </p>
     </div>
 
     <!-- Video Demo Block -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 Video Demonstration</h3>
-        <div style="margin-top:15px;">
-            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
-               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
-               target="_blank">
-                Link to video demonstration
-            </a>
-        </div>
-        <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
-            See how ParticleAnalyzer works with real examples
-        </p>
-    </div>
-
-    <!-- Support block -->
-    <div style="background:var(--block-background-fill);padding:15px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow)">
-        <h3 style="margin-top:0;color:#e65100;font-weight:600">🛠 Technical Support</h3>
-        <div style="font-size:15px;line-height:1.5;color:var(--text-color)">
-            <div style="margin-bottom:8px">If you encounter any issues:</div>
-            <ul style="margin-top:8px;margin-bottom:12px;padding-left:20px;color:var(--text-color)">
-                <li>Attach the problematic image</li>
-                <li>Include a screenshot of the error</li>
-                <li>Describe the expected result</li>
-                <li>Specify the program version</li>
-            </ul>
-            <strong>Contact:</strong> 
-            <a href="mailto:rybakov-ks@ya.ru" style="color:var(--link-text-color);text-decoration:none">rybakov-ks@ya.ru</a>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
+            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
         </div>
     </div>
 
@@ -237,39 +201,20 @@ about_zh_cn = f"""
             </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
-            一款用于分析<strong style="color:var(--block-label-text-color)">颗粒尺寸特征</strong>的工具，
-            支持SEM图像的自动分割、统计分析以及结果导出功能。
+            用于扫描电镜（SEM）图像自动处理的工具，可执行颗粒分割、测量几何参数、进行统计分析，并提供便捷的数据导出功能。
         </p>
     </div>
 
     <!-- 视频演示 -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 视频演示</h3>
-        <div style="margin-top:15px;">
-            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
-               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
-               target="_blank">
-                影片示範連結
-            </a>
-        </div>
-        <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
-            观看颗粒分析器在实际案例中的应用
-        </p>
-    </div>
-
-    <!-- 技术支持 -->
-    <div style="background:var(--block-background-fill);padding:15px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow)">
-        <h3 style="margin-top:0;color:#e65100;font-weight:600">🛠 技术支持</h3>
-        <div style="font-size:15px;line-height:1.5;color:var(--text-color)">
-            <div style="margin-bottom:8px">如遇问题请提供：</div>
-            <ul style="margin-top:8px;margin-bottom:12px;padding-left:20px;color:var(--text-color)">
-                <li>问题图像文件</li>
-                <li>错误截图</li>
-                <li>预期结果描述</li>
-                <li>软件版本信息</li>
-            </ul>
-            <strong>联系方式：</strong> 
-            <a href="mailto:rybakov-ks@ya.ru" style="color:var(--link-text-color);text-decoration:none">rybakov-ks@ya.ru</a>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
+            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
         </div>
     </div>
 
@@ -332,39 +277,20 @@ about_zh_tw = f"""
             </a>
         </div>
         <p style="font-size:16px;line-height:1.6;margin-bottom:0;color:var(--text-color)">
-            用於分析<strong style="color:var(--block-label-text-color)">粒子尺寸特徵</strong>的工具，
-            具備SEM影像自動分割、統計分析及結果導出功能。
+            用於掃描式電子顯微鏡（SEM）影像自動處理的工具，可執行顆粒分割、測量幾何參數、進行統計分析，並提供便捷的資料匯出功能。
         </p>
     </div>
 
     <!-- 影片示範 -->
     <div style="background:var(--block-background-fill);padding:20px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow);text-align:center">
         <h3 style="margin-top:0;color:var(--header-text-color);font-weight:600">🎥 影片示範</h3>
-        <div style="margin-top:15px;">
-            <a href="https://www.youtube.com/embed/qlCuZDjDyqk" 
-               style="color:var(--link-color);text-decoration:underline;font-size:16px;" 
-               target="_blank">
-                影片示範連結
-            </a>
-        </div>
-        <p style="font-size:14px;color:var(--text-color-secondary);margin-top:10px">
-            影片示範連結
-        </p>
-    </div>
-
-    <!-- 技術支援 -->
-    <div style="background:var(--block-background-fill);padding:15px;border-radius:8px;margin-bottom:20px;border:1px solid var(--border-color-primary);box-shadow:var(--block-shadow)">
-        <h3 style="margin-top:0;color:#e65100;font-weight:600">🛠 技術支援</h3>
-        <div style="font-size:15px;line-height:1.5;color:var(--text-color)">
-            <div style="margin-bottom:8px">若遇到問題請提供：</div>
-            <ul style="margin-top:8px;margin-bottom:12px;padding-left:20px;color:var(--text-color)">
-                <li>有問題的影像檔案</li>
-                <li>錯誤截圖</li>
-                <li>預期結果說明</li>
-                <li>程式版本資訊</li>
-            </ul>
-            <strong>聯絡方式：</strong> 
-            <a href="mailto:rybakov-ks@ya.ru" style="color:var(--link-text-color);text-decoration:none">rybakov-ks@ya.ru</a>
+        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin-top:15px;border-radius:6px">
+            <iframe src="https://www.youtube.com/embed/qlCuZDjDyqk" 
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+            </iframe>
         </div>
     </div>
 

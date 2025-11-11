@@ -10,9 +10,11 @@ particleanalyzer/model/*.yaml
 particleanalyzer/output/*.png
 particleanalyzer/output/*.jpg
 particleanalyzer/output/*.csv
+particleanalyzer/output/*.json
 output/*.png
 output/*.jpg
 output/*.csv
+output/*.json
 
 # Игнорировать все в .idea
 .idea/*

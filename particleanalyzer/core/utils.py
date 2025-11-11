@@ -160,18 +160,28 @@ def scale_input_unit_measurement(scale_selector, request: gr.Request):
     return gr.update(label=label)
 
 
-def save_data_to_csv(
-    data_table: pd.DataFrame, data_table2: pd.DataFrame, output_dir: str = "output"
+def save_data_to_csv_and_binary_mask(
+    image_name: str,
+    data_table: pd.DataFrame,
+    data_table2: pd.DataFrame,
+    output_dir: str = "output",
 ):
     """Сохраняет данные частиц в CSV файлы"""
+    if image_name is None:
+        return gr.skip()
     os.makedirs(output_dir, exist_ok=True)
-    particle_path = os.path.join(output_dir, "particle_characteristics.csv")
-    stats_path = os.path.join(output_dir, "particle_statistics.csv")
+    particle_path = os.path.join(
+        output_dir, f"particle_characteristics_{image_name}.csv"
+    )
+    stats_path = os.path.join(output_dir, f"particle_statistics_{image_name}.csv")
 
     data_table.to_csv(particle_path, index=False, encoding="utf-8-sig")
     data_table2.to_csv(stats_path, index=False, encoding="utf-8-sig")
 
-    return [particle_path, stats_path]
+    binary_mask_path = os.path.join(output_dir, f"binary_mask_{image_name}.png")
+    coco_path = os.path.join(output_dir, f"coco_file_{image_name}.json")
+
+    return [particle_path, stats_path, binary_mask_path, coco_path]
 
 
 def log_analytics(
@@ -238,7 +248,7 @@ def statistic_an(
     S_slider,
     P_slider,
     I_slider,
-    image2: np.ndarray,
+    in_image: np.ndarray,
     solution,
     sahi_mode,
     outline_color,
@@ -249,10 +259,12 @@ def statistic_an(
     fill_alpha,
 ):
 
+    if in_image is None:
+        return None, None, None, None
+
     lang = LanguageContext.get_language()
     scale_config = ParticleAnalyzer.SCALE_OPTIONS[scale_selector]
-    selected_image = image2
-    selected_image = cv2.cvtColor(selected_image, cv2.COLOR_RGB2BGR)
+    selected_image = in_image
     selected_image, scale_factor_glob = ImagePreprocessor.resize_image(
         selected_image, solution, sahi_mode
     )
@@ -332,7 +344,6 @@ def statistic_an(
                 color=ParticleAnalyzer.rgba_to_bgr(outline_color),
                 thickness=thickness,
             )
-    selected_image = cv2.cvtColor(selected_image, cv2.COLOR_BGR2RGB)
 
     return (
         selected_image,
@@ -475,7 +486,11 @@ def particle_removal(
 
 
 def sahi_row_visibility(model_change):
-    return gr.update(visible=(model_change != "RF-DETR Seg (Preview)")), gr.update(interactive=(model_change != "RF-DETR Seg (Preview)")), gr.update(interactive=(model_change != "RF-DETR Seg (Preview)"))
+    return (
+        gr.update(visible=(model_change != "RF-DETR Seg (Preview)")),
+        gr.update(interactive=(model_change != "RF-DETR Seg (Preview)")),
+        gr.update(interactive=(model_change != "RF-DETR Seg (Preview)")),
+    )
 
 
 empty_df_ParticleCharacteristics = get_columns("Pixels").fillna("")

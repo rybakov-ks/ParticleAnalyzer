@@ -19,7 +19,9 @@ class ImagePreprocessor:
         "2048x2048": (2048, 2048),
         "Оригинал": None,
     }
-
+    
+    file_name = None
+    
     def __init__(self, output_dir: str = "output", lang="ru"):
         self.output_dir = output_dir
         self.lang = lang
@@ -51,10 +53,12 @@ class ImagePreprocessor:
                         "Обозначьте на изображении масштабную шкалу при помощи двух точек."
                     )
                 )
-                return None, None, None, None, None
+                return None, None, None, None, None, None
 
             # Сохранение метаданных
-            self._save_image_metadata(image, request)
+            image_name = self._save_image_metadata(image, request)
+            
+            image_name = f"{ImagePreprocessor.file_name}_{image_name}"
 
             # Изменение размера
             image, scale_factor_glob = self.resize_image(image, solution, sahi_mode)
@@ -63,11 +67,11 @@ class ImagePreprocessor:
             orig_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             gray_image = cv2.cvtColor(orig_image, cv2.COLOR_BGR2GRAY)
             pbar.update(1)
-            return image, orig_image, gray_image, scale, scale_factor_glob
+            return image, orig_image, gray_image, scale, scale_factor_glob, image_name
 
         except Exception as e:
             print(f"Ошибка при обработке изображения: {e}")
-            return None, None, None, None, None
+            return None, None, None, None, None, None
 
     @staticmethod
     def resize_image(
@@ -76,6 +80,7 @@ class ImagePreprocessor:
         sahi_mode: bool,
     ) -> np.ndarray:
         """Изменяет размер изображения согласно выбранному профилю."""
+        
         if solution == "Оригинал" or sahi_mode:
             return image, 1
 
@@ -95,7 +100,6 @@ class ImagePreprocessor:
                 ), "Изображение масштабировалось с изменением пропорций"
                 scale_factor_glob = (scale_x + scale_y) / 2
 
-                # print(f"Изменение размера: {w}x{h} → {new_size[0]}x{new_size[1]}")
                 return (
                     cv2.resize(image, new_size, interpolation=cv2.INTER_AREA),
                     scale_factor_glob,
@@ -133,6 +137,8 @@ class ImagePreprocessor:
             else:
                 new_df.to_csv(csv_path, mode="w", header=True, index=False)
 
+            return timestamp
+
         except Exception:
-            pass
+            return None
             # print(f"Ошибка при сохранении метаданных: {e}")

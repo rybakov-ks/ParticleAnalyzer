@@ -15,7 +15,7 @@ def main(port=8000, api_key=""):
         pwa=True,
         favicon_path=f'{assets_path("")}/icon/favicon.png',
         i18n=i18n,
-        ssr_mode=True,
+        ssr_mode=False,
         show_api=True,
         inbrowser=True,
         allowed_paths=[assets_path("")],

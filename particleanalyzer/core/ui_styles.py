@@ -1,4 +1,3 @@
-
 # CSS для стилизации интерфейса
 css = """
 /* ==========================================================================
@@ -165,13 +164,25 @@ css = """
    ========================================================================== */
 #image-file,
 #in-image,
-#output-image {
+#output-image,
+#scale-selector,
+#scale-input-row,
+#instruction {
   border-radius: 12px !important;
   border: 1px solid var(--border) !important;
   box-shadow: var(--shadow) !important;
   background: var(--card-bg) !important;
   transition: all 0.4s ease;
 }
+
+#component-13 .svelte-1vd8eap {
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow-y: visible !important;
+}
+
+
 
 #analyze {
   background-color: var(--card-bg) !important;
@@ -305,8 +316,8 @@ input:checked + .slider:before {
 }
 
 .btn-delete-row img {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   margin-right: 6px;
 }
 
@@ -321,8 +332,8 @@ input:checked + .slider:before {
 }
 
 .btn-reset-row img {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   margin-right: 6px;
 }
 
@@ -451,8 +462,7 @@ footer {
 }
 """
 
-custom_head = (
-    """
+custom_head = """
 <!-- HTML Meta Tags -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -481,4 +491,3 @@ custom_head = (
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 """
-)

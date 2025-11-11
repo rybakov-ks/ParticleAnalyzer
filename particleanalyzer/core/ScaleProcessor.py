@@ -363,8 +363,9 @@ class ScaleProcessor:
             image = cv2.cvtColor(np.array(input_image), cv2.COLOR_RGB2BGR)
 
         original_image = image.copy()
-
-        results = self.model(image, conf=confidence_threshold, device=self.device)
+        results = self.model(
+            image, conf=confidence_threshold, verbose=False, device=self.device
+        )
         # annotated_image = results[0].plot()
         annotated_image = image
 

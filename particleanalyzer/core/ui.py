@@ -1,6 +1,7 @@
 import os
 import gradio as gr
 from gradio_rangeslider import RangeSlider
+from gradio_imagemeasurement import ImageMeasurement
 from particleanalyzer.core.ParticleAnalyzer import ParticleAnalyzer
 from particleanalyzer.core.utils import (
     scale_input_visibility,
@@ -10,7 +11,7 @@ from particleanalyzer.core.utils import (
     log_analytics,
     empty_df_ParticleCharacteristics,
     empty_df_ParticleStatistics,
-    save_data_to_csv,
+    save_data_to_csv_and_binary_mask,
     scale_input_unit_measurement,
     toggleTheme,
     translate_chatbot,
@@ -43,7 +44,7 @@ def get_available_models():
     yolo_models = list(YOLOLoader.MODEL_MAPPING.keys())
     rfdetr_models = list(ONNXLoader.MODEL_MAPPING.keys())
     if not DETECTRON2_AVAILABLE:
-        return yolo_models[:-1]
+        return yolo_models[:-1] + rfdetr_models
     return (
         yolo_models[:-1] + rfdetr_models + list(Detectron2Loader.MODEL_MAPPING.keys())
     )
@@ -81,11 +82,12 @@ def create_interface(api_key):
         points_df = gr.State()
         scale = gr.State()
         points_scale = gr.State()
+        image_name = gr.State()
 
         with gr.Column(elem_id="app-container"):
             with gr.Row(equal_height=True, elem_id="gr-head"):
                 gr.HTML(
-                    f"""
+                    """
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: inline-block; margin-left: 7px; overflow: hidden;">
                             <a href="https://particleanalyzer.ru" target="_blank">
@@ -155,7 +157,7 @@ def create_interface(api_key):
                                             )
                                     with gr.Row(equal_height=True):
                                         with gr.Column():
-                                            in_image = gr.Image(
+                                            in_image = ImageMeasurement(
                                                 sources=[],
                                                 label=i18n("Изображение СЭМ"),
                                                 elem_id="in-image",
@@ -187,14 +189,14 @@ def create_interface(api_key):
                                         with gr.Column():
                                             reset_df = gr.Button(
                                                 value=i18n("Сбросить таблицу"),
-                                                icon="https://rybakov-k.ru/assets/icon/reset-14414.png",
+                                                icon="https://rybakov-k.ru/assets/icon/reset.png",
                                                 elem_id="reset-row-btn",
                                                 elem_classes="custom-btn btn-reset-row",
                                             )
                                         with gr.Column():
                                             delete_row = gr.Button(
                                                 value=i18n("Удалить частицы"),
-                                                icon="https://rybakov-k.ru/assets/icon/incorrect.png",
+                                                icon="https://rybakov-k.ru/assets/icon/remove_particles.png",
                                                 elem_id="delete-row-btn",
                                                 elem_classes="custom-btn btn-delete-row",
                                             )
@@ -218,7 +220,7 @@ def create_interface(api_key):
                                         with gr.Column(min_width=140):
                                             process_button = gr.Button(
                                                 value=i18n("Анализировать"),
-                                                icon="https://rybakov-k.ru/assets/icon/icons8-химия-50-white.png",
+                                                icon="https://rybakov-k.ru/assets/icon/sem.png",
                                                 elem_id="process-button",
                                                 elem_classes="custom-btn btn-analyze",
                                             )
@@ -310,7 +312,7 @@ def create_interface(api_key):
                                                     label=i18n(
                                                         "ИИ-интерпретация SEM-данных"
                                                     ),
-                                                    type='messages',
+                                                    type="messages",
                                                     height=600,
                                                     show_copy_all_button=True,
                                                     avatar_images=(
@@ -391,6 +393,13 @@ def create_interface(api_key):
                                 step=0.01,
                                 label=i18n("Порог перекрытия (IoU)"),
                             )
+                        with gr.Row():
+                            auto_scale_mode = gr.Checkbox(
+                                label=i18n("Включить"),
+                                info=i18n(
+                                    "Включить автоматическое определение масштабной шкалы?"
+                                ),
+                            )
                     with gr.Group(elem_id="sahi-setting") as sahi_row:
                         gr.Markdown(
                             f"<h3 style='margin-left: 7px;'><i class='fas fa-puzzle-piece'></i> {i18n('Обработка с разбиением (SAHI)')}</h3>"
@@ -430,7 +439,7 @@ def create_interface(api_key):
                         )
                         with gr.Row(equal_height=True) as solution_and_segment_mode_row:
                             with gr.Column():
-                                solution = gr.Radio(
+                                solution = gr.Dropdown(
                                     ("Original", "640x640", "1024x1024"),
                                     value="1024x1024",
                                     label=i18n("Разрешение изображения"),
@@ -488,7 +497,7 @@ def create_interface(api_key):
                                     info=i18n("Включить заливку?"),
                                 )
                             with gr.Column(min_width=250):
-                                fill_type_color = gr.Radio(
+                                fill_type_color = gr.Dropdown(
                                     ("Random", "Permanent"),
                                     value="Random",
                                     label=i18n("Тип заливки"),
@@ -513,7 +522,7 @@ def create_interface(api_key):
                                 )
                             with gr.Column(scale=1):
                                 show_Scale_bar = gr.Checkbox(
-                                    value=True,
+                                    value=False,
                                     label=i18n("Включить"),
                                     info=i18n("Включить отображение масштабной шкалы?"),
                                 )
@@ -568,20 +577,10 @@ def create_interface(api_key):
                     I_slider = RangeSlider(
                         label=f"I [{i18n('ед.')}]",
                     )
-                # with gr.Row():
-                # apply_filter = gr.Button(value=i18n('Применить фильтр'), icon='https://rybakov-k.ru/assets/icon/dislike.png', elem_id='filter-btn', elem_classes='custom-btn btn-f')
-                # apply_filter = gr.HTML(
-                # f"""
-                # <button class="custom-btn btn-f" id="filter-btn" style="display: flex; align-items: center; gap: 8px;">
-                # <i class="fas fa-filter" style="color: #000000; font-size: 1.1em;"></i>
-                # {i18n('Применить фильтр')}
-                # </button>
-                # """
-                # )
 
         image_file.change(
             fn=analyzer.handle_file_upload,
-            inputs=[image_file, scale_selector],
+            inputs=[image_file, scale_selector, auto_scale_mode],
             outputs=[
                 in_image,
                 row_image_file,
@@ -596,7 +595,7 @@ def create_interface(api_key):
             show_progress="hidden",
         )
 
-        in_image.select(
+        in_image.measurement(
             fn=point_manager.handle_select,
             inputs=scale_selector,
             outputs=[scale_input_status, scale, points_scale],
@@ -652,6 +651,7 @@ def create_interface(api_key):
                 I_slider,
                 sidebar,
                 output_image_row,
+                image_name,
             ],
             show_progress_on=in_image,
         )
@@ -667,6 +667,7 @@ def create_interface(api_key):
         )
 
         process_button.click(translate_chatbot, None, chatbot)
+        
         delete_row.click(
             particle_removal,
             inputs=[
@@ -720,6 +721,7 @@ def create_interface(api_key):
             ],
             outputs=[output_image, output_table2, output_plot, vector_field],
         )
+        
         gr.on(
             triggers=[reset_df.click, process_button.click],
             fn=reset_selection,
@@ -730,6 +732,7 @@ def create_interface(api_key):
                 reset_delete_buttons_row,
             ],
         )
+        
         gr.on(
             triggers=[
                 d_max_slider.release,
@@ -740,6 +743,12 @@ def create_interface(api_key):
                 S_slider.release,
                 P_slider.release,
                 I_slider.release,
+                outline_color.change,
+                show_fillPoly.change,
+                show_polylines.change,
+                fill_type_color.change,
+                fill_color.change,
+                fill_alpha.change,
             ],
             fn=statistic_an,
             inputs=[
@@ -875,8 +884,8 @@ def create_interface(api_key):
         )
 
         output_table.change(
-            fn=save_data_to_csv,
-            inputs=[output_table, output_table2],
+            fn=save_data_to_csv_and_binary_mask,
+            inputs=[image_name, output_table, output_table2],
             outputs=download_output,
         )
 
