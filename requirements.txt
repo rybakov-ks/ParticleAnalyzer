@@ -2,7 +2,7 @@
 # torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # Web Interface
-gradio==5.47.2
+gradio==5.49.1
 gradio-rangeslider
 gradio_imagemeasurement
 
