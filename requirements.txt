@@ -2,7 +2,7 @@
 # torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 # Web Interface
-gradio==5.49.1
+gradio==5.50.0
 gradio-rangeslider
 gradio_imagemeasurement
 
@@ -19,7 +19,7 @@ opencv-python-headless
 Pillow
 
 # Machine Learning
-ultralytics
+ultralytics>=8.4.7
 sahi
 supervision
 easyocr

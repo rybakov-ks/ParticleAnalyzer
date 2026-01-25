@@ -5,6 +5,7 @@ from ultralytics import YOLO, RTDETR
 class YOLOLoader:
     MODEL_MAPPING = {
         "Yolo11 (dataset 11)": "Yolo11_d12_batch48.pt",
+        "Yolo26 (dataset 11)": "Yolo2026_d11_batch64.pt",
         "ScaleProcessor": "ScaleProcessor_dataset9_RT-DETR.pt",
     }
 
