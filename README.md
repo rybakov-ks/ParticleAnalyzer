@@ -71,7 +71,7 @@ If the model cannot segment your images correctly, please send them to rybakov-k
 - Comprehensive statistical analysis of particle characteristics
 - Interactive visualization of size distributions
 - Dual unit support — switch between pixels and micrometers (µm)
-- Supports multiple AI models: YOLOv11, YOLOv12, RF-DETR Seg (Preview) and Detectron2
+- Supports multiple AI models: YOLOv11, YOLOv12, YOLOv26, RF-DETR Seg (Preview) and Detectron2
 - Advanced configuration options for fine-tuning detection accuracy
 - AI Interpretation of SEM Data
 - Multi-language interface: Russian, Simplified Chinese, Traditional Chinese, English (ru, zh-CN, zh-TW, en)
